@@ -1,14 +1,9 @@
 import type { Metadata } from 'next'
 import { promises as fs } from 'fs'
-
-// import { GoogleTagManager } from '@next/third-parties/google'
 import { pretendard } from '@/lib/fonts/pretendard'
-import { cn } from '@/lib/utils/cn'
-
 import './globals.css'
-// import { TooltipProvider } from '@/components/ui/tooltip'
-// import { Toaster as Sonner } from '@/components/ui/sonner'
-// import { NavigationGuardProvider } from 'next-navigation-guard'
+import { cn } from '@/lib/utils'
+import { ThemeProvider } from 'next-themes'
 
 export async function generateMetadata(): Promise<Metadata> {
   const publicMetadata = JSON.parse(
@@ -24,16 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html suppressHydrationWarning>
-      {/* {process.env.GTM_ID && <GoogleTagManager gtmId={process.env.GTM_ID} />} */}
-      <body className={cn(pretendard.className, 'overflow-hidden bg-white antialiased dark:bg-gray-900')}>
-        {/* <TooltipProvider delayDuration={0}> */}
-        <div id="root">
+    <html lang="ko" suppressHydrationWarning className={cn(pretendard.className, 'scroll-smooth')}>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
-          {/* <NavigationGuardProvider>{children}</NavigationGuardProvider> */}
-          {/* <Sonner /> */}
-        </div>
-        {/* </TooltipProvider> */}
+        </ThemeProvider>
       </body>
     </html>
   )
