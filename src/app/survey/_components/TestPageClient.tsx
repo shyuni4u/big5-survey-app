@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { questions, gameClasses as wowClasses } from '@/lib/data'
 import type { UserAnswers } from '@/lib/types'
@@ -131,7 +132,7 @@ function TestContent() {
                           : 'border-border hover:border-primary/50 hover:bg-secondary',
                       )}
                     >
-                      <img
+                      <Image
                         src={wowClass.image || '/placeholder.svg'}
                         alt={wowClass.name}
                         className="h-12 w-12 rounded"
@@ -164,7 +165,7 @@ function TestContent() {
                         )}
                       >
                         <div className="mb-2 flex w-full items-center gap-3">
-                          <img src={spec.image || '/placeholder.svg'} alt={spec.name} className="h-8 w-8 rounded" />
+                          <Image src={spec.image || '/placeholder.svg'} alt={spec.name} className="h-8 w-8 rounded" />
                           <div className="flex-1">
                             <div className="font-medium">{spec.name}</div>
                             <div className="text-xs opacity-80">

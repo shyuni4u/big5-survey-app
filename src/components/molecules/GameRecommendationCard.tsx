@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import type { GameRecommendation } from '@/lib/data'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -49,13 +50,13 @@ export default function GameRecommendationCard({ recommendation, rank }: GameRec
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <img
+            <Image
               src={recommendation.image || '/placeholder.svg?height=48&width=48'}
               alt={recommendation.class}
               className="h-12 w-12 rounded border border-border"
               style={{ backgroundColor: recommendation.color }}
             />
-            <img
+            <Image
               src={recommendation.talentImage || '/placeholder.svg?height=24&width=24'}
               alt={recommendation.talent}
               className="absolute -bottom-1 -right-1 h-6 w-6 rounded border border-border bg-card"
