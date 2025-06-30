@@ -277,7 +277,7 @@ export const aboutContent: AboutContent[] = [
 export const gameClasses: GameClass[] = [
   {
     name: '죽음의 기사',
-    image: 'https://render.worldofwarcraft.com/us/icons/56/class_deathknight.jpg',
+    image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_deathknight.jpg',
     color: '#c41f3b',
     specs: [
       {
@@ -302,7 +302,7 @@ export const gameClasses: GameClass[] = [
   },
   {
     name: '악마사냥꾼',
-    image: 'https://render.worldofwarcraft.com/us/icons/56/class_demonhunter.jpg',
+    image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_demonhunter.jpg',
     color: '#a330c9',
     specs: [
       {
@@ -377,7 +377,7 @@ export const gameClasses: GameClass[] = [
   },
   {
     name: '기원사',
-    image: 'https://render.worldofwarcraft.com/us/icons/56/class_evoker.jpg',
+    image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_evoker.jpg',
     color: '#33937f',
     specs: [
       {
