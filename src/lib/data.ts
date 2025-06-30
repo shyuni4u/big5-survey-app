@@ -614,7 +614,7 @@ export const getRecommendedClasses = (scores: PersonalityScores, preferredRoles:
     matchReason: string
     score: number
   }> = []
-
+  console.log(preferredRoles)
   // 각 클래스의 전문화를 평가
   gameClasses.forEach((gameClass) => {
     gameClass.specs.forEach((spec) => {
@@ -722,7 +722,7 @@ export const getRecommendedClasses = (scores: PersonalityScores, preferredRoles:
   })
 
   // 점수순으로 정렬하고 상위 3개 반환
-  return recommendations.sort((a, b) => b.score - a.score).slice(0, 3)
+  return recommendations.toSorted((a, b) => b.score - a.score).slice(0, 3)
 }
 
 export type GameRecommendation = ReturnType<typeof getRecommendedClasses>[0]
