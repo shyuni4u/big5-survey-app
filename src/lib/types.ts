@@ -35,10 +35,8 @@ export type PersonalityScores = {
 
 export type TestData = {
   userType: 'existing' | 'new'
-  userAnswers: UserAnswers
   personalityScores: PersonalityScores
   currentClass?: string[]
-  currentSpec?: string[]
 }
 
 export type GameClass = {

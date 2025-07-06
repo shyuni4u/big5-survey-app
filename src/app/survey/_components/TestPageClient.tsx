@@ -4,11 +4,11 @@ import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { questions, gameClasses as wowClasses } from '@/lib/data'
-import type { UserAnswers } from '@/lib/types'
+import type { TestData, UserAnswers, PersonalityScores } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { cn } from '@/lib/utils'
+import { cn, SEPERATE_TOKEN } from '@/lib/utils'
 
 function TestContent() {
   const router = useRouter()
@@ -21,6 +21,12 @@ function TestContent() {
   const [shuffledQuestions, setShuffledQuestions] = useState(questions)
   const [selectedClass, setSelectedClass] = useState<string>('')
   const [selectedSpec, setSelectedSpec] = useState<string>('')
+  const [selectedClassList, setSelectedClassList] = useState<
+    {
+      class: string
+      spec: string
+    }[]
+  >([])
 
   const questionsPerPage = 5
 
@@ -75,15 +81,53 @@ function TestContent() {
   }
 
   const handleSpecSelect = (specName: string) => {
-    setSelectedSpec(specName)
+    setSelectedClassList((prev) => {
+      const alreadyExists = prev.some((item) => item.class === selectedClass && item.spec === specName)
+
+      if (!alreadyExists) {
+        return [...prev, { class: selectedClass, spec: specName }]
+      }
+
+      return prev
+    })
+    setSelectedClass('')
+    setSelectedSpec('')
+  }
+
+  const handleDeleteClassSpec = (className: string, specName: string) => {
+    setSelectedClassList((prev) => prev.filter((item) => !(item.class === className && item.spec === specName)))
+  }
+
+  const calculateScores = (userAnswers: UserAnswers): PersonalityScores => {
+    const scores = { E: 0, A: 0, C: 0, N: 0, O: 0 }
+    const maxScorePerTrait = { E: 0, A: 0, C: 0, N: 0, O: 0 }
+
+    questions.forEach((q, index) => {
+      let score = userAnswers[index] || 3
+      if (q.reverse) {
+        score = 6 - score
+      }
+      scores[q.trait] += score
+      maxScorePerTrait[q.trait] += 5
+    })
+
+    const percentageScores: PersonalityScores = { E: 0, A: 0, C: 0, N: 0, O: 0 }
+    for (const trait in scores) {
+      const minScore = maxScorePerTrait[trait as keyof typeof maxScorePerTrait] / 5
+      const maxScore = maxScorePerTrait[trait as keyof typeof maxScorePerTrait]
+      const normalizedScore = ((scores[trait as keyof typeof scores] - minScore) / (maxScore - minScore)) * 100
+      percentageScores[trait as keyof PersonalityScores] = Math.round(normalizedScore)
+    }
+
+    return percentageScores
   }
 
   const goToResults = () => {
-    const testData = {
+    const calculatedScores = calculateScores(userAnswers)
+    const testData: TestData = {
       userType: userType!,
-      userAnswers,
-      currentClass: selectedClass || undefined,
-      currentSpec: selectedSpec || undefined,
+      personalityScores: calculatedScores,
+      currentClass: selectedClassList.map((item) => [item.class, item.spec].join(SEPERATE_TOKEN)),
     }
     const encodedData = encodeURIComponent(JSON.stringify(testData))
     router.push(`/result?data=${encodedData}`)
@@ -123,6 +167,7 @@ function TestContent() {
                   {wowClasses.map((wowClass) => (
                     <Button
                       key={wowClass.name}
+                      type="button"
                       variant={selectedClass === wowClass.name ? 'default' : 'outline'}
                       onClick={() => handleClassSelect(wowClass.name)}
                       className={cn(
@@ -134,6 +179,8 @@ function TestContent() {
                     >
                       <Image
                         src={wowClass.image || '/placeholder.svg'}
+                        width="56"
+                        height="56"
                         alt={wowClass.name}
                         className="h-12 w-12 rounded"
                         style={{ backgroundColor: wowClass.color }}
@@ -145,16 +192,18 @@ function TestContent() {
               </CardContent>
             </Card>
 
-            {selectedClassData && (
-              <Card className="border-border bg-card shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-center text-foreground">{selectedClass} 전문화 선택</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {selectedClassData.specs.map((spec) => (
+            <Card className="border-border bg-card shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-center text-foreground">{selectedClass} 전문화 선택</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {selectedClass !== '' &&
+                    selectedClassData &&
+                    selectedClassData.specs.map((spec) => (
                       <Button
                         key={spec.name}
+                        type="button"
                         variant={selectedSpec === spec.name ? 'default' : 'outline'}
                         onClick={() => handleSpecSelect(spec.name)}
                         className={cn(
@@ -165,7 +214,13 @@ function TestContent() {
                         )}
                       >
                         <div className="mb-2 flex w-full items-center gap-3">
-                          <Image src={spec.image || '/placeholder.svg'} alt={spec.name} className="h-8 w-8 rounded" />
+                          <Image
+                            src={spec.image || '/placeholder.svg'}
+                            alt={spec.name}
+                            className="h-8 w-8 rounded"
+                            width="56"
+                            height="56"
+                          />
                           <div className="flex-1">
                             <div className="font-medium">{spec.name}</div>
                             <div className="text-xs opacity-80">
@@ -175,9 +230,57 @@ function TestContent() {
                             </div>
                           </div>
                         </div>
-                        <p className="text-left text-sm font-normal opacity-80">{spec.description}</p>
+                        <span className="whitespace-normal text-left text-sm font-normal opacity-80">
+                          {spec.description}
+                        </span>
                       </Button>
                     ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {selectedClassList.length > 0 && (
+              <Card className="border-border bg-card shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-center text-foreground">내가 하는 직업 목록</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {selectedClassList.map((obj) => {
+                      const _class = wowClasses.find((c) => c.name === obj.class)!
+                      const _spec = _class.specs.find((s) => s.name === obj.spec)!
+
+                      return (
+                        <Button
+                          key={`${_class.name}-${_spec.name}`}
+                          type="button"
+                          variant="default"
+                          onClick={() => handleDeleteClassSpec(_class.name, _spec.name)}
+                          className="flex h-auto flex-col items-start border-primary bg-primary p-4 text-left text-primary-foreground shadow-lg transition-all"
+                        >
+                          <div className="mb-2 flex w-full items-center gap-3">
+                            <Image
+                              src={_spec.image || '/placeholder.svg'}
+                              alt={_spec.name}
+                              className="h-8 w-8 rounded"
+                              width="56"
+                              height="56"
+                            />
+                            <div className="flex-1">
+                              <div className="font-medium">{_spec.name}</div>
+                              <div className="text-xs opacity-80">
+                                {_spec.role === 'tanker' && '🛡️ 탱커'}
+                                {_spec.role === 'dealer' && '⚔️ 딜러'}
+                                {_spec.role === 'healer' && '💚 힐러'}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="whitespace-normal text-left text-sm font-normal opacity-80">
+                            {_spec.description}
+                          </span>
+                        </Button>
+                      )
+                    })}
                   </div>
                 </CardContent>
               </Card>
@@ -185,8 +288,9 @@ function TestContent() {
 
             <div className="text-center">
               <Button
+                type="button"
                 onClick={goToResults}
-                disabled={!selectedClass || !selectedSpec}
+                disabled={selectedClassList.length === 0}
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
@@ -259,7 +363,7 @@ function TestContent() {
                         <label
                           htmlFor={`q${questionIndex}v${value}`}
                           className={cn(
-                            'block flex min-h-[60px] cursor-pointer items-center justify-center rounded border-2 p-2 text-center transition-all duration-200 hover:scale-105 md:min-h-[80px] md:p-4',
+                            'flex min-h-[60px] cursor-pointer items-center justify-center rounded border-2 p-2 text-center transition-all duration-200 hover:scale-105 md:min-h-[80px] md:p-4',
                             userAnswers[questionIndex] === value
                               ? `border-${color}-400 bg-${color}-400/20 text-${color}-400`
                               : 'border-border bg-secondary text-muted-foreground hover:border-primary/50 hover:bg-secondary/80',
@@ -279,10 +383,10 @@ function TestContent() {
         </Card>
 
         <div className="mt-6 flex items-center justify-between">
-          <Button onClick={handlePrev} disabled={currentQuestionIndex === 0} variant="outline">
+          <Button type="button" onClick={handlePrev} disabled={currentQuestionIndex === 0} variant="outline">
             이전
           </Button>
-          <Button onClick={handleNext} className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button type="button" onClick={handleNext} className="bg-primary text-primary-foreground hover:bg-primary/90">
             {isLastPage ? (userType === 'existing' ? '직업 선택하기' : '결과 보기') : '다음'}
           </Button>
         </div>

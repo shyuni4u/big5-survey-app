@@ -4,13 +4,14 @@ import { useEffect, useRef, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
-import { questions, traitInfo } from '@/lib/data'
-import type { UserAnswers, PersonalityScores, TestData } from '@/lib/types'
+import { traitInfo } from '@/lib/data'
+import type { TestData } from '@/lib/types'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
 // import GameRecommendationCard from '@/components/molecules/GameRecommendationCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { SEPERATE_TOKEN } from '@/lib/utils'
 
 Chart.register(...registerables)
 
@@ -21,14 +22,13 @@ function ResultContent() {
   const chartInstance = useRef<Chart | null>(null)
 
   const [testData, setTestData] = useState<TestData | null>(null)
-  const [scores, setScores] = useState<PersonalityScores | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // const dataParam = searchParams.get('data')
-    // http://localhost:3000/result?data=test
+    // const dataParam = searchParams.get('data') // dummy: http://localhost:3000/result?data=%7B%22userType%22%3A%22existing%22%2C%22personalityScores%22%3A%7B%22E%22%3A50%2C%22A%22%3A63%2C%22C%22%3A56%2C%22N%22%3A38%2C%22O%22%3A53%7D%2C%22currentClass%22%3A%5B%22%EC%82%AC%EC%A0%9C%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%A3%BC%EC%88%A0%EC%82%AC%C2%A0%EB%B3%B5%EC%9B%90%22%2C%22%EC%84%B1%EA%B8%B0%EC%82%AC%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%88%98%EB%8F%84%EC%82%AC%C2%A0%EC%9A%B4%EB%AC%B4%22%5D%7D
     const dataParam =
-      '%7B%22userType%22%3A%22existing%22%2C%22userAnswers%22%3A%7B%220%22%3A5%2C%221%22%3A4%2C%222%22%3A3%2C%223%22%3A2%2C%224%22%3A1%2C%225%22%3A5%2C%226%22%3A4%2C%227%22%3A3%2C%228%22%3A2%2C%229%22%3A1%2C%2210%22%3A5%2C%2211%22%3A4%2C%2212%22%3A3%2C%2213%22%3A2%2C%2214%22%3A1%2C%2215%22%3A5%2C%2216%22%3A4%2C%2217%22%3A3%2C%2218%22%3A2%2C%2219%22%3A1%2C%2220%22%3A5%2C%2221%22%3A5%2C%2222%22%3A4%2C%2223%22%3A3%2C%2224%22%3A3%2C%2225%22%3A5%2C%2226%22%3A4%2C%2227%22%3A3%2C%2228%22%3A3%2C%2229%22%3A3%2C%2230%22%3A5%2C%2231%22%3A3%2C%2232%22%3A4%2C%2233%22%3A4%2C%2234%22%3A4%2C%2235%22%3A5%2C%2236%22%3A4%2C%2237%22%3A4%2C%2238%22%3A3%2C%2239%22%3A2%7D%2C%22currentClass%22%3A%22%EA%B8%B0%EC%9B%90%EC%82%AC%22%2C%22currentSpec%22%3A%22%EB%B3%B4%EC%A1%B4%22%7D'
+      '%7B%22userType%22%3A%22existing%22%2C%22personalityScores%22%3A%7B%22E%22%3A50%2C%22A%22%3A63%2C%22C%22%3A56%2C%22N%22%3A38%2C%22O%22%3A53%7D%2C%22currentClass%22%3A%5B%22%EC%82%AC%EC%A0%9C%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%A3%BC%EC%88%A0%EC%82%AC%C2%A0%EB%B3%B5%EC%9B%90%22%2C%22%EC%84%B1%EA%B8%B0%EC%82%AC%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%88%98%EB%8F%84%EC%82%AC%C2%A0%EC%9A%B4%EB%AC%B4%22%5D%7D'
+
     if (!dataParam) {
       router.push('/')
       return
@@ -38,28 +38,36 @@ function ResultContent() {
       const parsedData: TestData = JSON.parse(decodeURIComponent(dataParam))
       setTestData(parsedData)
 
-      const calculatedScores = calculateScores(parsedData.userAnswers)
-      setScores(calculatedScores)
+      const saveResult = async () => {
+        try {
+          if (Array.isArray(parsedData.currentClass) && parsedData.currentClass.length > 0) {
+            parsedData.currentClass.forEach(async (currentClass) => {
+              const _class = currentClass.split(SEPERATE_TOKEN)[0]!
+              const _spec = currentClass.split(SEPERATE_TOKEN)[1]!
 
-      // const saveResult = async () => {
-      //   try {
-      //     await fetch('/api/survey-result', {
-      //       method: 'POST',
-      //       headers: { 'Content-Type': 'application/json' },
-      //       body: JSON.stringify({
-      //         app: 'wow',
-      //         answers: calculatedScores,
-      //         class: parsedData.currentClass,
-      //         specialization: parsedData.currentSpec,
-      //       }),
-      //     })
+              await fetch('/api/survey-result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  app: 'wow',
+                  answers: parsedData.personalityScores,
+                  class: _class,
+                  specialization: _spec,
+                }),
+              })
 
-      //     console.info('결과가 성공적으로 저장되었습니다!')
-      //   } catch (error) {
-      //     console.error('Failed to save results:', error)
-      //   }
-      // }
-      // saveResult()
+              console.info('결과가 성공적으로 저장되었습니다!')
+            })
+          } else {
+            console.warn('클래스 정보가 없습니다. 결과를 저장하지 않습니다.')
+          }
+        } catch (error) {
+          console.error('Failed to save results:', error)
+        }
+      }
+
+      if (parsedData.userType === 'existing') saveResult()
+
       setIsLoading(false)
     } catch (error) {
       console.error('Failed to parse test data:', error)
@@ -67,31 +75,9 @@ function ResultContent() {
     }
   }, [searchParams, router])
 
-  const calculateScores = (userAnswers: UserAnswers): PersonalityScores => {
-    const scores = { E: 0, A: 0, C: 0, N: 0, O: 0 }
-    const maxScorePerTrait = { E: 0, A: 0, C: 0, N: 0, O: 0 }
-
-    questions.forEach((q, index) => {
-      let score = userAnswers[index] || 3
-      if (q.reverse) {
-        score = 6 - score
-      }
-      scores[q.trait] += score
-      maxScorePerTrait[q.trait] += 5
-    })
-
-    const percentageScores: PersonalityScores = { E: 0, A: 0, C: 0, N: 0, O: 0 }
-    for (const trait in scores) {
-      const minScore = maxScorePerTrait[trait as keyof typeof maxScorePerTrait] / 5
-      const maxScore = maxScorePerTrait[trait as keyof typeof maxScorePerTrait]
-      const normalizedScore = ((scores[trait as keyof typeof scores] - minScore) / (maxScore - minScore)) * 100
-      percentageScores[trait as keyof PersonalityScores] = Math.round(normalizedScore)
-    }
-
-    return percentageScores
-  }
-
   useEffect(() => {
+    const scores = testData?.personalityScores
+
     if (chartRef.current && scores) {
       if (chartInstance.current) {
         chartInstance.current.destroy()
@@ -157,9 +143,9 @@ function ResultContent() {
         chartInstance.current.destroy()
       }
     }
-  }, [scores])
+  }, [testData?.personalityScores])
 
-  if (isLoading || !testData || !scores) {
+  if (isLoading || !testData) {
     return (
       <div className="vscode-gradient flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -195,29 +181,10 @@ function ResultContent() {
         </Card>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {Object.entries(scores).map(([trait, score]) => (
+          {Object.entries(testData.personalityScores).map(([trait, score]) => (
             <ResultCard key={trait} trait={trait as keyof typeof traitInfo} score={score} />
           ))}
         </div>
-
-        {testData.userType === 'existing' && testData.currentClass && testData.currentSpec && (
-          <Card className="border-border bg-card shadow-lg">
-            <CardHeader className="text-center">
-              <CardTitle className="text-foreground">현재 플레이 중인 직업</CardTitle>
-              <CardDescription className="text-muted-foreground">제공해주신 현재 직업 정보입니다</CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <div className="rounded-lg border border-border bg-secondary p-6 text-center">
-                <div className="mb-2 text-2xl">🎮</div>
-                <h4 className="text-lg font-semibold text-foreground">{testData.currentClass}</h4>
-                <p className="font-medium text-primary">{testData.currentSpec}</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  이 정보는 더 정확한 추천을 위해 AI 학습에 활용됩니다
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         <AboutSection />
 
