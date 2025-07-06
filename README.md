@@ -59,3 +59,23 @@ http://localhost:3000
 - [ ] 데이터 학습
 - [ ] 모델 사용하여 직업 추천
 - [ ] 피드백 받는 양식보다는 주기적으로 데이터를 학습을 다시 진행하여 모델 적용
+
+## 학습 계획
+
+| 항목              | 내용                                                     |
+| --------------- | ------------------------------------------------------ |
+| 문제 유형    | 다중 분류 (Multi-class Classification)|
+| 입력 데이터   | E, A, C, N, O (5차원 벡터)|
+| 출력 레이블   | `class + specialization` 조합|
+| 모델 후보    | LightGBM, XGBoost, 또는 간단한 MLP (PyTorch / scikit-learn)|
+| 학습 주기    | 주간 또는 누적 1000건 이상일 때|
+| 예상 학습 시간 | 2\~3만 건이면 CPU에서도 수 분 내로 학습 가능|
+| 데이터 편향 | 같은 답변에 `class`가 다양하게 나올 수 있으므로, Top-3 예측이나 softmax 확률을 사용하면 UX가 좋아짐|
+| 모델 전환  | 모델을 무중단 교체하려면 `/model/reload` API를 두거나 버전 관리 필요|
+| 평가 기준  | accuracy 뿐 아니라 confusion matrix나 top-k accuracy도 고려|
+
+- 전처리 (Label Encoding 등)
+- 모델 학습 (train.py)
+- 모델 파일 저장 (model.pkl, model.onnx 등)
+- 추론 서버에서 새 모델 로드
+- API에 반영 (/predict 등)
