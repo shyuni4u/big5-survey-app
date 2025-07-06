@@ -41,4 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # local development
-src/tests/dummy_data.csv
+src/tests/dummy.csv

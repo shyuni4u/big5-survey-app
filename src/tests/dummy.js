@@ -47,13 +47,13 @@ function generateBig5Score(traitType) {
     }
 }
 
-// World of Warcraft 직업 및 전문화 목록과 각 역할
+// World of Warcraft 직업 및 전문화 목록과 각 역할 (한글 이름으로 변경)
 const wowSpecs = [
     {"class": "Death Knight", "spec": "Blood", "role": "Tank"},
     {"class": "Death Knight", "spec": "Frost", "role": "DPS"},
     {"class": "Death Knight", "spec": "Unholy", "role": "DPS"},
-    {"class": "Demon Hunter", "spec": "Vengeance", "role": "Tank"},
     {"class": "Demon Hunter", "spec": "Havoc", "role": "DPS"},
+    {"class": "Demon Hunter", "spec": "Vengeance", "role": "Tank"},
     {"class": "Druid", "spec": "Balance", "role": "DPS"},
     {"class": "Druid", "spec": "Feral", "role": "DPS"},
     {"class": "Druid", "spec": "Guardian", "role": "Tank"},
@@ -61,7 +61,7 @@ const wowSpecs = [
     {"class": "Evoker", "spec": "Augmentation", "role": "DPS"},
     {"class": "Evoker", "spec": "Devastation", "role": "DPS"},
     {"class": "Evoker", "spec": "Preservation", "role": "Healer"},
-    {"class": "Hunter", "spec": "BeastMastery", "role": "DPS"},
+    {"class": "Hunter", "spec": "Beast Mastery", "role": "DPS"},
     {"class": "Hunter", "spec": "Marksmanship", "role": "DPS"},
     {"class": "Hunter", "spec": "Survival", "role": "DPS"},
     {"class": "Mage", "spec": "Arcane", "role": "DPS"},
@@ -90,13 +90,13 @@ const wowSpecs = [
     {"class": "Warrior", "spec": "Protection", "role": "Tank"}
 ];
 
-// 각 전문화에 대한 이상적인 Big5 성격 프로필 (1-5점)
+// 각 전문화에 대한 이상적인 Big5 성격 프로필 (1-5점) (한글 이름으로 변경)
 const specIdeals = {
     "Blood Death Knight": {"O": 3, "C": 5, "E": 4, "A": 3, "N": 1},
     "Frost Death Knight": {"O": 2, "C": 3, "E": 3, "A": 2, "N": 3},
     "Unholy Death Knight": {"O": 3, "C": 4, "E": 3, "A": 2, "N": 3},
-    "Vengeance Demon Hunter": {"O": 3, "C": 4, "E": 4, "A": 3, "N": 2},
     "Havoc Demon Hunter": {"O": 3, "C": 3, "E": 4, "A": 2, "N": 3},
+    "Vengeance Demon Hunter": {"O": 3, "C": 4, "E": 4, "A": 3, "N": 2},
     "Balance Druid": {"O": 4, "C": 3, "E": 3, "A": 3, "N": 3},
     "Feral Druid": {"O": 4, "C": 4, "E": 2, "A": 2, "N": 3},
     "Guardian Druid": {"O": 4, "C": 4, "E": 4, "A": 4, "N": 2},
@@ -104,7 +104,7 @@ const specIdeals = {
     "Augmentation Evoker": {"O": 5, "C": 4, "E": 4, "A": 4, "N": 2},
     "Devastation Evoker": {"O": 3, "C": 3, "E": 3, "A": 3, "N": 3},
     "Preservation Evoker": {"O": 4, "C": 4, "E": 3, "A": 5, "N": 2},
-    "BeastMastery Hunter": {"O": 2, "C": 2, "E": 1, "A": 2, "N": 3},
+    "Beast Mastery Hunter": {"O": 2, "C": 2, "E": 1, "A": 2, "N": 3},
     "Marksmanship Hunter": {"O": 3, "C": 4, "E": 2, "A": 2, "N": 3},
     "Survival Hunter": {"O": 3, "C": 3, "E": 3, "A": 2, "N": 3},
     "Arcane Mage": {"O": 4, "C": 5, "E": 2, "A": 2, "N": 3},
@@ -133,7 +133,7 @@ const specIdeals = {
     "Protection Warrior": {"O": 2, "C": 5, "E": 4, "A": 3, "N": 1}
 };
 
-// "Class Spec" 문자열을 wowSpecs 배열의 객체로 매핑하는 헬퍼 딕셔너리
+// "전문화 직업" 문자열을 wowSpecs 배열의 객체로 매핑하는 헬퍼 딕셔너리
 const wowSpecMap = {};
 wowSpecs.forEach(s => {
     // specIdeals의 키 형식과 일치하도록 "전문화 직업" 형식으로 키를 생성
@@ -153,6 +153,24 @@ function scorePersonalityMatch(personality, idealProfile) {
     score += Math.abs(personality.neuroticism - idealProfile.N);
     return score;
 }
+
+/**
+ * CSV 필드 내의 특수 문자(쉼표, 큰따옴표, 개행)를 이스케이프하고
+ * 필요한 경우 필드를 큰따옴표로 묶습니다.
+ * @param {string | number | boolean} str - 이스케이프할 문자열 값.
+ * @returns {string} CSV 형식에 맞게 이스케이프되고 묶인 문자열.
+ */
+function escapeCsvString(str) {
+    // 값을 문자열로 변환
+    str = String(str);
+    // 쉼표, 큰따옴표, 개행 문자가 포함되어 있으면 큰따옴표로 묶고 내부 큰따옴표는 이중으로 이스케이프
+    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        const escapedStr = str.replace(/"/g, '""'); // 내부 큰따옴표 이스케이프
+        return `"${escapedStr}"`; // 전체 문자열을 큰따옴표로 묶음
+    }
+    return str; // 특수 문자가 없으면 그대로 반환
+}
+
 
 function generateDummyData(numEntries) {
     /**
@@ -187,7 +205,6 @@ function generateDummyData(numEntries) {
         }
 
         // 선택된 전문화의 세부 정보를 가져옵니다.
-        // bestSpecName이 유효한 키인지 확인
         const chosenSpecInfo = wowSpecMap[bestSpecName];
 
         // chosenSpecInfo가 undefined인 경우를 대비한 방어 로직 (이전 오류 방지)
@@ -196,13 +213,8 @@ function generateDummyData(numEntries) {
             continue; // 이 항목을 건너뛰고 다음 항목으로 진행
         }
 
-        // 현재 시간을 ISO 8601 형식으로 생성 (UTC)
-        const createdAt = new Date().toISOString();
-
         const entry = {
-            id: i + 1,
             app: "wow",
-            created_at: createdAt,
             answers: {
                 E: personality.extraversion * 20, // 1-5점을 20-100으로 변환 (예시)
                 A: personality.agreeableness * 20,
@@ -218,11 +230,34 @@ function generateDummyData(numEntries) {
     return data;
 }
 
+// 데이터를 CSV 형식으로 변환하는 함수
+function convertToCSV(data) {
+    // 헤더를 "answers" 컬럼 하나로 변경
+    const headers = ["app", "answers", "class", "specialization"];
+    const csvRows = [];
+
+    // 헤더 추가 (escapeCsvString 적용)
+    csvRows.push(headers.map(header => escapeCsvString(header)).join(","));
+
+    // 데이터 행 추가 (answers 객체를 JSON 문자열로 변환 후 이스케이프)
+    data.forEach(row => {
+        const values = [
+            escapeCsvString(row.app),
+            escapeCsvString(JSON.stringify(row.answers)), // answers 객체를 JSON 문자열로 변환
+            escapeCsvString(row.class),
+            escapeCsvString(row.specialization)
+        ];
+        csvRows.push(values.join(","));
+    });
+
+    return csvRows.join("\n");
+}
+
 // 10,000개의 더미 데이터 생성
-const dummyData = generateDummyData(10000);
+const dummyData = generateDummyData(1000);
 
-// JSON 형식으로 출력
-console.log(JSON.stringify(dummyData));
+// CSV 형식으로 변환하여 출력
+console.log(convertToCSV(dummyData));
 
 
-// Command: node dummy.js > dummy_data.csv
+// Command: node dummy.js > dummy.csv
