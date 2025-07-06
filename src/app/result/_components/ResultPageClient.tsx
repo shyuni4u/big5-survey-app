@@ -4,12 +4,11 @@ import { useEffect, useRef, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
-import { questions, traitInfo, getRecommendedClasses, type GameRecommendation } from '@/lib/data'
-import { saveTestResult } from '@/lib/supabase/client'
+import { questions, traitInfo } from '@/lib/data'
 import type { UserAnswers, PersonalityScores, TestData } from '@/lib/types'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
-import GameRecommendationCard from '@/components/molecules/GameRecommendationCard'
+// import GameRecommendationCard from '@/components/molecules/GameRecommendationCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -23,9 +22,7 @@ function ResultContent() {
 
   const [testData, setTestData] = useState<TestData | null>(null)
   const [scores, setScores] = useState<PersonalityScores | null>(null)
-  const [gameRecommendations, setGameRecommendations] = useState<GameRecommendation[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     // const dataParam = searchParams.get('data')
@@ -44,11 +41,25 @@ function ResultContent() {
       const calculatedScores = calculateScores(parsedData.userAnswers)
       setScores(calculatedScores)
 
-      if (parsedData.userType === 'new') {
-        const recommendations = getRecommendedClasses(calculatedScores, parsedData.userAnswers)
-        setGameRecommendations(recommendations)
-      }
+      // const saveResult = async () => {
+      //   try {
+      //     await fetch('/api/survey-result', {
+      //       method: 'POST',
+      //       headers: { 'Content-Type': 'application/json' },
+      //       body: JSON.stringify({
+      //         app: 'wow',
+      //         answers: calculatedScores,
+      //         class: parsedData.currentClass,
+      //         specialization: parsedData.currentSpec,
+      //       }),
+      //     })
 
+      //     console.info('결과가 성공적으로 저장되었습니다!')
+      //   } catch (error) {
+      //     console.error('Failed to save results:', error)
+      //   }
+      // }
+      // saveResult()
       setIsLoading(false)
     } catch (error) {
       console.error('Failed to parse test data:', error)
@@ -80,34 +91,6 @@ function ResultContent() {
     return percentageScores
   }
 
-  const handleSaveResults = async () => {
-    if (!testData || !scores) return
-
-    setIsSaving(true)
-    try {
-      await saveTestResult({
-        userType: testData.userType,
-        personalityScores: scores,
-        userAnswers: testData.userAnswers,
-        currentClass: testData.currentClass,
-        currentSpec: testData.currentSpec,
-        recommendedJobs: gameRecommendations.map((rec) => ({
-          class: rec.class,
-          talent: rec.talent,
-          score: rec.score,
-          matchReason: rec.matchReason,
-        })),
-      })
-
-      alert('결과가 성공적으로 저장되었습니다!')
-    } catch (error) {
-      console.error('Failed to save results:', error)
-      alert('결과 저장에 실패했습니다. 다시 시도해주세요.')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
   useEffect(() => {
     if (chartRef.current && scores) {
       if (chartInstance.current) {
@@ -128,11 +111,11 @@ function ResultContent() {
                 label: '성격 프로필',
                 data: data,
                 backgroundColor: 'rgba(0, 122, 204, 0.1)',
-                borderColor: 'hsl(var(--primary))',
-                pointBackgroundColor: 'hsl(var(--primary))',
-                pointBorderColor: 'hsl(var(--foreground))',
-                pointHoverBackgroundColor: 'hsl(var(--foreground))',
-                pointHoverBorderColor: 'hsl(var(--primary))',
+                borderColor: 'hsl(210 40% 98%)',
+                pointBackgroundColor: 'hsl(210 40% 98%)',
+                pointBorderColor: 'hsl(210 40% 98%)',
+                pointHoverBackgroundColor: 'hsl(210 40% 98%)',
+                pointHoverBorderColor: 'hsl(210 40% 98%)',
                 borderWidth: 2,
                 pointRadius: 5,
                 pointHoverRadius: 7,
@@ -147,11 +130,11 @@ function ResultContent() {
                 grid: { color: 'rgba(135, 135, 135, 0.3)' },
                 pointLabels: {
                   font: { size: 14, weight: 600 },
-                  color: 'hsl(var(--foreground))',
+                  color: 'hsl(210 40% 98%)',
                 },
                 ticks: {
                   backdropColor: 'rgba(37, 37, 38, 0.8)',
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'hsl(215 20.2% 65.1%)',
                   stepSize: 25,
                   font: { size: 11 },
                 },
@@ -236,35 +219,9 @@ function ResultContent() {
           </Card>
         )}
 
-        {testData.userType === 'new' && gameRecommendations.length > 0 && (
-          <Card className="border-border bg-card shadow-lg">
-            <CardHeader className="text-center">
-              <CardTitle className="text-foreground">추천 게임 직업</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                성격 분석을 바탕으로 추천하는 WoW 직업입니다
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {gameRecommendations.map((recommendation, index) => (
-                  <GameRecommendationCard key={index} recommendation={recommendation} rank={index + 1} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         <AboutSection />
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button
-            onClick={handleSaveResults}
-            disabled={isSaving}
-            size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            {isSaving ? '저장 중...' : '결과 저장하기'}
-          </Button>
           <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
             <Link href="/">새로운 테스트 시작하기</Link>
           </Button>

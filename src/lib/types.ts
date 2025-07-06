@@ -1,31 +1,31 @@
-export interface Question {
+export type Question = {
   text: string
   trait: 'E' | 'A' | 'C' | 'N' | 'O'
   reverse: boolean
 }
 
-export interface UserAnswers {
+export type UserAnswers = {
   [questionIndex: number]: number
 }
 
-export interface TraitInfo {
+export type TraitInfo = {
   name: string
   icon: string
   color: string
   description: string
 }
 
-export interface ResultInterpretation {
+export type ResultInterpretation = {
   high: string
   low: string
 }
 
-export interface AboutContent {
+export type AboutContent = {
   title: string
   content: string
 }
 
-export interface PersonalityScores {
+export type PersonalityScores = {
   E: number
   A: number
   C: number
@@ -33,23 +33,22 @@ export interface PersonalityScores {
   O: number
 }
 
-export interface TestData {
+export type TestData = {
   userType: 'existing' | 'new'
   userAnswers: UserAnswers
   personalityScores: PersonalityScores
-  currentClass?: string
-  currentSpec?: string
-  preferredRoles?: string[]
+  currentClass?: string[]
+  currentSpec?: string[]
 }
 
-export interface GameClass {
+export type GameClass = {
   name: string
   image: string
   color: string
   specs: GameSpec[]
 }
 
-export interface GameSpec {
+export type GameSpec = {
   name: string
   role: 'tanker' | 'dealer' | 'healer'
   image: string
