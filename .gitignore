@@ -41,4 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 # local development
-src/tests/dummy.csv
+src/scripts/survey_results_rows.csv
+src/scripts/dummy.csv
+src/scripts/dummy.js
