@@ -24,9 +24,7 @@ function ResultContent() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // const dataParam = searchParams.get('data') // dummy: http://localhost:3000/result?data=%7B%22userType%22%3A%22existing%22%2C%22personalityScores%22%3A%7B%22E%22%3A50%2C%22A%22%3A63%2C%22C%22%3A56%2C%22N%22%3A38%2C%22O%22%3A53%7D%2C%22currentClass%22%3A%5B%22%EC%82%AC%EC%A0%9C%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%A3%BC%EC%88%A0%EC%82%AC%C2%A0%EB%B3%B5%EC%9B%90%22%2C%22%EC%84%B1%EA%B8%B0%EC%82%AC%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%88%98%EB%8F%84%EC%82%AC%C2%A0%EC%9A%B4%EB%AC%B4%22%5D%7D
-    const dataParam =
-      '%7B%22userType%22%3A%22existing%22%2C%22personalityScores%22%3A%7B%22E%22%3A50%2C%22A%22%3A63%2C%22C%22%3A56%2C%22N%22%3A38%2C%22O%22%3A53%7D%2C%22currentClass%22%3A%5B%22%EC%82%AC%EC%A0%9C%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%A3%BC%EC%88%A0%EC%82%AC%C2%A0%EB%B3%B5%EC%9B%90%22%2C%22%EC%84%B1%EA%B8%B0%EC%82%AC%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%88%98%EB%8F%84%EC%82%AC%C2%A0%EC%9A%B4%EB%AC%B4%22%5D%7D'
+    const dataParam = searchParams.get('data') // dummy: http://localhost:3000/result?data=%7B%22userType%22%3A%22existing%22%2C%22personalityScores%22%3A%7B%22E%22%3A50%2C%22A%22%3A63%2C%22C%22%3A56%2C%22N%22%3A38%2C%22O%22%3A53%7D%2C%22currentClass%22%3A%5B%22%EC%82%AC%EC%A0%9C%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%A3%BC%EC%88%A0%EC%82%AC%C2%A0%EB%B3%B5%EC%9B%90%22%2C%22%EC%84%B1%EA%B8%B0%EC%82%AC%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%88%98%EB%8F%84%EC%82%AC%C2%A0%EC%9A%B4%EB%AC%B4%22%5D%7D
 
     if (!dataParam) {
       router.push('/')

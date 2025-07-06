@@ -82,19 +82,3 @@ export async function GET() {
     return NextResponse.json({ error: 'Unexpected error' }, { status: 500 })
   }
 }
-
-// export async function getTestResults() {
-//   try {
-//     const { data, error } = await supabase.from('survey_results').select('*').order('created_at', { ascending: false })
-
-//     if (error) {
-//       console.error('Error fetching test results:', error)
-//       throw error
-//     }
-
-//     return data
-//   } catch (error) {
-//     console.error('Failed to fetch test results:', error)
-//     throw error
-//   }
-// }
