@@ -56,7 +56,7 @@ function ResultContent() {
                 }),
               })
 
-              console.info('결과가 성공적으로 저장되었습니다!')
+              console.info('결과가 성공적으로 저장되었습니다!', _class, _spec)
             })
           } else {
             console.warn('클래스 정보가 없습니다. 결과를 저장하지 않습니다.')

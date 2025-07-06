@@ -3,10 +3,11 @@
 import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { X } from 'lucide-react'
 import { questions, gameClasses as wowClasses } from '@/lib/data'
 import type { TestData, UserAnswers, PersonalityScores } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { cn, SEPERATE_TOKEN } from '@/lib/utils'
 
@@ -251,13 +252,17 @@ function TestContent() {
                       const _spec = _class.specs.find((s) => s.name === obj.spec)!
 
                       return (
-                        <Button
+                        <div
                           key={`${_class.name}-${_spec.name}`}
-                          type="button"
-                          variant="default"
                           onClick={() => handleDeleteClassSpec(_class.name, _spec.name)}
-                          className="flex h-auto flex-col items-start border-primary bg-primary p-4 text-left text-primary-foreground shadow-lg transition-all"
+                          className="group relative cursor-pointer rounded-lg border border-primary bg-secondary p-4 text-left shadow-lg transition-all hover:border-destructive"
                         >
+                          <button
+                            aria-label="선택 해제"
+                            className="absolute -right-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full border bg-background text-muted-foreground opacity-0 transition-all group-hover:border-destructive group-hover:text-destructive group-hover:opacity-100"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
                           <div className="mb-2 flex w-full items-center gap-3">
                             <Image
                               src={_spec.image || '/placeholder.svg'}
@@ -267,18 +272,18 @@ function TestContent() {
                               height="56"
                             />
                             <div className="flex-1">
-                              <div className="font-medium">{_spec.name}</div>
-                              <div className="text-xs opacity-80">
+                              <div className="font-medium text-foreground">{_spec.name}</div>
+                              <div className="text-xs text-muted-foreground">
                                 {_spec.role === 'tanker' && '🛡️ 탱커'}
                                 {_spec.role === 'dealer' && '⚔️ 딜러'}
                                 {_spec.role === 'healer' && '💚 힐러'}
                               </div>
                             </div>
                           </div>
-                          <span className="whitespace-normal text-left text-sm font-normal opacity-80">
+                          <span className="whitespace-normal text-left text-sm font-normal text-muted-foreground">
                             {_spec.description}
                           </span>
-                        </Button>
+                        </div>
                       )
                     })}
                   </div>
@@ -314,41 +319,23 @@ function TestContent() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        <Card className="mb-6 border-border bg-card shadow-lg">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-foreground">진행률</CardTitle>
-              <span className="font-medium text-primary">
-                {answeredCount} / {shuffledQuestions.length}
-              </span>
-            </div>
-            <CardDescription className="text-muted-foreground">
-              페이지 {Math.floor(currentQuestionIndex / questionsPerPage) + 1} /{' '}
-              {Math.ceil(shuffledQuestions.length / questionsPerPage)}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Progress value={progress} className="h-2 [&>div]:bg-primary" />
-          </CardContent>
-        </Card>
-
+      <main className="mx-auto max-w-4xl px-4 py-8 pb-24">
         <Card className="animate-slide-up border-border bg-card shadow-lg">
           <CardContent className="space-y-8 p-6 md:p-8">
             {questionsToShow.map((question, index) => {
               const questionIndex = currentQuestionIndex + index
               return (
-                <div key={questionIndex} className="border-b border-border pb-8 last:border-b-0">
-                  <h4 className="mb-6 text-lg font-medium leading-relaxed text-foreground md:text-xl">
+                <div key={questionIndex} className="border-b border-border pb-6 last:border-b-0">
+                  <h4 className="mb-4 text-lg font-medium leading-relaxed text-foreground md:text-xl">
                     <span className="font-semibold text-primary">{questionIndex + 1}.</span> {question.text}
                   </h4>
                   <div className="grid grid-cols-5 gap-2 md:gap-3">
                     {[
-                      { value: 1, label: '전혀\n아니다', color: 'red' },
+                      { value: 1, label: '전혀 아니다', color: 'red' },
                       { value: 2, label: '아니다', color: 'slate' },
                       { value: 3, label: '보통', color: 'gray' },
                       { value: 4, label: '그렇다', color: 'cyan' },
-                      { value: 5, label: '매우\n그렇다', color: 'blue' },
+                      { value: 5, label: '매우 그렇다', color: 'blue' },
                     ].map(({ value, label, color }) => (
                       <div key={value}>
                         <input
@@ -363,7 +350,7 @@ function TestContent() {
                         <label
                           htmlFor={`q${questionIndex}v${value}`}
                           className={cn(
-                            'flex min-h-[60px] cursor-pointer items-center justify-center rounded border-2 p-2 text-center transition-all duration-200 hover:scale-105 md:min-h-[80px] md:p-4',
+                            'flex min-h-[50px] cursor-pointer items-center justify-center rounded border-2 p-2 text-center transition-all duration-200 hover:scale-105 md:min-h-[70px] md:p-4',
                             userAnswers[questionIndex] === value
                               ? `border-${color}-400 bg-${color}-400/20 text-${color}-400`
                               : 'border-border bg-secondary text-muted-foreground hover:border-primary/50 hover:bg-secondary/80',
@@ -381,16 +368,34 @@ function TestContent() {
             })}
           </CardContent>
         </Card>
-
-        <div className="mt-6 flex items-center justify-between">
-          <Button type="button" onClick={handlePrev} disabled={currentQuestionIndex === 0} variant="outline">
-            이전
-          </Button>
-          <Button type="button" onClick={handleNext} className="bg-primary text-primary-foreground hover:bg-primary/90">
-            {isLastPage ? (userType === 'existing' ? '직업 선택하기' : '결과 보기') : '다음'}
-          </Button>
-        </div>
       </main>
+
+      <div className="sticky bottom-0 w-full border-t border-border bg-card/95 p-4 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-4xl items-center gap-4">
+          <div className="flex-1">
+            <div className="mb-1 flex justify-between text-sm">
+              <span className="font-semibold text-foreground">진행률</span>
+              <span className="font-medium text-primary">
+                {answeredCount} / {shuffledQuestions.length}
+              </span>
+            </div>
+            <Progress value={progress} className="h-2 [&>div]:bg-primary" />
+          </div>
+          <div className="h-10 w-px bg-border" />
+          <div className="flex items-center gap-2">
+            <Button type="button" onClick={handlePrev} disabled={currentQuestionIndex === 0} variant="outline">
+              이전
+            </Button>
+            <Button
+              type="button"
+              onClick={handleNext}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {isLastPage ? (userType === 'existing' ? '직업 선택하기' : '결과 보기') : '다음'}
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
