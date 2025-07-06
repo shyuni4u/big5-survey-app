@@ -1,7 +1,6 @@
 // app/api/save-result/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { PersonalityScores } from '@/lib/types'
 
 const supabaseUrl = process.env.SUPABASE_URL!
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!
@@ -29,16 +28,7 @@ interface Database {
     }
   }
 }
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
-
-export type SurveyResultSchema = {
-  id?: number
-  app: string
-  createdAt?: string
-  answers: PersonalityScores
-  class: string
-  specialization: string
-}
+const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
 export async function POST(req: NextRequest) {
   try {

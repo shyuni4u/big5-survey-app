@@ -44,3 +44,5 @@ next-env.d.ts
 src/scripts/survey_results_rows.csv
 src/scripts/dummy.csv
 src/scripts/dummy.js
+
+.vercel
