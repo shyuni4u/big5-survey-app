@@ -186,7 +186,7 @@ function TestContent() {
                         className="h-12 w-12 rounded"
                         style={{ backgroundColor: wowClass.color }}
                       />
-                      <span className="text-sm font-medium">{wowClass.name}</span>
+                      <span className="text-sm font-medium">{wowClass.nameKr}</span>
                     </Button>
                   ))}
                 </div>
@@ -223,7 +223,7 @@ function TestContent() {
                             height="56"
                           />
                           <div className="flex-1">
-                            <div className="font-medium">{spec.name}</div>
+                            <div className="font-medium">{spec.nameKr}</div>
                             <div className="text-xs opacity-80">
                               {spec.role === 'tanker' && '🛡️ 탱커'}
                               {spec.role === 'dealer' && '⚔️ 딜러'}
@@ -272,7 +272,7 @@ function TestContent() {
                               height="56"
                             />
                             <div className="flex-1">
-                              <div className="font-medium text-foreground">{_spec.name}</div>
+                              <div className="font-medium text-foreground">{_spec.nameKr}</div>
                               <div className="text-xs text-muted-foreground">
                                 {_spec.role === 'tanker' && '🛡️ 탱커'}
                                 {_spec.role === 'dealer' && '⚔️ 딜러'}

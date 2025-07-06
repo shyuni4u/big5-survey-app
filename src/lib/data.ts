@@ -1,12 +1,4 @@
-import type {
-  Question,
-  TraitInfo,
-  ResultInterpretation,
-  AboutContent,
-  GameClass,
-  PersonalityScores,
-  UserAnswers,
-} from '@/lib/types'
+import type { Question, TraitInfo, ResultInterpretation, AboutContent, GameClass } from '@/lib/types'
 
 export const questions: Question[] = [
   // 외향성 (Extraversion)
@@ -276,24 +268,28 @@ export const aboutContent: AboutContent[] = [
 
 export const gameClasses: GameClass[] = [
   {
-    name: '죽음의 기사',
+    name: 'Death Knight',
+    nameKr: '죽음의 기사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_deathknight.jpg',
     color: '#c41f3b',
     specs: [
       {
-        name: '혈기',
+        name: 'Blood',
+        nameKr: '혈기',
         role: 'tanker',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_deathknight_bloodpresence.jpg',
         description: '생명력을 흡수하고 강력한 방어 기술로 아군을 보호하는 탱커 전문화입니다.',
       },
       {
-        name: '냉기',
+        name: 'Frost',
+        nameKr: '냉기',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_deathknight_frostpresence.jpg',
         description: '얼음 룬을 활용해 빠르고 강력한 근접 딜을 가하는 딜러 전문화입니다.',
       },
       {
-        name: '부정',
+        name: 'Unholy',
+        nameKr: '부정',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_deathknight_unholypresence.jpg',
         description: '언데드 소환과 질병으로 지속 피해를 입히는 딜러 전문화입니다.',
@@ -301,18 +297,21 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '악마사냥꾼',
+    name: 'Demon Hunter',
+    nameKr: '악마사냥꾼',
     image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_demonhunter.jpg',
     color: '#a330c9',
     specs: [
       {
-        name: '파멸',
+        name: 'Havoc',
+        nameKr: '파멸',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_demonhunter_specdps.jpg',
         description: '양날 검과 악마의 힘을 이용해 빠르고 파괴적인 피해를 가하는 딜러입니다.',
       },
       {
-        name: '복수',
+        name: 'Vengeance',
+        nameKr: '복수',
         role: 'tanker',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_demonhunter_spectank.jpg',
         description: '방어와 생존에 집중한 근접 탱커 스타일 전문화입니다.',
@@ -320,30 +319,35 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '드루이드',
+    name: 'Druid',
+    nameKr: '드루이드',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_druid.jpg',
     color: '#ff7d0a',
     specs: [
       {
-        name: '수호',
+        name: 'Guardian',
+        nameKr: '수호',
         role: 'tanker',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_racial_bearform.jpg',
         description: '곰 형태로 변신해 높은 방어력과 생존력을 자랑하는 탱커입니다.',
       },
       {
-        name: '야성',
+        name: 'Feral',
+        nameKr: '야성',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_druid_catform.jpg',
         description: '표범 형태로 빠르고 연속적인 근접 딜을 넣는 딜러입니다.',
       },
       {
-        name: '조화',
+        name: 'Balance',
+        nameKr: '조화',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_nature_starfall.jpg',
         description: '자연의 힘을 이용해 광역 및 단일 대상 마법 딜을 하는 원거리 딜러입니다.',
       },
       {
-        name: '회복',
+        name: 'Restoration',
+        nameKr: '회복',
         role: 'healer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_nature_healingtouch.jpg',
         description: '치유 마법과 재생 오라로 아군을 회복시키는 힐러 전문화입니다.',
@@ -351,24 +355,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '사냥꾼',
+    name: 'Hunter',
+    nameKr: '사냥꾼',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_hunter.jpg',
     color: '#abd473',
     specs: [
       {
-        name: '야수 조련',
+        name: 'Beast Mastery',
+        nameKr: '야수 조련',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_hunter_bestialdiscipline.jpg',
         description: '야수를 소환해 함께 싸우는 근거리/원거리 딜러입니다.',
       },
       {
-        name: '생존',
+        name: 'Survival',
+        nameKr: '생존',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_hunter_camouflage.jpg',
         description: '트랩과 생존 기술로 근접 딜도 수행 가능한 특수 딜러입니다.',
       },
       {
-        name: '사격',
+        name: 'Marksmanship',
+        nameKr: '사격',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_hunter_focusedaim.jpg',
         description: '활이나 총으로 강력한 단일 대상 원거리 피해를 주는 딜러입니다.',
@@ -376,24 +384,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '기원사',
+    name: 'Evoker',
+    nameKr: '기원사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_evoker.jpg',
     color: '#33937f',
     specs: [
       {
-        name: '황폐',
+        name: 'Devastation',
+        nameKr: '황폐',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_evoker_devastation.jpg',
         description: '황폐 전문화는 용의 불과 마법을 융합하여 강력한 마법 피해를 입히는 원거리 딜러입니다.',
       },
       {
-        name: '보존',
+        name: 'Preservation',
+        nameKr: '보존',
         role: 'healer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_evoker_preservation.jpg',
         description: '보존 전문화는 시간과 생명의 마법을 사용하여 아군을 치유하고 보호하는 힐러입니다.',
       },
       {
-        name: '증강',
+        name: 'Augmentation',
+        nameKr: '증강',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_evoker_augmentation.jpg',
         description: '증강 전문화는 아군의 능력을 강화하여 전투력을 향상시키는 독특한 지원형 딜러입니다.',
@@ -401,24 +413,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '마법사',
+    name: 'Mage',
+    nameKr: '마법사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_mage.jpg',
     color: '#69ccf0',
     specs: [
       {
-        name: '비전',
+        name: 'Arcane',
+        nameKr: '비전',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_holy_magicalsentry.jpg',
         description: '비전 마법을 집중적으로 활용해 단일 대상에 강력한 마법 피해를 입히는 원거리 딜러입니다.',
       },
       {
-        name: '화염',
+        name: 'Fire',
+        nameKr: '화염',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_fire_firebolt02.jpg',
         description: '화염 마법으로 폭발적인 피해를 입히는 광역 딜러입니다.',
       },
       {
-        name: '냉기',
+        name: 'Frost',
+        nameKr: '냉기',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_frost_frostbolt02.jpg',
         description: '냉기 마법으로 적을 둔화시키고 제어하는 데 탁월한 원거리 딜러입니다.',
@@ -426,24 +442,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '수도사',
+    name: 'Monk',
+    nameKr: '수도사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_monk.jpg',
     color: '#00ff96',
     specs: [
       {
-        name: '양조',
+        name: 'Brewmaster',
+        nameKr: '양조',
         role: 'tanker',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_monk_brewmaster_spec.jpg',
         description: '양조 수도사는 회피와 자가 치유 능력을 활용해 피해를 분산시키는 탱커입니다.',
       },
       {
-        name: '운무',
+        name: 'Mistweaver',
+        nameKr: '운무',
         role: 'healer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_monk_mistweaver_spec.jpg',
         description: '운무 수도사는 치유 안개와 기술을 통해 아군을 회복시키는 힐러입니다.',
       },
       {
-        name: '풍운',
+        name: 'Windwalker',
+        nameKr: '풍운',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_monk_windwalker_spec.jpg',
         description: '빠른 근접 공격과 콤보 기반 기술을 사용하는 근접 딜러입니다.',
@@ -451,24 +471,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '성기사',
+    name: 'Paladin',
+    nameKr: '성기사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_paladin.jpg',
     color: '#f58cba',
     specs: [
       {
-        name: '보호',
+        name: 'Protection',
+        nameKr: '보호',
         role: 'tanker',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_paladin_shieldofthetemplar.jpg',
         description: '강력한 방패와 축복으로 아군을 지키는 탱커입니다.',
       },
       {
-        name: '신성',
+        name: 'Holy',
+        nameKr: '신성',
         role: 'healer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_holy_holybolt.jpg',
         description: '빛의 힘으로 아군을 치유하고 지원하는 힐러입니다.',
       },
       {
-        name: '징벌',
+        name: 'Retribution',
+        nameKr: '징벌',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_holy_auraoflight.jpg',
         description: '빛의 심판으로 적을 처단하는 근접 딜러입니다.',
@@ -476,24 +500,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '사제',
+    name: 'Priest',
+    nameKr: '사제',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_priest.jpg',
     color: '#ffffff',
     specs: [
       {
-        name: '수양',
+        name: 'Discipline',
+        nameKr: '수양',
         role: 'healer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_holy_powerwordshield.jpg',
         description: '공격과 방어를 병행하며 아군을 치유하는 하이브리드 힐러입니다.',
       },
       {
-        name: '신성',
+        name: 'Holy',
+        nameKr: '신성',
         role: 'healer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_holy_guardianspirit.jpg',
         description: '빛의 마법으로 아군을 치유하고 보호하는 순수 힐러입니다.',
       },
       {
-        name: '암흑',
+        name: 'Shadow',
+        nameKr: '암흑',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_shadow_shadowwordpain.jpg',
         description: '어둠의 힘으로 정신 공격과 도트를 사용하는 원거리 딜러입니다.',
@@ -501,24 +529,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '도적',
+    name: 'Rogue',
+    nameKr: '도적',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_rogue.jpg',
     color: '#fff569',
     specs: [
       {
-        name: '무법',
+        name: 'Outlaw',
+        nameKr: '무법',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_rogue_waylay.jpg',
         description: '적의 허점을 찔러 빠르게 피해를 입히는 공격적인 근접 딜러입니다.',
       },
       {
-        name: '잠행',
+        name: 'Subtlety',
+        nameKr: '잠행',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_stealth.jpg',
         description: '은신과 급습을 활용해 빠르게 적을 처치하는 암살형 딜러입니다.',
       },
       {
-        name: '암살',
+        name: 'Assassination',
+        nameKr: '암살',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_rogue_deadlybrew.jpg',
         description: '독과 출혈로 적을 서서히 죽이는 도트 기반 근접 딜러입니다.',
@@ -526,24 +558,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '주술사',
+    name: 'Shaman',
+    nameKr: '주술사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_shaman.jpg',
     color: '#0070de',
     specs: [
       {
-        name: '정기',
+        name: 'Elemental',
+        nameKr: '정기',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_nature_lightning.jpg',
         description: '자연의 힘으로 원거리에서 마법 피해를 입히는 딜러입니다.',
       },
       {
-        name: '고양',
+        name: 'Enhancement',
+        nameKr: '고양',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_shaman_improvedstormstrike.jpg',
         description: '근접 무기를 강화해 강력한 공격을 퍼붓는 근접 딜러입니다.',
       },
       {
-        name: '복원',
+        name: 'Restoration',
+        nameKr: '복원',
         role: 'healer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_nature_magicimmunity.jpg',
         description: '토템과 자연 마법을 통해 아군을 치유하는 힐러입니다.',
@@ -551,24 +587,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '흑마법사',
+    name: 'Warlock',
+    nameKr: '흑마법사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_warlock.jpg',
     color: '#9482c9',
     specs: [
       {
-        name: '고통',
+        name: 'Affliction',
+        nameKr: '고통',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_shadow_deathcoil.jpg',
         description: '어둠의 저주와 도트로 적을 서서히 괴롭히는 마법 딜러입니다.',
       },
       {
-        name: '악마',
+        name: 'Demonology',
+        nameKr: '악마',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_shadow_metamorphosis.jpg',
         description: '악마를 소환하고 조종해 싸우는 펫 기반 딜러입니다.',
       },
       {
-        name: '파괴',
+        name: 'Destruction',
+        nameKr: '파괴',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/spell_shadow_rainoffire.jpg',
         description: '폭발적인 마법으로 강력한 피해를 입히는 원거리 딜러입니다.',
@@ -576,24 +616,28 @@ export const gameClasses: GameClass[] = [
     ],
   },
   {
-    name: '전사',
+    name: 'Warrior',
+    nameKr: '전사',
     image: 'https://render.worldofwarcraft.com/us/icons/56/class_warrior.jpg',
     color: '#c79c6e',
     specs: [
       {
-        name: '방어',
+        name: 'Protection',
+        nameKr: '방어',
         role: 'tanker',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_warrior_defensivestance.jpg',
         description: '방패와 전투 기술로 적의 공격을 막아내는 튼튼한 탱커입니다.',
       },
       {
-        name: '무기',
+        name: 'Arms',
+        nameKr: '무기',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_warrior_savageblow.jpg',
         description: '대검이나 도끼를 활용한 강력한 일격이 특징인 근접 딜러입니다.',
       },
       {
-        name: '분노',
+        name: 'Fury',
+        nameKr: '분노',
         role: 'dealer',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_warrior_innerrage.jpg',
         description: '이중 무기를 휘둘러 연속적인 피해를 입히는 광전사 스타일 딜러입니다.',
@@ -601,128 +645,3 @@ export const gameClasses: GameClass[] = [
     ],
   },
 ]
-
-// 성격 특성과 게임 직업 매칭 로직
-export const getRecommendedClasses = (scores: PersonalityScores, preferredRoles: UserAnswers) => {
-  const recommendations: Array<{
-    class: string
-    talent: string
-    image: string
-    color: string
-    talentImage: string
-    desc: string
-    matchReason: string
-    score: number
-  }> = []
-  console.log(preferredRoles)
-  // 각 클래스의 전문화를 평가
-  gameClasses.forEach((gameClass) => {
-    gameClass.specs.forEach((spec) => {
-      let matchScore = 0
-      const reasons: string[] = []
-
-      // 외향성 기반 매칭
-      if (scores.E >= 70) {
-        if (spec.role === 'tanker') {
-          matchScore += 25
-          reasons.push('리더십과 주도성')
-        }
-        if (['전사', '성기사', '수도사'].includes(gameClass.name)) {
-          matchScore += 15
-          reasons.push('활동적인 성향')
-        }
-      } else if (scores.E <= 30) {
-        if (['마법사', '사제', '흑마법사'].includes(gameClass.name)) {
-          matchScore += 20
-          reasons.push('신중하고 집중적인 성향')
-        }
-        if (spec.role === 'healer') {
-          matchScore += 15
-          reasons.push('지원 역할 선호')
-        }
-      }
-
-      // 친화성 기반 매칭
-      if (scores.A >= 70) {
-        if (spec.role === 'healer') {
-          matchScore += 30
-          reasons.push('타인을 돕는 성향')
-        }
-        if (['드루이드', '성기사', '사제'].includes(gameClass.name)) {
-          matchScore += 20
-          reasons.push('협력적 성향')
-        }
-      } else if (scores.A <= 30) {
-        if (['도적', '악마사냥꾼', '죽음의 기사'].includes(gameClass.name)) {
-          matchScore += 20
-          reasons.push('독립적이고 경쟁적인 성향')
-        }
-      }
-
-      // 성실성 기반 매칭
-      if (scores.C >= 70) {
-        if (spec.role === 'tanker') {
-          matchScore += 25
-          reasons.push('책임감과 신뢰성')
-        }
-        if (['성기사', '전사', '수도사'].includes(gameClass.name)) {
-          matchScore += 15
-          reasons.push('체계적이고 계획적인 성향')
-        }
-      } else if (scores.C <= 30) {
-        if (['도적', '악마사냥꾼', '사냥꾼'].includes(gameClass.name)) {
-          matchScore += 15
-          reasons.push('자유롭고 즉흥적인 성향')
-        }
-      }
-
-      // 신경증 기반 매칭 (낮을수록 안정적)
-      if (scores.N <= 30) {
-        if (spec.role === 'tanker') {
-          matchScore += 20
-          reasons.push('스트레스 상황에서의 안정성')
-        }
-      } else if (scores.N >= 70) {
-        if (spec.role === 'dealer') {
-          matchScore += 15
-          reasons.push('감정적 에너지를 공격으로 전환')
-        }
-      }
-
-      // 개방성 기반 매칭
-      if (scores.O >= 70) {
-        if (['마법사', '흑마법사', '기원사'].includes(gameClass.name)) {
-          matchScore += 25
-          reasons.push('창의적이고 상상력이 풍부한 성향')
-        }
-        if (['드루이드', '주술사'].includes(gameClass.name)) {
-          matchScore += 20
-          reasons.push('다양한 형태와 능력에 대한 호기심')
-        }
-      } else if (scores.O <= 30) {
-        if (['전사', '성기사'].includes(gameClass.name)) {
-          matchScore += 15
-          reasons.push('전통적이고 실용적인 성향')
-        }
-      }
-
-      if (matchScore > 0) {
-        recommendations.push({
-          class: gameClass.name,
-          talent: spec.name,
-          image: gameClass.image,
-          color: gameClass.color,
-          talentImage: spec.image,
-          desc: spec.description,
-          matchReason: reasons.join(', '),
-          score: matchScore,
-        })
-      }
-    })
-  })
-
-  // 점수순으로 정렬하고 상위 3개 반환
-  return recommendations.toSorted((a, b) => b.score - a.score).slice(0, 3)
-}
-
-export type GameRecommendation = ReturnType<typeof getRecommendedClasses>[0]

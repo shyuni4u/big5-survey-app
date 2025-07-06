@@ -41,6 +41,7 @@ export type TestData = {
 
 export type GameClass = {
   name: string
+  nameKr: string
   image: string
   color: string
   specs: GameSpec[]
@@ -48,6 +49,7 @@ export type GameClass = {
 
 export type GameSpec = {
   name: string
+  nameKr: string
   role: 'tanker' | 'dealer' | 'healer'
   image: string
   description: string
