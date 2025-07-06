@@ -66,19 +66,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unexpected error' }, { status: 500 })
   }
 }
-
-export async function GET() {
-  try {
-    const { data, error } = await supabase.from('survey_results').select('*').order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('[Supabase fetch error]', error)
-      return NextResponse.json({ error }, { status: 500 })
-    }
-
-    return NextResponse.json(data)
-  } catch (err) {
-    console.error('[API Uncaught Error]', err)
-    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 })
-  }
-}
