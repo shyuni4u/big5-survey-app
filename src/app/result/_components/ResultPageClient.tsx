@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
 import { traitInfo } from '@/lib/data'
-import type { TestData } from '@/lib/types'
+import type { TestData, PersonalityScores } from '@/lib/types'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
 import { Button } from '@/components/ui/button'
@@ -153,7 +153,7 @@ function ResultContent() {
     }
   }, [testData?.personalityScores])
 
-  const fetchRecommendations = async (personalityScores: any) => {
+  const fetchRecommendations = async (personalityScores: PersonalityScores) => {
     setIsLoadingRecommendations(true)
     try {
       const response = await fetch('https://156bac15-cafa-4f5f-bdf5-f6236fbbcc4a.moai-dev.moreh.dev/predict', {

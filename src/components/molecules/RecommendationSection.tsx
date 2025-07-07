@@ -137,7 +137,7 @@ export default function RecommendationSection({ recommendations, isLoading }: Re
       <CardContent className="px-8 pb-12">
         {/* 올림픽 단상 */}
         <div className="mb-8 flex items-end justify-center gap-8">
-          {podiumOrder.map((item, index) => {
+          {podiumOrder.map((item) => {
             if (!item.data) return null
 
             const { gameClass, spec } = getClassAndSpec(item.data.label)
