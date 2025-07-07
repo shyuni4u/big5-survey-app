@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { gameClasses } from '@/lib/data'
 import { cn } from '@/lib/utils'
-import { Trophy, Medal, Award } from 'lucide-react'
+import { Trophy, Medal, Award, AlertTriangle } from 'lucide-react'
 
 interface Recommendation {
   label: string
@@ -16,9 +16,10 @@ interface Recommendation {
 interface RecommendationSectionProps {
   recommendations: Recommendation[]
   isLoading: boolean
+  error?: string
 }
 
-export default function RecommendationSection({ recommendations, isLoading }: RecommendationSectionProps) {
+export default function RecommendationSection({ recommendations, isLoading, error }: RecommendationSectionProps) {
   const [visibleCards, setVisibleCards] = useState<number>(0)
 
   useEffect(() => {
@@ -95,6 +96,23 @@ export default function RecommendationSection({ recommendations, isLoading }: Re
       default:
         return { text: '', style: '' }
     }
+  }
+
+  if (error) {
+    return (
+      <Card className="border-border bg-card">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
+          </div>
+          <CardTitle className="text-2xl text-foreground">AI 추천 오류</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 text-center">
+          <p className="text-muted-foreground">AI 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>
+          <p className="text-sm text-muted-foreground">오류: {error}</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   if (isLoading) {

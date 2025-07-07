@@ -49,36 +49,6 @@ export default function HomePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-8">
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card className="bg-secondary transition-colors hover:border-primary/50">
-                <CardHeader className="text-center">
-                  <div className="mb-3 text-2xl text-blue-400">📊</div>
-                  <CardTitle className="text-base text-foreground">과학적 분석</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-sm text-muted-foreground">Big5 모델 기반의 정확한 성격 분석</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-secondary transition-colors hover:border-primary/50">
-                <CardHeader className="text-center">
-                  <div className="mb-3 text-2xl text-blue-400">🎮</div>
-                  <CardTitle className="text-base text-foreground">게임 직업 추천</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-sm text-muted-foreground">성격에 맞는 WoW 직업과 특성 추천</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-secondary transition-colors hover:border-primary/50">
-                <CardHeader className="text-center">
-                  <div className="mb-3 text-2xl text-green-400">⚡</div>
-                  <CardTitle className="text-base text-foreground">빠른 테스트</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-center text-sm text-muted-foreground">5-10분 내에 완료 가능한 간편한 테스트</p>
-                </CardContent>
-              </Card>
-            </div>
-
             <div className="space-y-4 text-center">
               <p className="text-muted-foreground">
                 <strong className="text-primary">40개의 질문</strong>을 통해 5가지 성격 차원을 분석합니다

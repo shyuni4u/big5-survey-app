@@ -9,7 +9,7 @@ import type { TestData, UserAnswers, PersonalityScores } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { cn, SEPERATE_TOKEN } from '@/lib/utils'
+import { cn, SEPERATE_TOKEN, zipData } from '@/lib/utils'
 
 function TestContent() {
   const router = useRouter()
@@ -158,8 +158,8 @@ function TestContent() {
       personalityScores: calculatedScores,
       currentClass: selectedClassList.map((item) => [item.class, item.spec].join(SEPERATE_TOKEN)),
     }
-    const encodedData = encodeURIComponent(JSON.stringify(testData))
-    router.push(`/result?data=${encodedData}`)
+    const hashedData = zipData(testData)
+    router.replace(`/result?data=${hashedData}`)
   }
 
   if (!userType) {
@@ -360,7 +360,7 @@ function TestContent() {
                   <div className="grid grid-cols-5 gap-2 md:gap-3">
                     {[
                       { value: 1, label: '전혀 아니다', color: 'red' },
-                      { value: 2, label: '아니다', color: 'slate' },
+                      { value: 2, label: '아니다', color: 'orange' },
                       { value: 3, label: '보통', color: 'gray' },
                       { value: 4, label: '그렇다', color: 'cyan' },
                       { value: 5, label: '매우 그렇다', color: 'blue' },
@@ -380,7 +380,15 @@ function TestContent() {
                           className={cn(
                             'flex min-h-[50px] cursor-pointer items-center justify-center rounded border-2 p-2 text-center transition-all duration-200 hover:scale-105 md:min-h-[70px] md:p-4',
                             userAnswers[questionIndex] === value
-                              ? `border-${color}-400 bg-${color}-400/20 text-${color}-400`
+                              ? color === 'red'
+                                ? 'border-red-400 bg-red-400/20 text-red-400'
+                                : color === 'orange'
+                                  ? 'border-orange-400 bg-orange-400/20 text-orange-400'
+                                  : color === 'gray'
+                                    ? 'border-gray-400 bg-gray-400/20 text-gray-400'
+                                    : color === 'cyan'
+                                      ? 'border-cyan-400 bg-cyan-400/20 text-cyan-400'
+                                      : 'border-blue-400 bg-blue-400/20 text-blue-400'
                               : 'border-border bg-secondary text-muted-foreground hover:border-primary/50 hover:bg-secondary/80',
                           )}
                         >

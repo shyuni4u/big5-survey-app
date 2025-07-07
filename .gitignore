@@ -41,8 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 # local development
-src/scripts/survey_results_rows.csv
-src/scripts/dummy.csv
-src/scripts/dummy.js
-
-.vercel
+src/scripts/*

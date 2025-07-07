@@ -10,8 +10,9 @@ import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { SEPERATE_TOKEN } from '@/lib/utils'
+import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
 import RecommendationSection from '@/components/molecules/RecommendationSection'
+import { Share2 } from 'lucide-react'
 
 Chart.register(...registerables)
 
@@ -30,9 +31,10 @@ function ResultContent() {
     }[]
   >([])
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false)
+  const [recommendationError, setRecommendationError] = useState<string>('')
 
   useEffect(() => {
-    const dataParam = searchParams.get('data') // dummy: http://localhost:3000/result?data=%7B%22userType%22%3A%22existing%22%2C%22personalityScores%22%3A%7B%22E%22%3A50%2C%22A%22%3A63%2C%22C%22%3A56%2C%22N%22%3A38%2C%22O%22%3A53%7D%2C%22currentClass%22%3A%5B%22%EC%82%AC%EC%A0%9C%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%A3%BC%EC%88%A0%EC%82%AC%C2%A0%EB%B3%B5%EC%9B%90%22%2C%22%EC%84%B1%EA%B8%B0%EC%82%AC%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%88%98%EB%8F%84%EC%82%AC%C2%A0%EC%9A%B4%EB%AC%B4%22%5D%7D
+    const dataParam = searchParams.get('data') // http://localhost:3000/result?data=JTdCJTIydXNlclR5cGUlMjIlM0ElMjJuZXclMjIlMkMlMjJwZXJzb25hbGl0eVNjb3JlcyUyMiUzQSU3QiUyMkUlMjIlM0E3MSUyQyUyMkElMjIlM0EyNSUyQyUyMkMlMjIlM0EzMCUyQyUyMk4lMjIlM0E0MyUyQyUyMk8lMjIlM0EzNCU3RCUyQyUyMmN1cnJlbnRDbGFzcyUyMiUzQSU1QiU1RCU3RA==
 
     if (!dataParam) {
       router.push('/')
@@ -40,7 +42,7 @@ function ResultContent() {
     }
 
     try {
-      const parsedData: TestData = JSON.parse(decodeURIComponent(dataParam))
+      const parsedData: TestData = unzipData(dataParam)
       setTestData(parsedData)
 
       const saveResult = async () => {
@@ -155,6 +157,7 @@ function ResultContent() {
 
   const fetchRecommendations = async (personalityScores: PersonalityScores) => {
     setIsLoadingRecommendations(true)
+    setRecommendationError('')
     try {
       const response = await fetch('https://156bac15-cafa-4f5f-bdf5-f6236fbbcc4a.moai-dev.moreh.dev/predict', {
         method: 'POST',
@@ -169,11 +172,47 @@ function ResultContent() {
       if (response.ok) {
         const data = await response.json()
         setRecommendations(data.top_5_recommendations || [])
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
     } catch (error) {
       console.error('Failed to fetch recommendations:', error)
+      setRecommendationError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.')
     } finally {
       setIsLoadingRecommendations(false)
+    }
+  }
+
+  const handleShare = async () => {
+    const dataParam = searchParams.get('data')! // http://localhost:3000/result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjPQUXKEUM5KVqbGOkp-QMpIR8lfycrYsFZHKbm0qCg1r8Q5J7EYqCc6thYAWRMcFw
+    const parsedData: TestData = unzipData(dataParam)
+    const url = `${window.location.origin}/result?data=${zipData({
+      ...parsedData,
+      userType: 'new',
+    })}`
+
+    const shareData = {
+      title: 'Big5 성격 분석 결과',
+      text: '나의 성격 분석 결과와 WoW 직업 추천을 확인해보세요!',
+      url,
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        await navigator.clipboard.writeText(url)
+        alert('링크가 클립보드에 복사되었습니다!')
+      }
+    } catch (error) {
+      console.error('공유 실패:', error)
+      try {
+        await navigator.clipboard.writeText(url)
+        alert('링크가 클립보드에 복사되었습니다!')
+      } catch (clipboardError) {
+        alert('공유에 실패했습니다. 브라우저가 지원하지 않는 기능입니다.')
+        console.error('공유 실패:', clipboardError)
+      }
     }
   }
 
@@ -191,20 +230,29 @@ function ResultContent() {
   return (
     <div className="vscode-gradient min-h-screen">
       <header className="border-b border-border bg-card/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-7xl px-4 py-6 text-center">
-          <h1 className="mb-2 font-display text-2xl font-bold text-primary md:text-3xl">성격 분석 결과</h1>
-          <p className="text-muted-foreground">
-            {testData.userType === 'existing' ? '기존 유저' : '신규 유저'} • 당신의 Big5 성격 특성 프로필입니다
-          </p>
+        <div className="mx-auto max-w-7xl px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 text-center">
+              <h1 className="mb-2 font-display text-2xl font-bold text-primary md:text-3xl">성격 분석 결과</h1>
+              <p className="text-muted-foreground">
+                {testData.userType === 'existing' ? '기존 유저' : '신규 유저'} • 당신의 Big5 성격 특성 프로필입니다
+              </p>
+            </div>
+            <Button variant="ghost" onClick={handleShare} className="flex items-center gap-2">
+              <Share2 className="h-4 w-4" />
+              공유
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-8">
         {/* AI 추천 결과 섹션 */}
-        {recommendations.length > 0 && (
-          <RecommendationSection recommendations={recommendations} isLoading={isLoadingRecommendations} />
-        )}
-
+        <RecommendationSection
+          recommendations={recommendations}
+          isLoading={isLoadingRecommendations}
+          error={recommendationError}
+        />
         <Card className="animate-slide-up border-border bg-card text-center shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl text-foreground md:text-3xl">성격 분석 결과</CardTitle>
@@ -228,6 +276,10 @@ function ResultContent() {
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
             <Link href="/">새로운 테스트 시작하기</Link>
+          </Button>
+          <Button onClick={handleShare} size="lg" className="flex items-center gap-2">
+            <Share2 className="h-4 w-4" />
+            결과 공유하기
           </Button>
         </div>
       </main>
