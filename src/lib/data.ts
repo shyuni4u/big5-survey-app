@@ -1,194 +1,250 @@
 import type { Question, TraitInfo, ResultInterpretation, AboutContent, GameClass } from '@/lib/types'
 
 export const questions: Question[] = [
-  // 외향성 (Extraversion)
+  // 외향성 (Extraversion) - E
   {
     text: '나는 파티나 모임에서 분위기를 주도하는 편이다.',
     trait: 'E',
     reverse: false,
+    weight: 1.2, // 활동성, 리더십을 나타내는 강한 지표
   },
   {
     text: '사람들과 함께 있을 때 에너지가 넘친다.',
     trait: 'E',
     reverse: false,
+    weight: 1.5, // 외향성의 가장 핵심적인 정의
   },
-  { text: '대화의 중심에 서는 것을 즐긴다.', trait: 'E', reverse: false },
+  {
+    text: '대화의 중심에 서는 것을 즐긴다.',
+    trait: 'E',
+    reverse: false,
+    weight: 1.2, // 사교성, 주목성을 나타내는 강한 지표
+  },
   {
     text: '새로운 사람들에게 먼저 말을 거는 것이 어렵지 않다.',
     trait: 'E',
     reverse: false,
+    weight: 1.2, // 적극성, 사교성을 나타내는 강한 지표
   },
   {
     text: '혼자 조용히 시간을 보내는 것을 더 선호한다.',
     trait: 'E',
     reverse: true,
+    weight: 1.5, // 내향성(외향성의 반대)의 핵심적인 정의
   },
   {
     text: '주목받는 것을 별로 좋아하지 않는다.',
     trait: 'E',
     reverse: true,
+    weight: 1.2, // 내향성의 강한 지표
   },
-  { text: '말수가 적고 과묵한 편이다.', trait: 'E', reverse: true },
+  {
+    text: '말수가 적고 과묵한 편이다.',
+    trait: 'E',
+    reverse: true,
+    weight: 1.2, // 내향성의 강한 지표
+  },
   {
     text: '대규모 사교 모임에서는 쉽게 지친다.',
     trait: 'E',
     reverse: true,
+    weight: 1.5, // 내향성의 핵심적인 특징 (에너지 소모)
   },
-  // 친화성 (Agreeableness)
+  // 친화성 (Agreeableness) - A
   {
     text: '다른 사람들의 감정에 깊이 공감한다.',
     trait: 'A',
     reverse: false,
+    weight: 1.5, // 친화성의 핵심인 '공감'을 직접적으로 측정
   },
   {
     text: '타인을 돕는 것에서 큰 기쁨을 느낀다.',
     trait: 'A',
     reverse: false,
+    weight: 1.2, // 이타심을 나타내는 강한 지표
   },
   {
     text: '사람들을 신뢰하고 그들의 좋은 면을 보려고 한다.',
     trait: 'A',
     reverse: false,
+    weight: 1.2, // 신뢰, 긍정성을 나타내는 강한 지표
   },
   {
     text: '갈등을 피하고 조화로운 관계를 중시한다.',
     trait: 'A',
     reverse: false,
+    weight: 1.0, // 관계 조화를 나타내지만, 때로는 소극성으로도 해석될 수 있어 표준 가중치 부여
   },
   {
     text: '다른 사람의 일에 별로 관심이 없다.',
     trait: 'A',
     reverse: true,
+    weight: 1.5, // 공감 부족을 직접적으로 보여주는 핵심 역문항
   },
   {
     text: '사람들의 단점을 잘 찾아내는 편이다.',
     trait: 'A',
     reverse: true,
+    weight: 1.2, // 비판적, 냉소적 태도를 보여주는 강한 역문항
   },
   {
     text: '내 이익을 위해 다른 사람과 경쟁하는 것을 마다하지 않는다.',
     trait: 'A',
     reverse: true,
+    weight: 1.2, // 낮은 친화성(경쟁성)을 보여주는 강한 역문항
   },
   {
     text: '때로는 다른 사람에게 무례하게 굴 때가 있다.',
     trait: 'A',
     reverse: true,
+    weight: 1.0, // 직접적인 행동이지만, 상황에 따라 해석이 달라질 수 있어 표준 가중치 부여
   },
-  // 성실성 (Conscientiousness)
+  // 성실성 (Conscientiousness) - C
   {
     text: '나는 항상 계획을 세우고 준비한다.',
     trait: 'C',
     reverse: false,
+    weight: 1.2, // 계획성을 보여주는 강한 지표
   },
   {
     text: '맡은 일은 끝까지 철저하게 해낸다.',
     trait: 'C',
     reverse: false,
+    weight: 1.5, // 성실성의 핵심인 '책임감', '완수'를 측정
   },
   {
     text: '주변을 항상 깔끔하게 정리정돈한다.',
     trait: 'C',
     reverse: false,
+    weight: 1.2, // 체계성, 정리정돈을 나타내는 강한 지표
   },
   {
     text: '규칙을 잘 지키고 의무를 다하려고 노력한다.',
     trait: 'C',
     reverse: false,
+    weight: 1.5, // '의무감', '규칙준수'라는 핵심 요소를 측정
   },
   {
     text: '물건을 제자리에 두지 않고 아무데나 두는 경향이 있다.',
     trait: 'C',
     reverse: true,
+    weight: 1.2, // 낮은 체계성을 보여주는 강한 역문항
   },
   {
     text: '일을 미루다가 마감 기한에 닥쳐서 하는 경우가 많다.',
     trait: 'C',
     reverse: true,
+    weight: 1.5, // 낮은 성실성(미루는 습관)의 가장 대표적인 행동
   },
   {
     text: '다소 부주의하고 실수가 잦은 편이다.',
     trait: 'C',
     reverse: true,
+    weight: 1.2, // 신중함 부족을 나타내는 강한 역문항
   },
   {
     text: '즉흥적으로 행동하는 것을 좋아한다.',
     trait: 'C',
     reverse: true,
+    weight: 1.0, // 낮은 계획성을 나타내지만, 개방성(O)과도 관련이 있어 표준 가중치 부여
   },
-  // 신경증 (Neuroticism)
+  // 신경증 (Neuroticism) - N
   {
     text: '사소한 일에도 걱정을 많이 하는 편이다.',
     trait: 'N',
     reverse: false,
+    weight: 1.5, // 신경증의 핵심인 '불안', '걱정'을 직접 측정
   },
   {
     text: '스트레스를 받으면 쉽게 예민해진다.',
     trait: 'N',
     reverse: false,
+    weight: 1.2, // 스트레스에 대한 민감도를 나타내는 강한 지표
   },
   {
     text: '기분 변화가 잦고 감정 기복이 심하다.',
     trait: 'N',
     reverse: false,
+    weight: 1.5, // '감정의 불안정성'이라는 핵심 요소를 측정
   },
   {
     text: '종종 우울하거나 슬픈 감정을 느낀다.',
     trait: 'N',
     reverse: false,
+    weight: 1.2, // 우울감을 나타내는 강한 지표
   },
   {
     text: '나는 대부분의 시간을 편안하고 안정적으로 느낀다.',
     trait: 'N',
     reverse: true,
+    weight: 1.5, // 정서적 안정성(낮은 신경증)의 핵심
   },
   {
     text: '스트레스 상황에서도 침착함을 유지하는 편이다.',
     trait: 'N',
     reverse: true,
+    weight: 1.2, // 스트레스 대처 능력을 보여주는 강한 역문항
   },
-  { text: '나는 자신감이 넘치는 사람이다.', trait: 'N', reverse: true },
+  {
+    text: '나는 자신감이 넘치는 사람이다.',
+    trait: 'N',
+    reverse: true,
+    weight: 1.0, // 낮은 신경증과 관련되지만, 외향성(E)과도 관련이 있어 표준 가중치 부여
+  },
   {
     text: '좀처럼 화를 내거나 짜증을 내지 않는다.',
     trait: 'N',
     reverse: true,
+    weight: 1.2, // 분노 조절, 낮은 적대감을 나타내는 강한 역문항
   },
-  // 개방성 (Openness)
-  { text: '새로운 경험이나 모험을 즐긴다.', trait: 'O', reverse: false },
+  // 개방성 (Openness) - O
+  {
+    text: '새로운 경험이나 모험을 즐긴다.',
+    trait: 'O',
+    reverse: false,
+    weight: 1.2, // 행동적 개방성을 나타내는 강한 지표
+  },
   {
     text: '예술, 음악, 문학에 깊은 감명을 받는다.',
     trait: 'O',
     reverse: false,
+    weight: 1.5, // 심미적 개방성(미적 감수성)의 핵심 지표
   },
   {
     text: '풍부한 상상력을 가지고 있고 공상에 잠기곤 한다.',
     trait: 'O',
     reverse: false,
+    weight: 1.2, // 상상력, 창의성을 나타내는 강한 지표
   },
   {
     text: '추상적이거나 철학적인 아이디어에 대해 생각하는 것을 좋아한다.',
     trait: 'O',
     reverse: false,
+    weight: 1.5, // 지적 개방성(지적 호기심)의 핵심 지표
   },
   {
     text: '익숙하고 예측 가능한 일상을 선호한다.',
     trait: 'O',
     reverse: true,
+    weight: 1.2, // 경험에 대한 폐쇄성을 나타내는 강한 역문항
   },
   {
     text: '추상적인 개념을 이해하는 데 어려움을 느낀다.',
     trait: 'O',
     reverse: true,
+    weight: 1.2, // 지적 개방성이 낮음을 보여주는 강한 역문항
   },
   {
     text: '전통적인 가치와 방식을 중요하게 생각한다.',
     trait: 'O',
     reverse: true,
+    weight: 1.0, // 보수성을 나타내며, 낮은 개방성과 관련 있지만 문화적 영향도 고려하여 표준 가중치 부여
   },
   {
     text: '나의 관심 분야는 비교적 좁고 한정적이다.',
     trait: 'O',
     reverse: true,
+    weight: 1.0, // 낮은 개방성의 결과일 수 있으나, 성실성(C)의 전문성과도 관련될 수 있어 표준 가중치 부여
   },
 ]
 

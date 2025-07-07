@@ -2,6 +2,7 @@ export type Question = {
   text: string
   trait: 'E' | 'A' | 'C' | 'N' | 'O'
   reverse: boolean
+  weight: number
 }
 
 export type UserAnswers = {
