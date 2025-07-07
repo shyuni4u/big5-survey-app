@@ -11,6 +11,7 @@ import AboutSection from '@/components/molecules/AboutSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { SEPERATE_TOKEN } from '@/lib/utils'
+import RecommendationSection from '@/components/molecules/RecommendationSection'
 
 Chart.register(...registerables)
 
@@ -22,6 +23,13 @@ function ResultContent() {
 
   const [testData, setTestData] = useState<TestData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [recommendations, setRecommendations] = useState<
+    {
+      label: string
+      score: number
+    }[]
+  >([])
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false)
 
   useEffect(() => {
     const dataParam = searchParams.get('data') // dummy: http://localhost:3000/result?data=%7B%22userType%22%3A%22existing%22%2C%22personalityScores%22%3A%7B%22E%22%3A50%2C%22A%22%3A63%2C%22C%22%3A56%2C%22N%22%3A38%2C%22O%22%3A53%7D%2C%22currentClass%22%3A%5B%22%EC%82%AC%EC%A0%9C%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%A3%BC%EC%88%A0%EC%82%AC%C2%A0%EB%B3%B5%EC%9B%90%22%2C%22%EC%84%B1%EA%B8%B0%EC%82%AC%C2%A0%EC%8B%A0%EC%84%B1%22%2C%22%EC%88%98%EB%8F%84%EC%82%AC%C2%A0%EC%9A%B4%EB%AC%B4%22%5D%7D
@@ -66,6 +74,9 @@ function ResultContent() {
       if (parsedData.userType === 'existing') saveResult()
 
       setIsLoading(false)
+
+      // Fetch AI recommendations
+      fetchRecommendations(parsedData.personalityScores)
     } catch (error) {
       console.error('Failed to parse test data:', error)
       router.push('/')
@@ -142,6 +153,30 @@ function ResultContent() {
     }
   }, [testData?.personalityScores])
 
+  const fetchRecommendations = async (personalityScores: any) => {
+    setIsLoadingRecommendations(true)
+    try {
+      const response = await fetch('https://156bac15-cafa-4f5f-bdf5-f6236fbbcc4a.moai-dev.moreh.dev/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          answers: personalityScores,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setRecommendations(data.top_5_recommendations || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch recommendations:', error)
+    } finally {
+      setIsLoadingRecommendations(false)
+    }
+  }
+
   if (isLoading || !testData) {
     return (
       <div className="vscode-gradient flex min-h-screen items-center justify-center">
@@ -165,6 +200,11 @@ function ResultContent() {
       </header>
 
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-8">
+        {/* AI 추천 결과 섹션 */}
+        {recommendations.length > 0 && (
+          <RecommendationSection recommendations={recommendations} isLoading={isLoadingRecommendations} />
+        )}
+
         <Card className="animate-slide-up border-border bg-card text-center shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl text-foreground md:text-3xl">성격 분석 결과</CardTitle>

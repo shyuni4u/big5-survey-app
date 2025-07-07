@@ -95,37 +95,41 @@ export default function HomePage() {
             <div className="space-y-6">
               <h3 className="text-center text-xl font-semibold text-foreground">어떤 유형의 사용자이신가요?</h3>
               <div className="grid gap-6 md:grid-cols-2">
-                <Card className="transform bg-secondary transition-all duration-200 hover:scale-105 hover:border-primary/50">
-                  <CardHeader className="text-center">
-                    <div className="mb-3 text-4xl">🎮</div>
-                    <CardTitle className="text-foreground">기존 WoW 유저</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      현재 플레이 중인 직업이 있으신가요? 성격 분석과 함께 현재 직업 정보를 제공해주시면 더 정확한
-                      분석을 받을 수 있습니다.
-                    </p>
-                    <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-                      <Link href="/survey?type=existing">테스트 시작하기</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+                <Link href="/survey?type=existing" className="block">
+                  <Card className="h-full transform cursor-pointer bg-secondary transition-all duration-200 hover:scale-105 hover:border-primary/50">
+                    <CardHeader className="text-center">
+                      <div className="mb-3 text-4xl">🎮</div>
+                      <CardTitle className="text-foreground">기존 WoW 유저</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        현재 플레이 중인 직업이 있으신가요? 성격 분석과 함께 현재 직업 정보를 제공해주시면 더 정확한
+                        분석을 받을 수 있습니다.
+                      </p>
+                      <Button className="pointer-events-none bg-primary text-primary-foreground hover:bg-primary/90">
+                        테스트 시작하기
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
 
-                <Card className="transform bg-secondary transition-all duration-200 hover:scale-105 hover:border-green-400/50">
-                  <CardHeader className="text-center">
-                    <div className="mb-3 text-4xl">✨</div>
-                    <CardTitle className="text-foreground">신규 유저</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4 text-center">
-                    <p className="text-sm text-muted-foreground">
-                      WoW를 처음 시작하시거나 새로운 직업을 찾고 계신가요? AI가 당신의 성격을 분석해서 가장 적합한
-                      직업을 추천해드립니다.
-                    </p>
-                    <Button asChild className="bg-green-600 text-white hover:bg-green-700">
-                      <Link href="/survey?type=new">테스트 시작하기</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+                <Link href="/survey?type=new" className="block">
+                  <Card className="h-full transform cursor-pointer bg-secondary transition-all duration-200 hover:scale-105 hover:border-green-400/50">
+                    <CardHeader className="text-center">
+                      <div className="mb-3 text-4xl">✨</div>
+                      <CardTitle className="text-foreground">신규 유저</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        WoW를 처음 시작하시거나 새로운 직업을 찾고 계신가요? AI가 당신의 성격을 분석해서 가장 적합한
+                        직업을 추천해드립니다.
+                      </p>
+                      <Button className="pointer-events-none bg-green-600 text-white hover:bg-green-700">
+                        테스트 시작하기
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
               </div>
             </div>
           </CardContent>
