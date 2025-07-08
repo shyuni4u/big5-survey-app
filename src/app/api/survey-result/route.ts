@@ -34,16 +34,12 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
 
-    const { data, error } = await supabase
-      .from('survey_results')
-      .insert({
-        app: body.app,
-        answers: body.answers,
-        class: body.class,
-        specialization: body.specialization,
-      })
-      .select()
-      .single()
+    const { data, error } = await supabase.from('survey_results').insert({
+      app: body.app,
+      answers: body.answers,
+      class: body.class,
+      specialization: body.specialization,
+    })
 
     if (error) {
       console.error('[Supabase insert error]', error)
