@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
 import { traitInfo } from '@/lib/data'
+import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
@@ -34,7 +35,7 @@ function ResultContent() {
   const [recommendationError, setRecommendationError] = useState<string>('')
 
   useEffect(() => {
-    const dataParam = searchParams.get('data') // http://localhost:3000/result?data=JTdCJTIydXNlclR5cGUlMjIlM0ElMjJuZXclMjIlMkMlMjJwZXJzb25hbGl0eVNjb3JlcyUyMiUzQSU3QiUyMkUlMjIlM0E3MSUyQyUyMkElMjIlM0EyNSUyQyUyMkMlMjIlM0EzMCUyQyUyMk4lMjIlM0E0MyUyQyUyMk8lMjIlM0EzNCU3RCUyQyUyMmN1cnJlbnRDbGFzcyUyMiUzQSU1QiU1RCU3RA==
+    const dataParam = searchParams.get('data') // /result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjHRUXIEUmY6Ss5KVmaGOkp-SlZG5jpK_kCeQa2OUnJpUVFqXolzTmIxUE90bC0AWlkcIA
 
     if (!dataParam) {
       router.push('/')
@@ -159,24 +160,10 @@ function ResultContent() {
     setIsLoadingRecommendations(true)
     setRecommendationError('')
     try {
-      const response = await fetch('https://156bac15-cafa-4f5f-bdf5-f6236fbbcc4a.moai-dev.moreh.dev/predict', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          answers: personalityScores,
-        }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setRecommendations(data.top_5_recommendations || [])
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
+      const data = await predict(personalityScores)
+      setRecommendations(data.top_5_recommendations || [])
     } catch (error) {
-      console.error('Failed to fetch recommendations:', error)
+      console.error('Failed to get recommendations locally:', error)
       setRecommendationError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.')
     } finally {
       setIsLoadingRecommendations(false)
