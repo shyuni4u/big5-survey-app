@@ -49,11 +49,11 @@ export default function RecommendationSection({ recommendations, isLoading, erro
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Trophy className="h-12 w-12 text-yellow-400" />
+        return <Trophy className="h-8 w-8 text-yellow-400 md:h-12 md:w-12" />
       case 2:
-        return <Medal className="h-10 w-10 text-gray-300" />
+        return <Medal className="h-7 w-7 text-gray-300 md:h-10 md:w-10" />
       case 3:
-        return <Award className="h-8 w-8 text-amber-600" />
+        return <Award className="h-6 w-6 text-amber-600 md:h-8 md:w-8" />
       default:
         return null
     }
@@ -62,26 +62,13 @@ export default function RecommendationSection({ recommendations, isLoading, erro
   const getRankStyle = (rank: number) => {
     switch (rank) {
       case 1:
-        return 'border-yellow-400/50 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 shadow-2xl shadow-yellow-400/30'
+        return 'border-yellow-400/70 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 shadow-2xl shadow-yellow-400/30'
       case 2:
         return 'border-gray-300/50 bg-gradient-to-br from-gray-300/20 to-gray-500/20 shadow-xl shadow-gray-300/20'
       case 3:
         return 'border-amber-600/50 bg-gradient-to-br from-amber-600/20 to-amber-800/20 shadow-lg shadow-amber-600/20'
       default:
         return ''
-    }
-  }
-
-  const getPodiumHeight = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return 'h-80' // 가장 높음
-      case 2:
-        return 'h-64' // 중간
-      case 3:
-        return 'h-48' // 가장 낮음
-      default:
-        return 'h-48'
     }
   }
 
@@ -95,6 +82,55 @@ export default function RecommendationSection({ recommendations, isLoading, erro
         return { text: '🥉 BRONZE', style: 'bg-amber-600 text-amber-100 border-amber-700' }
       default:
         return { text: '', style: '' }
+    }
+  }
+
+  const getRankScale = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return {
+          cardWidth: 'w-56', // 1위: 더 큰 카드
+          cardHeight: 'h-96', // 1위: 더 높은 카드
+          imageSize: 'h-20 w-20', // 1위: 더 큰 이미지
+          titleSize: 'text-xl', // 1위: 더 큰 제목
+          subtitleSize: 'text-base', // 1위: 더 큰 부제목
+          scoreSize: 'text-4xl', // 1위: 더 큰 점수
+          iconScale: 'scale-125', // 1위: 아이콘 확대
+          badgeSize: 'px-5 py-3 text-base', // 1위: 더 큰 배지
+        }
+      case 2:
+        return {
+          cardWidth: 'w-48', // 2위: 기본 크기
+          cardHeight: 'h-80',
+          imageSize: 'h-16 w-16',
+          titleSize: 'text-lg',
+          subtitleSize: 'text-sm',
+          scoreSize: 'text-3xl',
+          iconScale: 'scale-100',
+          badgeSize: 'px-4 py-2 text-sm',
+        }
+      case 3:
+        return {
+          cardWidth: 'w-44', // 3위: 더 작은 카드
+          cardHeight: 'h-72', // 3위: 더 낮은 카드
+          imageSize: 'h-14 w-14', // 3위: 더 작은 이미지
+          titleSize: 'text-base', // 3위: 더 작은 제목
+          subtitleSize: 'text-sm', // 3위: 더 작은 부제목
+          scoreSize: 'text-2xl', // 3위: 더 작은 점수
+          iconScale: 'scale-90', // 3위: 아이콘 축소
+          badgeSize: 'px-3 py-1 text-xs', // 3위: 더 작은 배지
+        }
+      default:
+        return {
+          cardWidth: 'w-48',
+          cardHeight: 'h-80',
+          imageSize: 'h-16 w-16',
+          titleSize: 'text-lg',
+          subtitleSize: 'text-sm',
+          scoreSize: 'text-3xl',
+          iconScale: 'scale-100',
+          badgeSize: 'px-4 py-2 text-sm',
+        }
     }
   }
 
@@ -152,9 +188,9 @@ export default function RecommendationSection({ recommendations, isLoading, erro
         <p className="text-lg text-muted-foreground">당신의 성격에 가장 적합한 {GAME_NAME} 직업 TOP 3</p>
       </CardHeader>
 
-      <CardContent className="px-8 pb-12">
-        {/* 올림픽 단상 */}
-        <div className="mb-8 flex items-end justify-center gap-8">
+      <CardContent className="px-4 pb-12 md:px-8">
+        {/* 데스크톱: 올림픽 단상 레이아웃 */}
+        <div className="mb-8 hidden items-end justify-center gap-4 lg:flex lg:gap-8">
           {podiumOrder.map((item) => {
             if (!item.data) return null
 
@@ -163,6 +199,8 @@ export default function RecommendationSection({ recommendations, isLoading, erro
 
             const badge = getRankBadge(item.rank)
             const shouldShow = visibleCards > (item.rank === 1 ? 0 : item.rank === 2 ? 1 : 2)
+
+            const scale = getRankScale(item.rank)
 
             return (
               <div
@@ -173,38 +211,117 @@ export default function RecommendationSection({ recommendations, isLoading, erro
                 )}
                 style={{ transitionDelay: `${item.rank === 1 ? 0 : item.rank === 2 ? 400 : 800}ms` }}
               >
-                {/* 메달과 정보 */}
-                <div className="mb-4 text-center">
-                  <div className="mb-3 flex justify-center">{getRankIcon(item.rank)}</div>
-                  <Badge className={cn('mb-2 px-4 py-2 text-sm font-bold shadow-lg', badge.style)}>{badge.text}</Badge>
-                  <div className="text-2xl font-bold text-foreground">{Math.round(item.data.score * 100)}%</div>
+                {/* 순위 아이콘 - 카드 외부에 배치 */}
+                <div className="mb-4 flex flex-col items-center">
+                  <div className={cn('mb-3 flex justify-center', scale.iconScale)}>{getRankIcon(item.rank)}</div>
+                  <Badge className={cn('mb-2 font-bold shadow-lg', scale.badgeSize, badge.style)}>{badge.text}</Badge>
                 </div>
 
-                {/* 단상 */}
+                {/* 점수 표시 - 카드 외부에 배치 */}
+                <div className="mb-4 text-center">
+                  <div className={cn('font-bold text-foreground', scale.scoreSize)}>
+                    {Math.round(item.data.score * 100)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">적합도</div>
+                </div>
+
+                {/* 단상 카드 - 내용만 포함 */}
                 <Card
                   className={cn(
-                    'w-48 cursor-pointer border-2 transition-all duration-500 hover:scale-105',
-                    getPodiumHeight(item.rank),
+                    'cursor-pointer border-2 transition-all duration-500 hover:scale-105',
+                    scale.cardWidth,
+                    scale.cardHeight,
                     getRankStyle(item.rank),
                   )}
                 >
-                  <CardContent className="flex h-full flex-col items-center justify-center p-6 text-center">
+                  <CardContent className="flex h-full flex-col items-center justify-center p-4 text-center">
                     <Image
                       src={spec.image || '/placeholder.svg'}
                       alt={spec.name}
-                      width={80}
-                      height={80}
-                      className="mb-4 h-20 w-20 rounded-lg shadow-lg"
+                      width={64}
+                      height={64}
+                      className={cn('mb-3 rounded-lg shadow-lg', scale.imageSize)}
                       unoptimized
                     />
-                    <h3 className="mb-2 text-lg font-bold text-foreground">{gameClass.nameKr}</h3>
-                    <h4 className="text-md mb-2 font-semibold text-foreground">{spec.nameKr}</h4>
-                    <p className="mb-3 text-sm text-muted-foreground">
+                    <h3 className={cn('mb-2 font-bold text-foreground', scale.titleSize)}>{gameClass.nameKr}</h3>
+                    <h4 className={cn('mb-2 font-semibold text-foreground', scale.subtitleSize)}>{spec.nameKr}</h4>
+                    <p className="mb-3 text-xs text-muted-foreground">
                       {spec.role === 'tanker' && '🛡️ 탱커'}
                       {spec.role === 'dealer' && '⚔️ 딜러'}
                       {spec.role === 'healer' && '💚 힐러'}
                     </p>
-                    <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
+                  </CardContent>
+                </Card>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* 모바일/태블릿: 세로 배치 레이아웃 */}
+        <div className="mb-8 space-y-6 lg:hidden">
+          {recommendations.slice(0, 3).map((item, index) => {
+            const rank = index + 1
+            const { gameClass, spec } = getClassAndSpec(item.label)
+            if (!gameClass || !spec) return null
+
+            const badge = getRankBadge(rank)
+            const shouldShow = visibleCards > index
+
+            return (
+              <div
+                key={item.label}
+                className={cn(
+                  'transform transition-all duration-1000',
+                  shouldShow ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0',
+                )}
+                style={{ transitionDelay: `${index * 400}ms` }}
+              >
+                <Card
+                  className={cn(
+                    'cursor-pointer border-2 transition-all duration-300 hover:scale-[1.02]',
+                    getRankStyle(rank),
+                  )}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-4">
+                      <div className="flex flex-col items-center gap-5">
+                        {/* 순위 아이콘 */}
+                        <div className="flex flex-col items-center">
+                          <Badge className={cn('px-2 py-1 text-xs font-bold', badge.style)}>{badge.text}</Badge>
+                        </div>
+
+                        {/* 직업 이미지 */}
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={spec.image || '/placeholder.svg'}
+                            alt={spec.name}
+                            width={56}
+                            height={56}
+                            className="h-14 w-14 rounded-lg shadow-lg"
+                            unoptimized
+                          />
+                        </div>
+                      </div>
+
+                      {/* 직업 정보 */}
+                      <div className="min-w-0 flex-1 gap-4">
+                        <div className="flex items-start justify-between">
+                          <h3 className="truncate text-lg font-bold text-foreground">{gameClass.nameKr}</h3>
+                          <div className="text-right">
+                            <div className="text-xl font-bold text-foreground">{Math.round(item.score * 100)}%</div>
+                            <div className="text-xs text-muted-foreground">적합도</div>
+                          </div>
+                        </div>
+                        <h4 className="mb-1 text-sm font-semibold text-foreground">{spec.nameKr}</h4>
+                        <p className="mb-2 text-xs text-muted-foreground">
+                          {spec.role === 'tanker' && '🛡️ 탱커'}
+                          {spec.role === 'dealer' && '⚔️ 딜러'}
+                          {spec.role === 'healer' && '💚 힐러'}
+                        </p>
+                        <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -215,10 +332,12 @@ export default function RecommendationSection({ recommendations, isLoading, erro
         {/* 축하 메시지 */}
         {visibleCards >= 3 && (
           <div className="animate-slide-up text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 px-6 py-3">
-              <span className="text-2xl">🎉</span>
-              <p className="font-semibold text-foreground">축하합니다! AI가 분석한 당신만의 완벽한 직업을 찾았습니다</p>
-              <span className="text-2xl">🎉</span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 px-4 py-3 md:px-6">
+              <span className="text-xl md:text-2xl">🎉</span>
+              <p className="text-sm font-semibold text-foreground md:text-base">
+                축하합니다! AI가 분석한 당신만의 완벽한 직업을 찾았습니다
+              </p>
+              <span className="text-xl md:text-2xl">🎉</span>
             </div>
           </div>
         )}
