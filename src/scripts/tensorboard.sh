@@ -1,0 +1,1 @@
+tensorboard --logdir=runs/psych_model --port=8000 --reload_interval=15
