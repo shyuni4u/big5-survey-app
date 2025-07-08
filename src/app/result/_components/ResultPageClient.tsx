@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
-import { traitInfo } from '@/lib/data'
+import { GAME_NAME, traitInfo } from '@/lib/data'
 import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
 import ResultCard from '@/components/molecules/ResultCard'
@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
 import RecommendationSection from '@/components/molecules/RecommendationSection'
 import { Share2 } from 'lucide-react'
+import { Footer } from '@/components/atoms/Footer'
 
 Chart.register(...registerables)
 
@@ -180,7 +181,7 @@ function ResultContent() {
 
     const shareData = {
       title: 'Big5 성격 분석 결과',
-      text: '나의 성격 분석 결과와 WoW 직업 추천을 확인해보세요!',
+      text: `나의 성격 분석 결과와 ${GAME_NAME} 직업 추천을 확인해보세요!`,
       url,
     }
 
@@ -197,7 +198,6 @@ function ResultContent() {
         await navigator.clipboard.writeText(url)
         alert('링크가 클립보드에 복사되었습니다!')
       } catch (clipboardError) {
-        alert('공유에 실패했습니다. 브라우저가 지원하지 않는 기능입니다.')
         console.error('공유 실패:', clipboardError)
       }
     }
@@ -271,13 +271,7 @@ function ResultContent() {
         </div>
       </main>
 
-      <footer className="mt-16 border-t border-border bg-card/50">
-        <div className="mx-auto max-w-7xl px-4 py-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Big5 성격 모델을 기반으로 한 과학적 분석 • World of Warcraft 직업 추천
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

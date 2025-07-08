@@ -1,17 +1,19 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GAME_NAME } from '@/lib/data'
+import { Footer } from '@/components/atoms/Footer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Header } from '@/components/atoms/Header'
 
 export const metadata: Metadata = {
-  title: 'Big5 성격 분석 | WoW 직업 추천 테스트',
-  description:
-    '과학적으로 검증된 Big5 성격 모델을 통해 당신의 성격을 분석하고, World of Warcraft에서 가장 적합한 직업을 추천받아보세요.',
-  keywords: ['Big5', '성격 테스트', 'WoW', 'World of Warcraft', '직업 추천', '성격 분석'],
+  title: `Big5 성격 분석 | ${GAME_NAME} 직업 추천 테스트`,
+  description: `과학적으로 검증된 Big5 성격 모델을 통해 당신의 성격을 분석하고, ${GAME_NAME}에서 가장 적합한 직업을 추천받아보세요.`,
+  keywords: ['Big5', '성격 테스트', GAME_NAME, '직업 추천', '성격 분석'],
   openGraph: {
-    title: 'Big5 성격 분석 | WoW 직업 추천',
-    description: '당신의 성격에 맞는 완벽한 WoW 직업을 찾아보세요!',
+    title: `Big5 성격 분석 | ${GAME_NAME} 직업 추천`,
+    description: `당신의 성격에 맞는 완벽한 ${GAME_NAME} 직업을 찾아보세요!`,
     type: 'website',
   },
 }
@@ -20,14 +22,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-7xl px-4 py-6">
-          <div className="text-center">
-            <h1 className="mb-2 font-display text-3xl font-bold text-primary md:text-4xl">Big5 성격 분석</h1>
-            <p className="text-foreground">당신에게 맞는 게임 직업을 찾아보세요</p>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-4 py-8">
@@ -44,7 +39,7 @@ export default function HomePage() {
             </div>
             <CardTitle className="text-2xl text-foreground md:text-3xl">성격 분석 테스트</CardTitle>
             <CardDescription className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              과학적으로 검증된 Big5 성격 모델을 통해 당신의 성격을 분석하고, 그에 맞는 World of Warcraft 직업을
+              과학적으로 검증된 Big5 성격 모델을 통해 당신의 성격을 분석하고, 그에 맞는 {GAME_NAME} 직업을
               추천해드립니다.
             </CardDescription>
           </CardHeader>
@@ -69,7 +64,7 @@ export default function HomePage() {
                   <Card className="h-full transform cursor-pointer bg-secondary transition-all duration-200 hover:scale-105 hover:border-primary/50">
                     <CardHeader className="text-center">
                       <div className="mb-3 text-4xl">🎮</div>
-                      <CardTitle className="text-foreground">기존 WoW 유저</CardTitle>
+                      <CardTitle className="text-foreground">기존 유저</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 text-center">
                       <p className="text-sm text-muted-foreground">
@@ -91,8 +86,8 @@ export default function HomePage() {
                     </CardHeader>
                     <CardContent className="space-y-4 text-center">
                       <p className="text-sm text-muted-foreground">
-                        WoW를 처음 시작하시거나 새로운 직업을 찾고 계신가요? AI가 당신의 성격을 분석해서 가장 적합한
-                        직업을 추천해드립니다.
+                        처음 시작하시거나 새로운 직업을 찾고 계신가요? AI가 당신의 성격을 분석해서 가장 적합한 직업을
+                        추천해드립니다.
                       </p>
                       <Button className="pointer-events-none bg-green-600 text-white hover:bg-green-700">
                         테스트 시작하기
@@ -107,13 +102,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 border-t bg-card/50">
-        <div className="mx-auto max-w-7xl px-4 py-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Big5 성격 모델을 기반으로 한 과학적 분석 • World of Warcraft 직업 추천
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

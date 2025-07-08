@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { gameClasses } from '@/lib/data'
+import { GAME_NAME, gameClasses } from '@/lib/data'
 import { cn } from '@/lib/utils'
 import { Trophy, Medal, Award, AlertTriangle } from 'lucide-react'
 
@@ -149,7 +149,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
           <Trophy className="h-10 w-10 text-yellow-900" />
         </div>
         <CardTitle className="text-3xl font-bold text-foreground md:text-4xl">🏆 추천 직업</CardTitle>
-        <p className="text-lg text-muted-foreground">당신의 성격에 가장 적합한 WoW 직업 TOP 3</p>
+        <p className="text-lg text-muted-foreground">당신의 성격에 가장 적합한 {GAME_NAME} 직업 TOP 3</p>
       </CardHeader>
 
       <CardContent className="px-8 pb-12">

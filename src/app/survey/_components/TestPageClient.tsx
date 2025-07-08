@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
-import { questions, gameClasses as wowClasses } from '@/lib/data'
+import { questions, gameClasses } from '@/lib/data'
 import type { TestData, UserAnswers, PersonalityScores } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -172,7 +172,7 @@ function TestContent() {
   const isLastPage = currentQuestionIndex + questionsPerPage >= shuffledQuestions.length
 
   if (currentStep === 'class-selection') {
-    const selectedClassData = wowClasses.find((cls) => cls.name === selectedClass)
+    const selectedClassData = gameClasses.find((cls) => cls.name === selectedClass)
 
     return (
       <div className="vscode-gradient min-h-screen">
@@ -193,29 +193,29 @@ function TestContent() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-                  {wowClasses.map((wowClass) => (
+                  {gameClasses.map((gameClass) => (
                     <Button
-                      key={wowClass.name}
+                      key={gameClass.name}
                       type="button"
-                      variant={selectedClass === wowClass.name ? 'default' : 'outline'}
-                      onClick={() => handleClassSelect(wowClass.name)}
+                      variant={selectedClass === gameClass.name ? 'default' : 'outline'}
+                      onClick={() => handleClassSelect(gameClass.name)}
                       className={cn(
                         'flex h-auto flex-col items-center gap-2 p-4 transition-all',
-                        selectedClass === wowClass.name
+                        selectedClass === gameClass.name
                           ? 'border-primary bg-primary text-primary-foreground shadow-lg'
                           : 'border-border hover:border-primary/50 hover:bg-secondary',
                       )}
                     >
                       <Image
-                        src={wowClass.image || '/placeholder.svg'}
+                        src={gameClass.image || '/placeholder.svg'}
                         width="56"
                         height="56"
-                        alt={wowClass.name}
+                        alt={gameClass.name}
                         className="h-12 w-12 rounded"
-                        style={{ backgroundColor: wowClass.color }}
+                        style={{ backgroundColor: gameClass.color }}
                         unoptimized
                       />
-                      <span className="text-sm font-medium">{wowClass.nameKr}</span>
+                      <span className="text-sm font-medium">{gameClass.nameKr}</span>
                     </Button>
                   ))}
                 </div>
@@ -224,7 +224,7 @@ function TestContent() {
 
             <Card className="border-border bg-card shadow-lg">
               <CardHeader>
-                <CardTitle className="text-center text-foreground">{selectedClass} 전문화 선택</CardTitle>
+                <CardTitle className="text-center text-foreground">전문화 선택</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -278,7 +278,7 @@ function TestContent() {
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {selectedClassList.map((obj) => {
-                      const _class = wowClasses.find((c) => c.name === obj.class)!
+                      const _class = gameClasses.find((c) => c.name === obj.class)!
                       const _spec = _class.specs.find((s) => s.name === obj.spec)!
 
                       return (

@@ -322,6 +322,7 @@ export const aboutContent: AboutContent[] = [
   },
 ]
 
+export const GAME_NAME = 'WoW'
 export const gameClasses: GameClass[] = [
   {
     name: 'Death Knight',
