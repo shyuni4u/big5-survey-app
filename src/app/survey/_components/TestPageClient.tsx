@@ -213,6 +213,7 @@ function TestContent() {
                         alt={wowClass.name}
                         className="h-12 w-12 rounded"
                         style={{ backgroundColor: wowClass.color }}
+                        unoptimized
                       />
                       <span className="text-sm font-medium">{wowClass.nameKr}</span>
                     </Button>
@@ -249,6 +250,7 @@ function TestContent() {
                             className="h-8 w-8 rounded"
                             width="56"
                             height="56"
+                            unoptimized
                           />
                           <div className="flex-1">
                             <div className="font-medium">{spec.nameKr}</div>
@@ -298,6 +300,7 @@ function TestContent() {
                               className="h-8 w-8 rounded"
                               width="56"
                               height="56"
+                              unoptimized
                             />
                             <div className="flex-1">
                               <div className="font-medium text-foreground">{_spec.nameKr}</div>

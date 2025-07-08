@@ -195,6 +195,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
                       width={80}
                       height={80}
                       className="mb-4 h-20 w-20 rounded-lg shadow-lg"
+                      unoptimized
                     />
                     <h3 className="mb-2 text-lg font-bold text-foreground">{gameClass.nameKr}</h3>
                     <h4 className="text-md mb-2 font-semibold text-foreground">{spec.nameKr}</h4>
