@@ -58,7 +58,7 @@ function ResultContent() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  app: 'wow',
+                  app: GAME_NAME,
                   answers: parsedData.personalityScores,
                   class: _class,
                   specialization: _spec,
