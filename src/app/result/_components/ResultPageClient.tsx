@@ -278,6 +278,9 @@ function ResultContent() {
           <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
             <Link href={`https://lostark.enzo.kr/result?data=${withResultData}`}>로스트아크 직업 보기</Link>
           </Button>
+          <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
+            <Link href={`https://dnf.enzo.kr/result?data=${withResultData}`}>던파 직업 보기</Link>
+          </Button>
         </div>
       </main>
 
