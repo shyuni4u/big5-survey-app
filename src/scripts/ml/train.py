@@ -3,10 +3,12 @@ import pandas as pd
 import ast
 import torch
 import torch.nn as nn
+import numpy as np
 from torch.optim import Adam
 from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.utils.class_weight import compute_class_weight
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from model import PsychModel
@@ -55,6 +57,12 @@ def train(csv_path, epochs=2000, batch_size=256, lr=2e-4, model_path="model.pth"
 
     # Dataset and dataloader
     ds = PsychDataset(csv_path, label_classes=label_classes)
+
+    # ✅ 클래스 가중치 계산
+    labels = ds.y.cpu().numpy()
+    class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(labels), y=labels)
+    class_weights_tensor = torch.tensor(class_weights, dtype=torch.float32).to(device)
+
     train_idx, val_idx = train_test_split(range(len(ds)), test_size=0.2, random_state=42)
     train_dl = DataLoader(torch.utils.data.Subset(ds, train_idx), batch_size=batch_size, shuffle=True)
     val_dl = DataLoader(torch.utils.data.Subset(ds, val_idx), batch_size=batch_size)
@@ -73,7 +81,7 @@ def train(csv_path, epochs=2000, batch_size=256, lr=2e-4, model_path="model.pth"
     patience = 20  # ✅ 조기 종료 기준
 
     scheduler = CosineAnnealingLR(opt, T_max=epochs)
-    crit = nn.CrossEntropyLoss()
+    crit = nn.CrossEntropyLoss(weight=class_weights_tensor)
     writer = SummaryWriter(log_dir="runs/psych_model")
 
     for epoch in range(1, epochs + 1):

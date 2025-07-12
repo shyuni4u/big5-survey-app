@@ -34,7 +34,7 @@ const BIG5_MAX_VAL = 100;
 // 각 WoW 직업/전문화에 대한 Big5 특성 프로필 정의
 // 각 특성 값은 해당 특성의 '기본 평균'을 나타냅니다.
 // 실제 점수는 이 평균을 중심으로 BIG5_STD_DEV를 사용하여 생성됩니다.
-const wowClassSpecsBig5Profiles = {
+const gameClassSpecsBig5Profiles = {
     "Death Knight": {
         "Blood": { role: "Tank", A: 60, C: 85, E: 85, N: 20, O: 50, desc: "그룹을 주도하고 책임감을 느끼는 리더형 탱커" },
         "Frost": { role: "DPS", A: 30, C: 80, E: 40, N: 50, O: 50, desc: "효율적인 피해량과 전략적 플레이를 선호하는 딜러" },
@@ -107,12 +107,12 @@ const wowClassSpecsBig5Profiles = {
  * @param {number} numSamplesPerSpec - 각 전문화별로 생성할 샘플의 수.
  * @returns {Array<Object>} 생성된 더미 데이터 배열.
  */
-function generateWoWBig5DummyData(numSamplesPerSpec = 5) {
+function generateBig5DummyData(numSamplesPerSpec = 5) {
     const dummyData = [];
 
-    for (const className in wowClassSpecsBig5Profiles) {
-        for (const specializationName in wowClassSpecsBig5Profiles[className]) {
-            const specInfo = wowClassSpecsBig5Profiles[className][specializationName];
+    for (const className in gameClassSpecsBig5Profiles) {
+        for (const specializationName in gameClassSpecsBig5Profiles[className]) {
+            const specInfo = gameClassSpecsBig5Profiles[className][specializationName];
 
             for (let i = 0; i < numSamplesPerSpec; i++) {
                 const A = getBig5Score(specInfo.A, BIG5_STD_DEV, BIG5_MIN_VAL, BIG5_MAX_VAL);
@@ -174,9 +174,9 @@ function convertToCSV(data) {
 }
 
 // 사용 예시: 각 전문화별로 10개의 더미 데이터를 생성합니다.
-const generatedDummyData = generateWoWBig5DummyData(39000);
+const generatedDummyData = generateBig5DummyData(39000);
 
 // 생성된 데이터를 콘솔에 JSON 형식으로 출력합니다.
 // 이 데이터를 파일로 저장하거나 다른 애플리케이션에서 사용할 수 있습니다.
-// node .\dummy.js > survey_results_rows2.csv
+// node dummy.js > data.csv
 console.log(convertToCSV(generatedDummyData));
