@@ -51,7 +51,7 @@ export type GameClass = {
 export type GameSpec = {
   name: string
   nameKr: string
-  role: 'tanker' | 'dealer' | 'healer'
+  role: 'tanker' | 'dealer' | 'healer' | 'supporter'
   image: string
   description: string
 }

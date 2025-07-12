@@ -258,6 +258,7 @@ function TestContent() {
                               {spec.role === 'tanker' && '🛡️ 탱커'}
                               {spec.role === 'dealer' && '⚔️ 딜러'}
                               {spec.role === 'healer' && '💚 힐러'}
+                              {spec.role === 'supporter' && '✨ 서포터'}
                             </div>
                           </div>
                         </div>
@@ -308,6 +309,7 @@ function TestContent() {
                                 {_spec.role === 'tanker' && '🛡️ 탱커'}
                                 {_spec.role === 'dealer' && '⚔️ 딜러'}
                                 {_spec.role === 'healer' && '💚 힐러'}
+                                {_spec.role === 'supporter' && '✨ 서포터'}
                               </div>
                             </div>
                           </div>

@@ -249,6 +249,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
                       {spec.role === 'tanker' && '🛡️ 탱커'}
                       {spec.role === 'dealer' && '⚔️ 딜러'}
                       {spec.role === 'healer' && '💚 힐러'}
+                      {spec.role === 'supporter' && '✨ 서포터'}
                     </p>
                     <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
                   </CardContent>
@@ -318,6 +319,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
                           {spec.role === 'tanker' && '🛡️ 탱커'}
                           {spec.role === 'dealer' && '⚔️ 딜러'}
                           {spec.role === 'healer' && '💚 힐러'}
+                          {spec.role === 'supporter' && '✨ 서포터'}
                         </p>
                         <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
                       </div>
