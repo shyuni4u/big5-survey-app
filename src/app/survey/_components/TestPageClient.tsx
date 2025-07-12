@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { cn, SEPERATE_TOKEN, zipData } from '@/lib/utils'
+import { CoupangParters } from '@/components/atoms/CoupangParters'
 
 function TestContent() {
   const router = useRouter()
@@ -185,7 +186,9 @@ function TestContent() {
           </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-4 py-8">
+        <CoupangParters />
+
+        <main className="mx-auto max-w-6xl px-4 pb-8">
           <div className="space-y-8">
             <Card className="border-border bg-card shadow-lg">
               <CardHeader>
@@ -352,7 +355,9 @@ function TestContent() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8 pb-24">
+      <CoupangParters />
+
+      <main className="mx-auto max-w-4xl px-4 pb-24">
         <Card className="animate-slide-up border-border bg-card shadow-lg">
           <CardContent className="space-y-8 p-6 md:p-8">
             {questionsToShow.map((question, index) => {

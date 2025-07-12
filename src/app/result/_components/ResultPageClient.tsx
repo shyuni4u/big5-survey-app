@@ -15,6 +15,7 @@ import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
 import RecommendationSection from '@/components/molecules/RecommendationSection'
 import { Share2 } from 'lucide-react'
 import { Footer } from '@/components/atoms/Footer'
+import { CoupangParters } from '@/components/atoms/CoupangParters'
 
 Chart.register(...registerables)
 
@@ -244,6 +245,9 @@ function ResultContent() {
           isLoading={isLoadingRecommendations}
           error={recommendationError}
         />
+
+        <CoupangParters />
+
         <Card className="animate-slide-up border-border bg-card text-center shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl text-foreground md:text-3xl">성격 분석 결과</CardTitle>
@@ -263,6 +267,8 @@ function ResultContent() {
         </div>
 
         <AboutSection />
+
+        <CoupangParters />
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
