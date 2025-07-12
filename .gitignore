@@ -41,6 +41,5 @@ yarn-error.log*
 next-env.d.ts
 src/scripts/ml/__pycache__
 src/scripts/big5_survey_scripts.egg-info
-src/scripts/runs
 src/scripts/data.csv
 src/scripts/venv
