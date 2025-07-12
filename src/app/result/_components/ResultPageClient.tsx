@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
@@ -157,6 +157,15 @@ function ResultContent() {
     }
   }, [testData?.personalityScores])
 
+  const withResultData = useMemo(() => {
+    const dataParam = searchParams.get('data')!
+    const parsedData: TestData = unzipData(dataParam)
+    return zipData({
+      ...parsedData,
+      userType: 'new',
+    })
+  }, [searchParams])
+
   const fetchRecommendations = async (personalityScores: PersonalityScores) => {
     setIsLoadingRecommendations(true)
     setRecommendationError('')
@@ -172,12 +181,7 @@ function ResultContent() {
   }
 
   const handleShare = async () => {
-    const dataParam = searchParams.get('data')! // http://localhost:3000/result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjPQUXKEUM5KVqbGOkp-QMpIR8lfycrYsFZHKbm0qCg1r8Q5J7EYqCc6thYAWRMcFw
-    const parsedData: TestData = unzipData(dataParam)
-    const url = `${window.location.origin}/result?data=${zipData({
-      ...parsedData,
-      userType: 'new',
-    })}`
+    const url = `${window.location.origin}/result?data=${withResultData}` // result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjPQUXKEUM5KVqbGOkp-QMpIR8lfycrYsFZHKbm0qCg1r8Q5J7EYqCc6thYAWRMcFw
 
     const shareData = {
       title: 'Big5 성격 분석 결과',
@@ -267,6 +271,12 @@ function ResultContent() {
           <Button onClick={handleShare} size="lg" className="flex items-center gap-2">
             <Share2 className="h-4 w-4" />
             결과 공유하기
+          </Button>
+        </div>
+
+        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
+            <Link href={`https://lostark.enzo.kr/result?data=${withResultData}`}>로스트아크 직업 보기</Link>
           </Button>
         </div>
       </main>
