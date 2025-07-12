@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import ast
 import torch
 import torch.nn as nn
 from torch.optim import Adam
@@ -8,8 +9,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import CosineAnnealingLR
-import json
-import numpy as np
 from model import PsychModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -17,14 +16,8 @@ print(f"Using device: {device}")
 
 class PsychDataset(Dataset):
     def __init__(self, csv_path, label_classes=None):
-        print("📥 Reading CSV...")
         df = pd.read_csv(csv_path)
-
-        print("🔍 Parsing answers...")
-        df["ans_dict"] = df["answers"].apply(json.loads)
-        # df["ans_dict"] = df["answers"].apply(lambda x: ast.literal_eval(x))
-
-        print("📊 Extracting traits...")
+        df["ans_dict"] = df["answers"].apply(lambda x: ast.literal_eval(x))
         df[["A", "C", "E", "N", "O"]] = df["ans_dict"].apply(pd.Series)
         df["label"] = df["class"] + "_" + df["specialization"]
         self.label_enc = LabelEncoder()
@@ -34,26 +27,13 @@ class PsychDataset(Dataset):
             df["label_id"] = self.label_enc.transform(df["label"])
         else:
             df["label_id"] = self.label_enc.fit_transform(df["label"])
-            
-        print("🧪 Checking for NaNs...")
-        trait_cols = ["A", "C", "E", "N", "O"]
-        df[trait_cols] = df[trait_cols].apply(pd.to_numeric, errors="coerce")
-        nan_rows = df[trait_cols].isna().sum().sum()
-        if nan_rows > 0:
-            print(f"⚠️ Found {nan_rows} NaN values, dropping them")
-            df.dropna(subset=trait_cols, inplace=True)
 
         # Convert to tensor and normalize to -1 to 1
         # Original range 0-100. To normalize to -1 to 1: (value / 50) - 1
-        print("🧪 Converting X to tensor...")
-        X_np = df[["A", "C", "E", "N", "O"]].to_numpy().astype(np.float32)
-        self.X = torch.from_numpy(X_np)
-        self.X = (self.X / 50.0) - 1.0
-        print("✅ X tensor created.")
+        self.X = torch.tensor(df[["A", "C", "E", "N", "O"]].values, dtype=torch.float32)
+        self.X = (self.X / 50.0) - 1.0 # Normalization step
         
-        print("🧪 Converting y to tensor...")
         self.y = torch.tensor(df["label_id"].values, dtype=torch.long)
-        print("✅ y tensor created.")
         self.num_classes = len(self.label_enc.classes_)
         # print(self.num_classes, self.label_enc.classes_)
 
@@ -63,7 +43,7 @@ class PsychDataset(Dataset):
     def __getitem__(self, idx):
         return self.X[idx], self.y[idx]
 
-def train(csv_path, epochs=2000, batch_size=512, lr=2e-4, model_path="model.pth"):
+def train(csv_path, epochs=2000, batch_size=256, lr=2e-4, model_path="model.pth"):
     label_classes = None
     model = None
 
@@ -75,17 +55,11 @@ def train(csv_path, epochs=2000, batch_size=512, lr=2e-4, model_path="model.pth"
 
     # Dataset and dataloader
     ds = PsychDataset(csv_path, label_classes=label_classes)
-    print("📦 Splitting dataset...")
     train_idx, val_idx = train_test_split(range(len(ds)), test_size=0.2, random_state=42)
-    print(f"✅ Train size: {len(train_idx)}, Val size: {len(val_idx)}")
-    
-    print("📦 Building dataloaders...")
     train_dl = DataLoader(torch.utils.data.Subset(ds, train_idx), batch_size=batch_size, shuffle=True)
     val_dl = DataLoader(torch.utils.data.Subset(ds, val_idx), batch_size=batch_size)
-    print("✅ Dataloaders ready.")
 
     # Model
-    print("🧠 Initializing model...")
     model = PsychModel(num_classes=ds.num_classes).to(device)
 
     if os.path.exists(model_path):
@@ -93,7 +67,11 @@ def train(csv_path, epochs=2000, batch_size=512, lr=2e-4, model_path="model.pth"
         print("Model weights loaded.")
 
     # Training components
-    opt = Adam(model.parameters(), lr=lr)
+    opt = Adam(model.parameters(), lr=lr, weight_decay=1e-4)
+    best_acc = 0
+    epochs_no_improve = 0
+    patience = 20  # ✅ 조기 종료 기준
+
     scheduler = CosineAnnealingLR(opt, T_max=epochs)
     crit = nn.CrossEntropyLoss()
     writer = SummaryWriter(log_dir="runs/psych_model")
@@ -127,6 +105,23 @@ def train(csv_path, epochs=2000, batch_size=512, lr=2e-4, model_path="model.pth"
         writer.add_scalar("Loss/train", avg_loss, epoch)
         writer.add_scalar("Accuracy/val", acc, epoch)
         writer.add_scalar("LR", scheduler.get_last_lr()[0], epoch)
+
+        # ✅ 조기 종료 조건 확인
+        if acc > best_acc:
+            best_acc = acc
+            epochs_no_improve = 0
+            torch.save({
+                "model_state": model.state_dict(),
+                "label_classes": ds.label_enc.classes_,
+                "epoch": epoch,
+                "acc": acc
+            }, model_path)
+            print(f"✅ Saved checkpoint (epoch {epoch}) – Val Acc: {acc:.4f}")
+        else:
+            epochs_no_improve += 1
+            if epochs_no_improve >= patience:
+                print("🛑 Early stopping triggered.")
+                break
 
         if epoch % 10 == 0:
             print(f"Epoch {epoch:02d} – Loss: {avg_loss:.4f}, Val Acc: {acc:.4f}")
