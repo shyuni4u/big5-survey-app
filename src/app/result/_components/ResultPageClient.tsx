@@ -15,7 +15,7 @@ import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
 import RecommendationSection from '@/components/molecules/RecommendationSection'
 import { Share2 } from 'lucide-react'
 import { Footer } from '@/components/atoms/Footer'
-import { CoupangParters } from '@/components/atoms/CoupangParters'
+import { CoupangPartners } from '@/components/atoms/CoupangPartners'
 
 Chart.register(...registerables)
 
@@ -246,7 +246,7 @@ function ResultContent() {
           error={recommendationError}
         />
 
-        <CoupangParters />
+        <CoupangPartners />
 
         <Card className="animate-slide-up border-border bg-card text-center shadow-lg">
           <CardHeader>
@@ -268,7 +268,7 @@ function ResultContent() {
 
         <AboutSection />
 
-        <CoupangParters />
+        <CoupangPartners />
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">

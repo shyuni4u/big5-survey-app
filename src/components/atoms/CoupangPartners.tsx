@@ -1,6 +1,6 @@
 import Image from 'next/image'
 
-export const CoupangParters = () => {
+export const CoupangPartners = () => {
   return (
     <div className="my-2 flex justify-center">
       <a href="https://link.coupang.com/a/cEqZFB" target="_blank" referrerPolicy="unsafe-url">

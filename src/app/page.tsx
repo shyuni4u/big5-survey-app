@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/atoms/Header'
-import { CoupangParters } from '@/components/atoms/CoupangParters'
+import { CoupangPartners } from '@/components/atoms/CoupangPartners'
 
 export const metadata: Metadata = {
   title: `Big5 성격 분석 | ${GAME_NAME} 직업 추천 테스트`,
@@ -100,7 +100,7 @@ export default function HomePage() {
             </div>
           </CardContent>
         </Card>
-        <CoupangParters />
+        <CoupangPartners />
       </main>
 
       {/* Footer */}
