@@ -20,7 +20,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    domains: ['lh3.googleusercontent.com'],
   },
   reactStrictMode: true,
 }

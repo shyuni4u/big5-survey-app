@@ -4,18 +4,18 @@ import { useEffect, useRef, useState, Suspense, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
-import { GAME_NAME, traitInfo } from '@/lib/data'
+import { games, traitInfo } from '@/lib/data'
 import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
-import ResultCard from '@/components/molecules/ResultCard'
-import AboutSection from '@/components/molecules/AboutSection'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
-import RecommendationSection from '@/components/molecules/RecommendationSection'
-import { Share2 } from 'lucide-react'
 import { Footer } from '@/components/atoms/Footer'
 import { CoupangPartners } from '@/components/atoms/CoupangPartners'
+import ResultCard from '@/components/molecules/ResultCard'
+import AboutSection from '@/components/molecules/AboutSection'
+import RecommendationSection from '@/components/molecules/RecommendationSection'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Share2 } from 'lucide-react'
 
 Chart.register(...registerables)
 
@@ -24,6 +24,11 @@ function ResultContent() {
   const searchParams = useSearchParams()
   const chartRef = useRef<HTMLCanvasElement>(null)
   const chartInstance = useRef<Chart | null>(null)
+  const game = searchParams.get('game')
+  if (!game) {
+    router.push('/')
+    throw new Error('게임 정보가 필요합니다.')
+  }
 
   const [testData, setTestData] = useState<TestData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -37,11 +42,25 @@ function ResultContent() {
   const [recommendationError, setRecommendationError] = useState<string>('')
 
   useEffect(() => {
-    const dataParam = searchParams.get('data') // /result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjHRUXIEUmY6Ss5KVmaGOkp-SlZG5jpK_kCeQa2OUnJpUVFqXolzTmIxUE90bC0AWlkcIA
+    const dataParam = searchParams.get('data') // /result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjHRUXIEUmY6Ss5KVmaGOkp-SlZG5jpK_kCeQa2OUnJpUVFqXolzTmIxUE90bC0AWlkcIA&game=LostArk
 
     if (!dataParam) {
       router.push('/')
       return
+    }
+
+    const fetchRecommendations = async (personalityScores: PersonalityScores) => {
+      setIsLoadingRecommendations(true)
+      setRecommendationError('')
+      try {
+        const data = await predict(game, personalityScores)
+        setRecommendations(data.top_5_recommendations || [])
+      } catch (error) {
+        console.error('Failed to get recommendations locally:', error)
+        setRecommendationError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.')
+      } finally {
+        setIsLoadingRecommendations(false)
+      }
     }
 
     try {
@@ -59,7 +78,7 @@ function ResultContent() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  app: GAME_NAME,
+                  app: game,
                   answers: parsedData.personalityScores,
                   class: _class,
                   specialization: _spec,
@@ -86,7 +105,7 @@ function ResultContent() {
       console.error('Failed to parse test data:', error)
       router.push('/')
     }
-  }, [searchParams, router])
+  }, [searchParams, router, game])
 
   useEffect(() => {
     const scores = testData?.personalityScores
@@ -167,26 +186,12 @@ function ResultContent() {
     })
   }, [searchParams])
 
-  const fetchRecommendations = async (personalityScores: PersonalityScores) => {
-    setIsLoadingRecommendations(true)
-    setRecommendationError('')
-    try {
-      const data = await predict(personalityScores)
-      setRecommendations(data.top_5_recommendations || [])
-    } catch (error) {
-      console.error('Failed to get recommendations locally:', error)
-      setRecommendationError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.')
-    } finally {
-      setIsLoadingRecommendations(false)
-    }
-  }
-
   const handleShare = async () => {
-    const url = `${window.location.origin}/result?data=${withResultData}` // result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjPQUXKEUM5KVqbGOkp-QMpIR8lfycrYsFZHKbm0qCg1r8Q5J7EYqCc6thYAWRMcFw
+    const url = `${window.location.origin}/result?data=${withResultData}&game=${game}` // result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjPQUXKEUM5KVqbGOkp-QMpIR8lfycrYsFZHKbm0qCg1r8Q5J7EYqCc6thYAWRMcFw
 
     const shareData = {
       title: 'Big5 성격 분석 결과',
-      text: `나의 성격 분석 결과와 ${GAME_NAME} 직업 추천을 확인해보세요!`,
+      text: `나의 성격 분석 결과와 ${game} 직업 추천을 확인해보세요!`,
       url,
     }
 
@@ -241,6 +246,7 @@ function ResultContent() {
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-8">
         {/* AI 추천 결과 섹션 */}
         <RecommendationSection
+          game={game}
           recommendations={recommendations}
           isLoading={isLoadingRecommendations}
           error={recommendationError}
@@ -281,12 +287,19 @@ function ResultContent() {
         </div>
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
-            <Link href={`https://lostark.enzo.kr/result?data=${withResultData}`}>로스트아크 직업 보기</Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
-            <Link href={`https://dnf.enzo.kr/result?data=${withResultData}`}>던파 직업 보기</Link>
-          </Button>
+          {games
+            .filter((g) => g.id !== game)
+            .map((game) => (
+              <Button
+                key={game.id}
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-border bg-transparent hover:bg-secondary"
+              >
+                <Link href={`/result?data=${withResultData}&game=${game.id}`}>{game.name} 직업 추천 받기</Link>
+              </Button>
+            ))}
         </div>
       </main>
 

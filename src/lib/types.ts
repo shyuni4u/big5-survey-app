@@ -40,6 +40,12 @@ export type TestData = {
   currentClass?: string[]
 }
 
+export type Game = {
+  id: string
+  name: string
+  image: string
+}
+
 export type GameClass = {
   name: string
   nameKr: string

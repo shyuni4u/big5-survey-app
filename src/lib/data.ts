@@ -1,4 +1,4 @@
-import type { Question, TraitInfo, ResultInterpretation, AboutContent, GameClass } from '@/lib/types'
+import type { Question, TraitInfo, ResultInterpretation, AboutContent, GameClass, Game } from '@/lib/types'
 
 export const questions: Question[] = [
   // 외향성 (Extraversion) - E
@@ -322,7 +322,23 @@ export const aboutContent: AboutContent[] = [
   },
 ]
 
-export const GAME_NAME = 'WoW'
+export const games: Game[] = [
+  {
+    id: 'DNF',
+    name: '던전앤파이터',
+    image: '/icons/dnf.png',
+  },
+  {
+    id: 'LostArk',
+    name: '로스트아크',
+    image: '/icons/lostark.png',
+  },
+  {
+    id: 'WoW',
+    name: '와우',
+    image: '/icons/wow.png',
+  },
+]
 export const wowClasses: GameClass[] = [
   {
     name: 'Death Knight',
@@ -999,3 +1015,16 @@ export const lostarkClasses: GameClass[] = [
     ],
   },
 ]
+
+export const getGameClasses = (game: string) => {
+  switch (game.toLowerCase()) {
+    case 'dnf':
+      return []
+    case 'lostark':
+      return lostarkClasses
+    case 'wow':
+      return wowClasses
+    default:
+      return []
+  }
+}

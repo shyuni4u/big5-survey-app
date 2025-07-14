@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
-import { questions, wowClasses, lostarkClasses } from '@/lib/data'
+import { questions, getGameClasses } from '@/lib/data'
 import type { TestData, UserAnswers, PersonalityScores } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +16,13 @@ function TestContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const userType = searchParams.get('type') as 'existing' | 'new' | null
+  const game = searchParams.get('game')
+  if (!game) {
+    router.push('/')
+    throw new Error('게임 정보가 필요합니다.')
+  }
+
+  const gameClasses = getGameClasses(game)
 
   const [currentStep, setCurrentStep] = useState<'personality' | 'class-selection'>('personality')
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -160,7 +167,7 @@ function TestContent() {
       currentClass: selectedClassList.map((item) => [item.class, item.spec].join(SEPERATE_TOKEN)),
     }
     const hashedData = zipData(testData)
-    router.replace(`/result?data=${hashedData}`)
+    router.replace(`/result?data=${hashedData}&game=${game}`)
   }
 
   if (!userType) {
@@ -173,7 +180,7 @@ function TestContent() {
   const isLastPage = currentQuestionIndex + questionsPerPage >= shuffledQuestions.length
 
   if (currentStep === 'class-selection') {
-    const selectedClassData = wowClasses.find((cls) => cls.name === selectedClass)
+    const selectedClassData = gameClasses.find((cls) => cls.name === selectedClass)
 
     return (
       <div className="vscode-gradient min-h-screen">
@@ -196,7 +203,7 @@ function TestContent() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-                  {wowClasses.map((gameClass) => (
+                  {gameClasses.map((gameClass) => (
                     <Button
                       key={gameClass.name}
                       type="button"
@@ -250,7 +257,7 @@ function TestContent() {
                           <Image
                             src={spec.image || '/placeholder.svg'}
                             alt={spec.name}
-                            className="h-8 w-8 rounded"
+                            className={cn('w-8 rounded', game.toLowerCase() === 'lostark' ? 'h-9' : 'h-8')}
                             width="56"
                             height="56"
                             unoptimized
@@ -282,7 +289,7 @@ function TestContent() {
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {selectedClassList.map((obj) => {
-                      const _class = wowClasses.find((c) => c.name === obj.class)!
+                      const _class = gameClasses.find((c) => c.name === obj.class)!
                       const _spec = _class.specs.find((s) => s.name === obj.spec)!
 
                       return (
@@ -301,7 +308,7 @@ function TestContent() {
                             <Image
                               src={_spec.image || '/placeholder.svg'}
                               alt={_spec.name}
-                              className="h-8 w-8 rounded"
+                              className={cn('w-8 rounded', game.toLowerCase() === 'lostark' ? 'h-9' : 'h-8')}
                               width="56"
                               height="56"
                               unoptimized

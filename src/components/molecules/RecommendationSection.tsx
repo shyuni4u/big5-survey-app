@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { GAME_NAME, gameClasses } from '@/lib/data'
+import { getGameClasses } from '@/lib/data'
 import { cn } from '@/lib/utils'
 import { Trophy, Medal, Award, AlertTriangle } from 'lucide-react'
 
@@ -14,12 +14,13 @@ interface Recommendation {
 }
 
 interface RecommendationSectionProps {
+  game: string
   recommendations: Recommendation[]
   isLoading: boolean
   error?: string
 }
 
-export default function RecommendationSection({ recommendations, isLoading, error }: RecommendationSectionProps) {
+export default function RecommendationSection({ game, recommendations, isLoading, error }: RecommendationSectionProps) {
   const [visibleCards, setVisibleCards] = useState<number>(0)
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
 
   const getClassAndSpec = (label: string) => {
     const [className, specName] = label.split('_')
+    const gameClasses = getGameClasses(game)
     const gameClass = gameClasses.find((cls) => cls.name === className)
     const spec = gameClass?.specs.find((s) => s.name === specName)
     return { gameClass, spec }
@@ -91,7 +93,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
         return {
           cardWidth: 'w-56', // 1위: 더 큰 카드
           cardHeight: 'h-96', // 1위: 더 높은 카드
-          imageSize: 'h-20 w-20', // 1위: 더 큰 이미지
+          imageSize: cn('w-20', game.toLowerCase() === 'lostark' ? 'h-24' : 'h-20'), // 1위: 더 큰 이미지
           titleSize: 'text-xl', // 1위: 더 큰 제목
           subtitleSize: 'text-base', // 1위: 더 큰 부제목
           scoreSize: 'text-4xl', // 1위: 더 큰 점수
@@ -102,7 +104,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
         return {
           cardWidth: 'w-48', // 2위: 기본 크기
           cardHeight: 'h-80',
-          imageSize: 'h-16 w-16',
+          imageSize: cn('w-16', game.toLowerCase() === 'lostark' ? 'h-20' : 'h-16'),
           titleSize: 'text-lg',
           subtitleSize: 'text-sm',
           scoreSize: 'text-3xl',
@@ -113,7 +115,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
         return {
           cardWidth: 'w-44', // 3위: 더 작은 카드
           cardHeight: 'h-72', // 3위: 더 낮은 카드
-          imageSize: 'h-14 w-14', // 3위: 더 작은 이미지
+          imageSize: cn('w-14', game.toLowerCase() === 'lostark' ? 'h-16' : 'h-14'), // 3위: 더 작은 이미지
           titleSize: 'text-base', // 3위: 더 작은 제목
           subtitleSize: 'text-sm', // 3위: 더 작은 부제목
           scoreSize: 'text-2xl', // 3위: 더 작은 점수
@@ -185,7 +187,7 @@ export default function RecommendationSection({ recommendations, isLoading, erro
           <Trophy className="h-10 w-10 text-yellow-900" />
         </div>
         <CardTitle className="text-3xl font-bold text-foreground md:text-4xl">🏆 추천 직업</CardTitle>
-        <p className="text-lg text-muted-foreground">당신의 성격에 가장 적합한 {GAME_NAME} 직업 TOP 3</p>
+        <p className="text-lg text-muted-foreground">당신의 성격에 가장 적합한 {game} 직업 TOP 3</p>
       </CardHeader>
 
       <CardContent className="px-4 pb-12 md:px-8">

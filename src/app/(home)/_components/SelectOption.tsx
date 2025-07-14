@@ -1,37 +1,23 @@
 'use client'
 
 import { useState } from 'react' // useState 훅 추가
-import { useRouter } from 'next/navigation' // useRouter 훅 추가
+import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import clsx from 'clsx' // 조건부 클래스 적용을 위한 clsx 라이브러리 추가 (설치 필요: npm install clsx)
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { games } from '@/lib/data'
+import type { Game } from '@/lib/types'
 
 export default function HomePage() {
-  const [selectedGame, setSelectedGame] = useState<string | null>(null) // 선택된 게임 상태
-  const [selectedUserType, setSelectedUserType] = useState<string | null>(null) // 선택된 유저 유형 상태
-  const router = useRouter() // useRouter 훅 초기화
+  const [selectedGame, setSelectedGame] = useState<Game>(games[1]) // 선택된 게임 상태
 
   // 게임 선택 핸들러
-  const handleGameSelect = (game: string) => {
+  const handleGameSelect = (game: Game) => {
     setSelectedGame(game)
   }
-
-  // 유저 유형 선택 핸들러
-  const handleUserTypeSelect = (type: string) => {
-    setSelectedUserType(type)
-  }
-
-  // 테스트 시작 버튼 클릭 핸들러
-  const handleStartTest = () => {
-    if (selectedGame && selectedUserType) {
-      // 선택된 게임과 유저 유형을 쿼리 파라미터로 전달하여 페이지 이동
-      router.push(`/survey?game=${selectedGame}&type=${selectedUserType}`)
-    }
-  }
-
-  // 버튼 활성화 여부
-  const isButtonEnabled = selectedGame !== null && selectedUserType !== null
 
   return (
     <CardContent className="space-y-8">
@@ -52,20 +38,50 @@ export default function HomePage() {
       <div className="space-y-6">
         <h3 className="text-center text-xl font-semibold text-foreground">어떤 게임을 플레이하시나요?</h3>
         <div className="flex flex-wrap justify-center gap-4">
-          {['로스트아크', '던파', '와우'].map((game) => (
-            <Button
-              key={game}
-              variant="outline"
-              className={clsx(
-                'min-w-[120px] transform transition-all duration-200',
-                selectedGame === game
-                  ? 'scale-105 border-primary bg-primary text-primary-foreground shadow-md'
-                  : 'border-gray-300 hover:scale-105 hover:border-primary/50',
-              )}
-              onClick={() => handleGameSelect(game)}
+          {games.map((game, index) => (
+            <motion.div
+              key={game.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -8 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {game}
-            </Button>
+              <Card
+                className={cn(
+                  'group relative flex h-36 w-28 cursor-pointer items-center overflow-hidden rounded-lg border align-middle transition-all duration-300',
+                  selectedGame?.id === game.id
+                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/20'
+                    : 'border-border bg-card hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10',
+                )}
+                onClick={() => handleGameSelect(game)}
+              >
+                <div className="flex min-h-16 w-16 items-center justify-center">
+                  <Image
+                    src={game.image || '/placeholder.svg'}
+                    alt={game.name}
+                    width={64}
+                    height={64}
+                    className="rounded-xl object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                </div>
+                <h3 className="text-center text-sm font-medium text-foreground transition-colors duration-200 group-hover:text-primary">
+                  {game.name}
+                </h3>
+
+                {/* Hover gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                {/* Selection indicator */}
+                {selectedGame?.id === game.id && (
+                  <motion.div
+                    layoutId="selection-indicator"
+                    className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5"
+                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+              </Card>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -73,17 +89,8 @@ export default function HomePage() {
       <div className="space-y-6">
         <h3 className="text-center text-xl font-semibold text-foreground">어떤 유형의 사용자이신가요?</h3>
         <div className="grid gap-6 md:grid-cols-2">
-          {/* 기존 유저 카드 */}
-          <div
-            className={clsx(
-              'block transform cursor-pointer transition-all duration-200',
-              selectedUserType === 'existing'
-                ? 'scale-105 border-primary shadow-lg'
-                : 'hover:scale-105 hover:border-primary/50',
-            )}
-            onClick={() => handleUserTypeSelect('existing')}
-          >
-            <Card className="h-full bg-secondary">
+          <Link href={`/survey?type=existing&game=${selectedGame.id}`} className="block">
+            <Card className="h-full transform cursor-pointer bg-secondary transition-all duration-200 hover:scale-105 hover:border-primary/50">
               <CardHeader className="text-center">
                 <div className="mb-3 text-4xl">🎮</div>
                 <CardTitle className="text-foreground">기존 유저</CardTitle>
@@ -93,33 +100,15 @@ export default function HomePage() {
                   현재 플레이 중인 직업이 있으신가요? 성격 분석과 함께 현재 직업 정보를 제공해주시면 더 정확한 분석을
                   받을 수 있습니다.
                 </p>
-                <Button
-                  className={clsx(
-                    'w-full',
-                    selectedUserType === 'existing'
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                      : 'cursor-not-allowed bg-gray-400 text-white',
-                  )}
-                  disabled={!isButtonEnabled} // 전체 활성화 조건에 따라 비활성화
-                  onClick={handleStartTest} // 버튼 클릭 시 페이지 이동
-                >
+                <Button className="pointer-events-none bg-primary text-primary-foreground hover:bg-primary/90">
                   테스트 시작하기
                 </Button>
               </CardContent>
             </Card>
-          </div>
+          </Link>
 
-          {/* 신규 유저 카드 */}
-          <div
-            className={clsx(
-              'block transform cursor-pointer transition-all duration-200',
-              selectedUserType === 'new'
-                ? 'scale-105 border-green-400 shadow-lg'
-                : 'hover:scale-105 hover:border-green-400/50',
-            )}
-            onClick={() => handleUserTypeSelect('new')}
-          >
-            <Card className="h-full bg-secondary">
+          <Link href={`/survey?type=new&game=${selectedGame.id}`} className="block">
+            <Card className="h-full transform cursor-pointer bg-secondary transition-all duration-200 hover:scale-105 hover:border-green-400/50">
               <CardHeader className="text-center">
                 <div className="mb-3 text-4xl">✨</div>
                 <CardTitle className="text-foreground">신규 유저</CardTitle>
@@ -129,21 +118,12 @@ export default function HomePage() {
                   처음 시작하시거나 새로운 직업을 찾고 계신가요? AI가 당신의 성격을 분석해서 가장 적합한 직업을
                   추천해드립니다.
                 </p>
-                <Button
-                  className={clsx(
-                    'w-full',
-                    selectedUserType === 'new'
-                      ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'cursor-not-allowed bg-gray-400 text-white',
-                  )}
-                  disabled={!isButtonEnabled} // 전체 활성화 조건에 따라 비활성화
-                  onClick={handleStartTest} // 버튼 클릭 시 페이지 이동
-                >
+                <Button className="pointer-events-none bg-green-600 text-white hover:bg-green-700">
                   테스트 시작하기
                 </Button>
               </CardContent>
             </Card>
-          </div>
+          </Link>
         </div>
       </div>
     </CardContent>

@@ -1,12 +1,7 @@
 import * as ort from 'onnxruntime-web'
-import { gameClasses } from '@/lib/data'
+import { getGameClasses } from '@/lib/data'
 
 let session: ort.InferenceSession | null = null
-
-// 월드 오브 워크래프트 직업 및 전문화 목록
-const classes: string[] = gameClasses.flatMap((gameClass) =>
-  gameClass.specs.map((spec) => `${gameClass.name}_${spec.name}`),
-)
 
 /**
  * ONNX 모델 세션을 초기화합니다.
@@ -34,12 +29,15 @@ export async function initSession(modelPath: string = '/models/model.onnx') {
  * @param answers - { A: number; C: number; E: number; N: number; O: number } 형태의 객체
  * @returns Top 5 추천 직업과 점수를 담은 객체
  */
-export async function predict(answers: Record<'A' | 'C' | 'E' | 'N' | 'O', number>): Promise<{
+export async function predict(
+  game: string,
+  answers: Record<'A' | 'C' | 'E' | 'N' | 'O', number>,
+): Promise<{
   top_5_recommendations: { label: string; score: number }[]
 }> {
   // 세션이 초기화되었는지 확인하고, 안 되어있으면 초기화 시도
   if (!session) {
-    await initSession()
+    await initSession(`/models/${game.toLowerCase()}/model.onnx`)
     if (!session) {
       // initSession 내부에서 에러를 throw하므로, 이 코드는 사실상 도달하기 어려움
       throw new Error('ONNX session is not initialized. Call initSession() first.')
@@ -76,6 +74,10 @@ export async function predict(answers: Record<'A' | 'C' | 'E' | 'N' | 'O', numbe
   }
 
   const probabilities = softmax(logits)
+
+  const classes = getGameClasses(game).flatMap((gameClass) =>
+    gameClass.specs.map((spec) => `${gameClass.name}_${spec.name}`),
+  )
 
   // 6. 확률이 높은 상위 5개 직업을 추출하고 점수와 함께 객체로 만듦
   const recommendations = Array.from(probabilities)
