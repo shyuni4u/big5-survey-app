@@ -40,6 +40,12 @@ export type TestData = {
   currentClass?: string[]
 }
 
+export type Game = {
+  id: string
+  name: string
+  image: string
+}
+
 export type GameClass = {
   name: string
   nameKr: string
@@ -51,7 +57,8 @@ export type GameClass = {
 export type GameSpec = {
   name: string
   nameKr: string
-  role: 'tanker' | 'dealer' | 'healer' | 'supporter'
-  image: string
+  role: 'tanker' | 'dealer' | 'healer' | 'supporter' | 'buffer'
+  position?: string
+  image?: string
   description: string
 }

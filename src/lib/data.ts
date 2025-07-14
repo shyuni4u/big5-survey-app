@@ -1,4 +1,4 @@
-import type { Question, TraitInfo, ResultInterpretation, AboutContent, GameClass } from '@/lib/types'
+import type { Question, TraitInfo, ResultInterpretation, AboutContent, GameClass, Game } from '@/lib/types'
 
 export const questions: Question[] = [
   // 외향성 (Extraversion) - E
@@ -322,8 +322,24 @@ export const aboutContent: AboutContent[] = [
   },
 ]
 
-export const GAME_NAME = 'WoW'
-export const gameClasses: GameClass[] = [
+export const games: Game[] = [
+  {
+    id: 'DNF',
+    name: '던전앤파이터',
+    image: '/icons/dnf.png',
+  },
+  {
+    id: 'LostArk',
+    name: '로스트아크',
+    image: '/icons/lostark.png',
+  },
+  {
+    id: 'WoW',
+    name: '와우',
+    image: '/icons/wow.png',
+  },
+]
+export const wowClasses: GameClass[] = [
   {
     name: 'Death Knight',
     nameKr: '죽음의 기사',
@@ -702,3 +718,943 @@ export const gameClasses: GameClass[] = [
     ],
   },
 ]
+
+export const lostarkClasses: GameClass[] = [
+  {
+    name: 'Assassin (Female)',
+    nameKr: '암살자 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-assassin.png',
+    color: '#7b48a3',
+    specs: [
+      {
+        name: 'Blade',
+        nameKr: '블레이드',
+        role: 'dealer',
+        image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Blade-border.png',
+        description: '세 자루의 검을 사용하여 혼돈의 힘을 제어하며 적들을 빠르고 현란하게 공격합니다.',
+      },
+      {
+        name: 'Reaper',
+        nameKr: '리퍼',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Reaper-border.png',
+        description: '단검과 그림자 기술을 사용하여 적의 배후를 노리는 암살의 귀재입니다.',
+      },
+      {
+        name: 'Shadowhunter',
+        nameKr: '데모닉',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Demonic-border.png',
+        description: '내재된 악마의 힘을 해방하여 파괴적인 힘으로 적들을 섬멸합니다.',
+      },
+      {
+        name: 'Souleater',
+        nameKr: '소울이터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Souleater-border.png',
+        description: '거대한 낫을 사용하여 망자의 영혼을 베고, 그 힘을 흡수하여 강력한 공격을 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Hunter (Female)',
+    nameKr: '헌터 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-hunter_female.png',
+    color: '#7199a9',
+    specs: [
+      {
+        name: 'Gunslinger',
+        nameKr: '건슬링어',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Gunslinger-border.png',
+        description: '세 가지 총기를 사용하여 전장을 지배하는 민첩하고 치명적인 여성 명사수입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Hunter (Male)',
+    nameKr: '헌터 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-hunter_male.png',
+    color: '#7199a9',
+    specs: [
+      {
+        name: 'Artillerist',
+        nameKr: '블래스터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Blaster-border.png',
+        description: '거대한 메카닉 런처와 중화기를 사용하여 막강한 화력을 퍼붓는 포격 전문가입니다.',
+      },
+      {
+        name: 'Deadeye',
+        nameKr: '데빌헌터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Devilhunter-border.png',
+        description: '세 가지 총기를 자유자재로 바꾸며 스타일리시한 전투를 펼치는 명사수입니다.',
+      },
+      {
+        name: 'Machinist',
+        nameKr: '스카우터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Scouter-border.png',
+        description: '최첨단 드론과 합작하여 전투를 펼치며, 하이퍼 싱크 상태로 변신할 수 있습니다.',
+      },
+      {
+        name: 'Sharpshooter',
+        nameKr: '호크아이',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Hawkeye-border.png',
+        description: '기계 활과 특수 화살을 사용하여 민첩하고 정교한 공격을 하는 명궁입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Mage (Female)',
+    nameKr: '마법사 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-magician.png',
+    color: '#a371b8',
+    specs: [
+      {
+        name: 'Bard',
+        nameKr: '바드',
+        role: 'supporter',
+        image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Bard-border.png',
+        description: '신성한 하프 연주로 아군을 치유하고 적을 공격하는 선율의 지휘자입니다.',
+      },
+      {
+        name: 'Summoner',
+        nameKr: '서머너',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Summoner-border.png',
+        description: '다양한 정령을 소환하여 함께 전투를 벌이는 강력한 원소 마법사입니다.',
+      },
+      {
+        name: 'Arcanist',
+        nameKr: '아르카나',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Arcana-border.png',
+        description: '마법이 깃든 카드를 사용하여 변칙적이고 화려한 공격을 구사합니다.',
+      },
+      {
+        name: 'Sorceress',
+        nameKr: '소서리스',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Sorceress-border.png',
+        description: '강력한 원소 마법으로 넓은 범위의 적들을 한 번에 쓸어버리는 정통 마법사입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Martial Artist (Female)',
+    nameKr: '무도가 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-fighter_female.png',
+    color: '#c1834c',
+    specs: [
+      {
+        name: 'Battle Master',
+        nameKr: '배틀마스터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Battlemaster-border.png',
+        description: '빠른 몸놀림과 강력한 연계기로 적을 몰아붙이는 근접 전투의 달인입니다.',
+      },
+      {
+        name: 'Glaivier',
+        nameKr: '창술사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Lancemaster-border.png',
+        description: '창과 언월도를 자유자재로 바꾸며 예측불허의 공격을 구사합니다.',
+      },
+      {
+        name: 'Infighter',
+        nameKr: '인파이터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Infighter-border.png',
+        description: '묵직한 헤비 건틀렛을 사용하여 파괴적인 충격 에너지를 적에게 쏟아붓습니다.',
+      },
+      {
+        name: 'Soulfist',
+        nameKr: '기공사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Soulmaster-border.png',
+        description: '내공을 활용하여 근거리와 원거리를 오가며 다채로운 공격을 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Martial Artist (Male)',
+    nameKr: '무도가 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-fighter_male.png',
+    color: '#c1834c',
+    specs: [
+      {
+        name: 'Breaker',
+        nameKr: '브레이커',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Breaker-border.png',
+        description: '헤비 건틀렛을 사용하며, 묵직하고 강력한 한 방으로 모든 것을 파괴합니다.',
+      },
+      {
+        name: 'Striker',
+        nameKr: '스트라이커',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Striker-border.png',
+        description: '강력한 발차기와 번개 같은 움직임으로 적을 제압하는 남성 무도가입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Specialist (Female)',
+    nameKr: '스페셜리스트 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-specialist.png',
+    color: '#e8ab5a',
+    specs: [
+      {
+        name: 'Artist',
+        nameKr: '도화가',
+        role: 'supporter',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Artist-border.png',
+        description: '환영의 힘이 담긴 붓으로 아군을 돕거나 적을 공격하는 전략적인 서포터입니다.',
+      },
+      {
+        name: 'Aeromancer',
+        nameKr: '기상술사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Aeromancer-border.png',
+        description: '우산을 사용하여 날씨를 자유자재로 바꾸며 다채로운 스킬을 구사합니다.',
+      },
+      {
+        name: 'Wildsoul',
+        nameKr: '환수사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Wildsoul-border.png',
+        description: '환수의 힘이 봉인된 두루마리를 바탕으로 환수를 소환하거나 환수로 변신하여 전투를 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Warrior (Female)',
+    nameKr: '전사 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-warrior.png',
+    color: '#a45141',
+    specs: [
+      {
+        name: 'Slayer',
+        nameKr: '슬레이어',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Slayer-border.png',
+        description: '대검을 사용하는 호쾌한 스타일의 여성 전사로, 적을 무자비하게 베어버립니다.',
+      },
+      {
+        name: 'Valkyrie',
+        nameKr: '발키리',
+        role: 'supporter',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Valkyrie-border.png',
+        description: '빛의 힘으로 아군을 치유하고 전장을 이끄는 서포트형 클래스입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Warrior (Male)',
+    nameKr: '전사 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-warrior.png',
+    color: '#a45141',
+    specs: [
+      {
+        name: 'Berserker',
+        nameKr: '버서커',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Berserker-border.png',
+        description: '거대한 대검을 사용하여 적을 섬멸하는 분노의 화신입니다.',
+      },
+      {
+        name: 'Destroyer',
+        nameKr: '디스트로이어',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Destroyer-border.png',
+        description: '강력한 중력 해머로 적을 분쇄하는 파괴적인 전사입니다.',
+      },
+      {
+        name: 'Holy Knight',
+        nameKr: '홀리나이트',
+        role: 'supporter',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Holyknight-border.png',
+        description: '신념의 검과 신앙의 힘으로 아군을 지원하고 전장을 이끄는 서포터입니다.',
+      },
+      {
+        name: 'Warlord',
+        nameKr: '워로드',
+        role: 'tanker',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Warlord-border.png',
+        description: '건랜스와 방패를 이용해 아군을 보호하고 전장을 지휘하는 든든한 방패입니다.',
+      },
+    ],
+  },
+]
+
+export const dnfClasses: GameClass[] = [
+  // 총검사
+  {
+    name: 'Agent',
+    nameKr: '총검사',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_14.png',
+    color: '#7b7268',
+    specs: [
+      {
+        name: 'Hitman',
+        nameKr: '히트맨',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '장도와 SMG를 이용해 적을 섬멸하는 총검사',
+      },
+      {
+        name: 'Secret Agent',
+        nameKr: '요원',
+        role: 'dealer',
+        position: '0 0',
+        description: '빠르고 절도있는 총검술을 활용하는 비밀 요원',
+      },
+      {
+        name: 'Specialist',
+        nameKr: '스페셜리스트',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '코어 에너지를 활용하여 적을 무력화시키는 전문가',
+      },
+      {
+        name: 'Troubleshooter',
+        nameKr: '트러블 슈터',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '총검과 샷건, 폭탄으로 적을 제압하는 전장의 해결사',
+      },
+    ],
+  },
+  // 아처
+  {
+    name: 'Archer',
+    nameKr: '아처',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_16.png',
+    color: '#83d3c3',
+    specs: [
+      {
+        name: 'Chimera',
+        nameKr: '키메라',
+        role: 'dealer',
+        position: '-800px 0',
+        description: '요수화의 힘을 극한으로 제어하여, 근접 전투에서 강력한 힘을 발휘하는 전사',
+      },
+      {
+        name: 'Hunter',
+        nameKr: '헌터',
+        role: 'dealer',
+        position: '-400px 0',
+        description: "매의 형상을 한 기계 '팔케'와 함께 전장을 누비며 적을 사냥하는 명사수",
+      },
+      {
+        name: 'Muse',
+        nameKr: '뮤즈',
+        role: 'buffer',
+        position: '-200px 0',
+        description: '활을 악기처럼 연주하여 아군에게 강력한 버프를 제공하는 음악가이자 버퍼',
+      },
+      {
+        name: 'Traveler',
+        nameKr: '트래블러',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '신비한 힘이 깃든 도구를 활용하여 화려하고 강력한 공격을 하는 자유로운 여행가',
+      },
+      {
+        name: 'Vigilante',
+        nameKr: '비질란테',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '인간과 요수의 힘을 동시에 사용하여 변칙적인 근접 공격을 펼치는 추격자',
+      },
+    ],
+  },
+  // 격투가 (여)
+  {
+    name: 'Fighter (F)',
+    nameKr: '격투가 (여)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_04.png',
+    color: '#e29412',
+    specs: [
+      {
+        name: 'Brawler',
+        nameKr: '스트리트파이터',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '이기기 위한 싸움에 특화되어 독, 바늘 등 다양한 암기와 도구를 사용',
+      },
+      {
+        name: 'Grappler',
+        nameKr: '그래플러',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '강력한 잡기 기술을 연계하여 적을 제압하는 데 특화된 유술가',
+      },
+      {
+        name: 'Nen Master',
+        nameKr: '넨마스터',
+        role: 'dealer',
+        position: '0px 0',
+        description: '넨의 힘을 다루어 아군을 보호하고, 빛의 힘으로 적을 공격하는 격투가',
+      },
+      {
+        name: 'Striker',
+        nameKr: '스트라이커',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '극한의 단련을 통해 강력한 발차기와 일격 필살의 기술을 사용하는 정통파 격투가',
+      },
+    ],
+  },
+  // 격투가 (남)
+  {
+    name: 'Fighter (M)',
+    nameKr: '격투가 (남)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_03.png',
+    color: '#c97811',
+    specs: [
+      {
+        name: 'Brawler',
+        nameKr: '스트리트파이터',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '살아남기 위해 수단과 방법을 가리지 않는 뒷골목 싸움의 달인',
+      },
+      {
+        name: 'Grappler',
+        nameKr: '그래플러',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '강력한 잡기 기술로 적에게 반격의 틈을 주지 않고 제압하는 유술가',
+      },
+      {
+        name: 'Nen Master',
+        nameKr: '넨마스터',
+        role: 'dealer',
+        position: '0 0',
+        description: '넨의 힘으로 아군을 보호하고 빛의 힘으로 적을 공격하는 격투가',
+      },
+      {
+        name: 'Striker',
+        nameKr: '스트라이커',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '자신의 몸을 극한까지 단련하여 빠르고 강력한 타격을 하는 정통파 격투가',
+      },
+    ],
+  },
+  // 거너 (여)
+  {
+    name: 'Gunner (F)',
+    nameKr: '거너 (여)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_06.png',
+    color: '#a1a5ad',
+    specs: [
+      {
+        name: 'Launcher',
+        nameKr: '런처',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '남성 런처보다 가볍고 빠르게 중화기를 운용하며 전장을 지배',
+      },
+      {
+        name: 'Mechanic',
+        nameKr: '메카닉',
+        role: 'dealer',
+        position: '-400px 0',
+        description: 'G-시리즈라 불리는 특수 로봇을 운용하여 전투를 효율적으로 이끄는 지휘관',
+      },
+      {
+        name: 'Paramedic',
+        nameKr: '패러메딕',
+        role: 'buffer',
+        position: '-800px 0',
+        description: '아군을 치유하고 보호하는 능력을 갖춘 의무병이자 버퍼',
+      },
+      {
+        name: 'Ranger',
+        nameKr: '레인저',
+        role: 'dealer',
+        position: '0 0',
+        description: '건블레이드를 활용한 체술과 리볼버 사격술을 구사하는 무법지대의 황녀',
+      },
+      {
+        name: 'Spitfire',
+        nameKr: '스핏파이어',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '공중에서 니트로 모터를 활용하여 다양한 속성의 탄환으로 적을 섬멸',
+      },
+    ],
+  },
+  // 거너 (남)
+  {
+    name: 'Gunner (M)',
+    nameKr: '거너 (남)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_05.png',
+    color: '#848a93',
+    specs: [
+      {
+        name: 'Blitz',
+        nameKr: '어썰트',
+        role: 'dealer',
+        position: '-800px 0',
+        description: '개조된 신체를 바탕으로 한 기동성과 강력한 화력을 동시에 갖춘 특수 요원',
+      },
+      {
+        name: 'Launcher',
+        nameKr: '런처',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '핸드캐논, 레이저 라이플 등 각종 중화기를 이용하여 전장을 초토화',
+      },
+      {
+        name: 'Mechanic',
+        nameKr: '메카닉',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '다양한 로봇과 기계 장치를 소환하여 전투를 유리하게 이끄는 전략가',
+      },
+      {
+        name: 'Ranger',
+        nameKr: '레인저',
+        role: 'dealer',
+        position: '0 0',
+        description: '리볼버를 이용한 빠른 사격과 화려한 체술을 결합하여 적을 제압',
+      },
+      {
+        name: 'Spitfire',
+        nameKr: '스핏파이어',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '다양한 종류의 탄환을 사용하여 전술적인 원거리 공격을 수행',
+      },
+    ],
+  },
+  // 나이트
+  {
+    name: 'Knight',
+    nameKr: '나이트',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_12.png',
+    color: '#f4c3c3',
+    specs: [
+      {
+        name: 'Chaos',
+        nameKr: '카오스',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '악마의 피를 가진 반인반마 기사',
+      },
+      {
+        name: 'Dragon Knight',
+        nameKr: '드래곤나이트',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '드래곤과 함께 전장을 누비는 용기사',
+      },
+      {
+        name: 'Elven Knight',
+        nameKr: '엘븐나이트',
+        role: 'dealer',
+        position: '0 0',
+        description: '자연으로부터 강력한 힘을 부여 받은 요정 기사',
+      },
+      {
+        name: 'Paladin',
+        nameKr: '팔라딘',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '빛의 힘을 부여 받은 신념의 수호 기사',
+      },
+    ],
+  },
+  // 마창사
+  {
+    name: 'Lancer',
+    nameKr: '마창사',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_13.png',
+    color: '#49448a',
+    specs: [
+      {
+        name: 'Dragoon',
+        nameKr: '드래고니안 랜서',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '서번트 랜스를 활용하여 마수를 사냥하는 마수 사냥꾼',
+      },
+      {
+        name: 'Impaler',
+        nameKr: '다크 랜서',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '마창의 기운에 투창술을 접목하여 사용하는 마창사',
+      },
+      {
+        name: 'Skirmisher',
+        nameKr: '듀얼리스트',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '마창의 힘을 대인 전투에 특화시킨 창술의 달인',
+      },
+      {
+        name: 'Vanguard',
+        nameKr: '뱅가드',
+        role: 'dealer',
+        position: '0 0',
+        description: '늘 전투의 최전방에서 다수의 적과 싸우며 파괴하는 마창사',
+      },
+    ],
+  },
+  // 마법사 (여)
+  {
+    name: 'Mage (F)',
+    nameKr: '마법사 (여)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_08.png',
+    color: '#a965c8',
+    specs: [
+      {
+        name: 'Battle Mage',
+        nameKr: '배틀메이지',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '체술과 마법을 결합하여 빠르고 현란한 근접 전투를 펼치는 전투 마법사',
+      },
+      {
+        name: 'Elementalist',
+        nameKr: '엘레멘탈마스터',
+        role: 'dealer',
+        position: '0 0',
+        description: '불, 물, 빛, 어둠의 4대 원소 마법을 극한까지 연마한 정통 마법사',
+      },
+      {
+        name: 'Enchantress',
+        nameKr: '인챈트리스',
+        role: 'buffer',
+        position: '-800px 0',
+        description: '저주와 인형술을 사용하여 아군의 능력을 극대화하고 적을 약화시키는 버퍼',
+      },
+      {
+        name: 'Summoner',
+        nameKr: '소환사',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '다양한 정령과 계약하여 강력한 소환수 군단을 이끌고 전투에 임함',
+      },
+      {
+        name: 'Witch',
+        nameKr: '마도학자',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '다양한 연금술과 마법 기계들을 활용하여 예측 불허의 공격을 하는 괴짜 마법사',
+      },
+    ],
+  },
+  // 마법사 (남)
+  {
+    name: 'Mage (M)',
+    nameKr: '마법사 (남)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_07.png',
+    color: '#3466cb',
+    specs: [
+      {
+        name: 'Blood Mage',
+        nameKr: '블러드 메이지',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '생명의 근원인 혈기를 흡수하고 조종하여 강력한 힘을 발휘하는 마법사',
+      },
+      {
+        name: 'Dimension Walker',
+        nameKr: '디멘션워커',
+        role: 'dealer',
+        position: '-800px 0',
+        description: '차원의 저편에서 불가사의한 존재와 계약하여 그 힘을 빌려 싸우는 마법사',
+      },
+      {
+        name: 'Elemental Bomber',
+        nameKr: '엘레멘탈 바머',
+        role: 'dealer',
+        position: '0 0',
+        description: '마법의 힘을 원소 구슬 형태로 압축하여 파괴적인 마법 공격을 하는 마법사',
+      },
+      {
+        name: 'Glacial Master',
+        nameKr: '빙결사',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '얼음 무기를 생성하여 근접전을 벌이고 강력한 냉기 마법으로 적을 얼리는 마법사',
+      },
+      {
+        name: 'Swift Master',
+        nameKr: '스위프트 마스터',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '바람의 힘을 이용하여 전장을 빠르게 이동하며 강력한 돌풍으로 적을 섬멸하는 마법사',
+      },
+    ],
+  },
+  // 프리스트 (여)
+  {
+    name: 'Priest (F)',
+    nameKr: '프리스트 (여)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_10.png',
+    color: '#f0b5d4',
+    specs: [
+      {
+        name: 'Crusader',
+        nameKr: '크루세이더',
+        role: 'buffer',
+        position: '0 0',
+        description: '신성력을 바탕으로 아군을 보호하고 적을 섬멸하는 신앙심 깊은 프리스트',
+      },
+      {
+        name: 'Inquisitor',
+        nameKr: '이단심판관',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '거병과 성화를 이용하여 이단들을 처단하는 냉혹한 심판관',
+      },
+      {
+        name: 'Mistress',
+        nameKr: '미스트리스',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '원죄의 힘을 자유자재로 다루며 타락의 낫으로 적의 영혼을 거두는 자',
+      },
+      {
+        name: 'Shaman',
+        nameKr: '무녀',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '신룡의 힘을 빌어 적을 물리치고 아군에게 신탁을 내려주는 신녀',
+      },
+    ],
+  },
+  // 프리스트 (남)
+  {
+    name: 'Priest (M)',
+    nameKr: '프리스트 (남)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_09.png',
+    color: '#c4a66a',
+    specs: [
+      {
+        name: 'Avenger',
+        nameKr: '어벤저',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '악을 처단하기 위해 악마의 힘을 받아들여 파괴적인 악마로 변신하여 싸움',
+      },
+      {
+        name: 'Crusader',
+        nameKr: '크루세이더',
+        role: 'buffer',
+        position: '0 0',
+        description: '신성한 빛의 힘으로 아군을 치유하고 강력한 버프를 제공하는 파티의 수호자',
+      },
+      {
+        name: 'Exorcist',
+        nameKr: '퇴마사',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '거대한 무기와 주술을 사용하여 마물을 퇴치하는 전투 프리스트',
+      },
+      {
+        name: 'Monk',
+        nameKr: '인파이터',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '신체를 극한까지 단련하여 신의 힘을 실은 주먹으로 적을 섬멸하는 권격가',
+      },
+    ],
+  },
+  // 외전
+  {
+    name: 'Side Story',
+    nameKr: '외전',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_15.png',
+    color: '#6e7a7a',
+    specs: [
+      {
+        name: 'Creator',
+        nameKr: '크리에이터',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '마우스를 이용해 사물을 생성, 소멸시키며 시공간을 제어하는 마법사',
+      },
+      {
+        name: 'Dark Knight',
+        nameKr: '다크나이트',
+        role: 'dealer',
+        position: '0 0',
+        description: '모든 귀검사의 힘을 흡수하여 시공의 틈을 넘나드는 존재',
+      },
+    ],
+  },
+  // 귀검사 (여)
+  {
+    name: 'Slayer (F)',
+    nameKr: '귀검사 (여)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_02.png',
+    color: '#d14335',
+    specs: [
+      {
+        name: 'Dark Templar',
+        nameKr: '다크템플러',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '암흑의 힘을 이용하여 적을 속박하고 무력화시키는 데 능한 암살자형 검사',
+      },
+      {
+        name: 'Demon Slayer',
+        nameKr: '데몬슬레이어',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '마인의 힘이 깃든 마검을 사용하여 파괴적인 공격을 하는 검사',
+      },
+      {
+        name: 'Spectre',
+        nameKr: '블레이드',
+        role: 'dealer',
+        position: '-800px 0',
+        description: '빠른 납도술과 와이어를 이용해 전장을 누비는 스타일리시한 전투가 특징',
+      },
+      {
+        name: 'Sword Master',
+        nameKr: '소드마스터',
+        role: 'dealer',
+        position: '0 0',
+        description: '마법의 힘을 검술에 접목하여 4대 원소의 힘을 자유자재로 사용하는 마검사',
+      },
+      {
+        name: 'Vagabond',
+        nameKr: '베가본드',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '내공을 활용하여 보조무기인 광검을 다루며 화려한 이도류 검술을 사용',
+      },
+    ],
+  },
+  // 귀검사 (남)
+  {
+    name: 'Slayer (M)',
+    nameKr: '귀검사 (남)',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_01.png',
+    color: '#a42c23',
+    specs: [
+      {
+        name: 'Asura',
+        nameKr: '아수라',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '파동의 힘을 느끼기 위해 스스로 시력을 포기한 귀검사',
+      },
+      {
+        name: 'Berserker',
+        nameKr: '버서커',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '강력한 힘을 위해 부작용을 감수하며 카잔증후군을 받아들인 귀검사',
+      },
+      {
+        name: 'Blade Master',
+        nameKr: '웨펀마스터',
+        role: 'dealer',
+        position: '0 0',
+        description: '귀수에 깃든 귀신을 억누르며 검술 연마에 매진하는 귀검사',
+      },
+      {
+        name: 'Ghostblade',
+        nameKr: '검귀',
+        role: 'dealer',
+        position: '-800px 0',
+        description: '자신의 원귀와 협력하여 빠르고 화려한 연계 공격을 구사하는 귀검사',
+      },
+      {
+        name: 'Soul Bender',
+        nameKr: '소울브링어',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '귀신과 소통함으로써 그 힘을 활용할 수 있게 된 귀검사',
+      },
+    ],
+  },
+  // 도적
+  {
+    name: 'Thief',
+    nameKr: '도적',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_11.png',
+    color: '#a089bd',
+    specs: [
+      {
+        name: 'Kunoichi',
+        nameKr: '쿠노이치',
+        role: 'dealer',
+        position: '-400px 0',
+        description: '인법을 사용하여 화려한 육체 기술과 강력한 화염술을 구사하는 닌자',
+      },
+      {
+        name: 'Necromancer',
+        nameKr: '사령술사',
+        role: 'dealer',
+        position: '-200px 0',
+        description: '망자의 원혼을 소환하고 발라크르의 힘을 빌려 적을 섬멸하는 흑마법의 대가',
+      },
+      {
+        name: 'Rogue',
+        nameKr: '로그',
+        role: 'dealer',
+        position: '0px 0',
+        description: '날렵한 몸놀림을 바탕으로 단검과 쌍검을 사용하여 적의 배후를 노리는 도적',
+      },
+      {
+        name: 'Shadow Dancer',
+        nameKr: '섀도우댄서',
+        role: 'dealer',
+        position: '-600px 0',
+        description: '그림자 속에 숨어 적의 배후를 급습하여 치명적인 암살 기술을 사용하는 암살자',
+      },
+    ],
+  },
+]
+
+export const getGameClasses = (game: string) => {
+  switch (game.toLowerCase()) {
+    case 'dnf':
+      return dnfClasses
+    case 'lostark':
+      return lostarkClasses
+    case 'wow':
+      return wowClasses
+    default:
+      return []
+  }
+}

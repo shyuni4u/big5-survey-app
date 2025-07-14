@@ -4,18 +4,26 @@ import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
-import { questions, gameClasses } from '@/lib/data'
+import { questions, getGameClasses } from '@/lib/data'
 import type { TestData, UserAnswers, PersonalityScores } from '@/lib/types'
+import { cn, SEPERATE_TOKEN, zipData } from '@/lib/utils'
+import { CoupangPartners } from '@/components/atoms/CoupangPartners'
+import { SpriteIcon } from '@/components/molecules/RecommendationSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { cn, SEPERATE_TOKEN, zipData } from '@/lib/utils'
-import { CoupangPartners } from '@/components/atoms/CoupangPartners'
 
 function TestContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const userType = searchParams.get('type') as 'existing' | 'new' | null
+  const game = searchParams.get('game')
+  if (!game) {
+    router.push('/')
+    throw new Error('게임 정보가 필요합니다.')
+  }
+
+  const gameClasses = getGameClasses(game)
 
   const [currentStep, setCurrentStep] = useState<'personality' | 'class-selection'>('personality')
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -160,7 +168,7 @@ function TestContent() {
       currentClass: selectedClassList.map((item) => [item.class, item.spec].join(SEPERATE_TOKEN)),
     }
     const hashedData = zipData(testData)
-    router.replace(`/result?data=${hashedData}`)
+    router.replace(`/result?data=${hashedData}&game=${game}`)
   }
 
   if (!userType) {
@@ -209,15 +217,17 @@ function TestContent() {
                           : 'border-border hover:border-primary/50 hover:bg-secondary',
                       )}
                     >
-                      <Image
-                        src={gameClass.image || '/placeholder.svg'}
-                        width="56"
-                        height="56"
-                        alt={gameClass.name}
-                        className="h-12 w-12 rounded"
-                        style={{ backgroundColor: gameClass.color }}
-                        unoptimized
-                      />
+                      {game.toLowerCase() !== 'dnf' && (
+                        <Image
+                          src={gameClass.image || '/placeholder.svg'}
+                          width="56"
+                          height="56"
+                          alt={gameClass.name}
+                          className="h-12 w-12 rounded"
+                          style={{ backgroundColor: gameClass.color }}
+                          unoptimized
+                        />
+                      )}
                       <span className="text-sm font-medium">{gameClass.nameKr}</span>
                     </Button>
                   ))}
@@ -247,14 +257,22 @@ function TestContent() {
                         )}
                       >
                         <div className="mb-2 flex w-full items-center gap-3">
-                          <Image
-                            src={spec.image || '/placeholder.svg'}
-                            alt={spec.name}
-                            className="h-8 w-8 rounded"
-                            width="56"
-                            height="56"
-                            unoptimized
-                          />
+                          {game.toLowerCase() === 'dnf' ? (
+                            <SpriteIcon
+                              imageUrl={selectedClassData.image || '/placeholder.svg'}
+                              position={spec.position || '0px 0px'}
+                            />
+                          ) : (
+                            <Image
+                              src={spec.image || '/placeholder.svg'}
+                              alt={spec.name}
+                              className={cn('w-8 rounded', game.toLowerCase() === 'lostark' ? 'h-9' : 'h-8')}
+                              width="56"
+                              height="56"
+                              unoptimized
+                            />
+                          )}
+
                           <div className="flex-1">
                             <div className="font-medium">{spec.nameKr}</div>
                             <div className="text-xs opacity-80">
@@ -262,6 +280,7 @@ function TestContent() {
                               {spec.role === 'dealer' && '⚔️ 딜러'}
                               {spec.role === 'healer' && '💚 힐러'}
                               {spec.role === 'supporter' && '✨ 서포터'}
+                              {spec.role === 'buffer' && '✨ 버퍼'}
                             </div>
                           </div>
                         </div>
@@ -298,14 +317,21 @@ function TestContent() {
                             <X className="h-4 w-4" />
                           </button>
                           <div className="mb-2 flex w-full items-center gap-3">
-                            <Image
-                              src={_spec.image || '/placeholder.svg'}
-                              alt={_spec.name}
-                              className="h-8 w-8 rounded"
-                              width="56"
-                              height="56"
-                              unoptimized
-                            />
+                            {game.toLowerCase() === 'dnf' ? (
+                              <SpriteIcon
+                                imageUrl={_class.image || '/placeholder.svg'}
+                                position={_spec.position || '0px 0px'}
+                              />
+                            ) : (
+                              <Image
+                                src={_spec.image || '/placeholder.svg'}
+                                alt={_spec.name}
+                                className={cn('w-8 rounded', game.toLowerCase() === 'lostark' ? 'h-9' : 'h-8')}
+                                width="56"
+                                height="56"
+                                unoptimized
+                              />
+                            )}
                             <div className="flex-1">
                               <div className="font-medium text-foreground">{_spec.nameKr}</div>
                               <div className="text-xs text-muted-foreground">
@@ -313,6 +339,7 @@ function TestContent() {
                                 {_spec.role === 'dealer' && '⚔️ 딜러'}
                                 {_spec.role === 'healer' && '💚 힐러'}
                                 {_spec.role === 'supporter' && '✨ 서포터'}
+                                {_spec.role === 'buffer' && '✨ 버퍼'}
                               </div>
                             </div>
                           </div>
