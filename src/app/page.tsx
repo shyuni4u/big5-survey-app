@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Home from '@/app/(home)/page'
+import Home from '@/components/atoms/Home'
 
 export const metadata: Metadata = {
   title: `Big5 성격 분석 | 게임 직업 추천 테스트`,

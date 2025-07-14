@@ -42,7 +42,10 @@ function ResultContent() {
   const [recommendationError, setRecommendationError] = useState<string>('')
 
   useEffect(() => {
-    const dataParam = searchParams.get('data') // /result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjHRUXIEUmY6Ss5KVmaGOkp-SlZG5jpK_kCeQa2OUnJpUVFqXolzTmIxUE90bC0AWlkcIA&game=LostArk
+    const dataParam = searchParams.get('data')
+    // Example dataParam values:
+    // dealer: /result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjHRUXIEUmY6Ss5KVmaGOkp-SlZG5jpK_kCeQa2OUnJpUVFqXolzTmIxUE90bC0AWlkcIA&game=LostArk
+    // healer: /result?data=eJwNyzEKgDAMBdC7_DlLRVCzibjqoJs4lJJBkCppixTx7nZ98F6kILrmW8Dw8oBwi4bL2_OIeXGXSgC_GMFVS-jBnSEM4LYhTGBTcAbX5iO4pCo-DqcN5Wz79wNbwBwp&game=LostArk
 
     if (!dataParam) {
       router.push('/')
