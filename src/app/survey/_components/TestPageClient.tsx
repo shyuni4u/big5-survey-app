@@ -25,7 +25,7 @@ function TestContent() {
 
   const gameClasses = getGameClasses(game)
 
-  const [currentStep, setCurrentStep] = useState<'personality' | 'class-selection'>('class-selection')
+  const [currentStep, setCurrentStep] = useState<'personality' | 'class-selection'>('personality')
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({})
   const [shuffledQuestions, setShuffledQuestions] = useState(questions)
