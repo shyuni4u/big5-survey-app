@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'cdn-lostark.game.onstove.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'render.worldofwarcraft.com',
         pathname: '/**',
       },

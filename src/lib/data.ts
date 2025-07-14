@@ -323,7 +323,7 @@ export const aboutContent: AboutContent[] = [
 ]
 
 export const GAME_NAME = 'WoW'
-export const gameClasses: GameClass[] = [
+export const wowClasses: GameClass[] = [
   {
     name: 'Death Knight',
     nameKr: '죽음의 기사',
@@ -698,6 +698,303 @@ export const gameClasses: GameClass[] = [
         role: 'tanker',
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_warrior_defensivestance.jpg',
         description: '방패와 전투 기술로 적의 공격을 막아내는 튼튼한 탱커입니다.',
+      },
+    ],
+  },
+]
+
+export const lostarkClasses: GameClass[] = [
+  {
+    name: 'Assassin (Female)',
+    nameKr: '암살자 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-assassin.png',
+    color: '#7b48a3',
+    specs: [
+      {
+        name: 'Blade',
+        nameKr: '블레이드',
+        role: 'dealer',
+        image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Blade-border.png',
+        description: '세 자루의 검을 사용하여 혼돈의 힘을 제어하며 적들을 빠르고 현란하게 공격합니다.',
+      },
+      {
+        name: 'Reaper',
+        nameKr: '리퍼',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Reaper-border.png',
+        description: '단검과 그림자 기술을 사용하여 적의 배후를 노리는 암살의 귀재입니다.',
+      },
+      {
+        name: 'Shadowhunter',
+        nameKr: '데모닉',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Demonic-border.png',
+        description: '내재된 악마의 힘을 해방하여 파괴적인 힘으로 적들을 섬멸합니다.',
+      },
+      {
+        name: 'Souleater',
+        nameKr: '소울이터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Souleater-border.png',
+        description: '거대한 낫을 사용하여 망자의 영혼을 베고, 그 힘을 흡수하여 강력한 공격을 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Hunter (Female)',
+    nameKr: '헌터 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-hunter_female.png',
+    color: '#7199a9',
+    specs: [
+      {
+        name: 'Gunslinger',
+        nameKr: '건슬링어',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Gunslinger-border.png',
+        description: '세 가지 총기를 사용하여 전장을 지배하는 민첩하고 치명적인 여성 명사수입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Hunter (Male)',
+    nameKr: '헌터 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-hunter_male.png',
+    color: '#7199a9',
+    specs: [
+      {
+        name: 'Artillerist',
+        nameKr: '블래스터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Blaster-border.png',
+        description: '거대한 메카닉 런처와 중화기를 사용하여 막강한 화력을 퍼붓는 포격 전문가입니다.',
+      },
+      {
+        name: 'Deadeye',
+        nameKr: '데빌헌터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Devilhunter-border.png',
+        description: '세 가지 총기를 자유자재로 바꾸며 스타일리시한 전투를 펼치는 명사수입니다.',
+      },
+      {
+        name: 'Machinist',
+        nameKr: '스카우터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Scouter-border.png',
+        description: '최첨단 드론과 합작하여 전투를 펼치며, 하이퍼 싱크 상태로 변신할 수 있습니다.',
+      },
+      {
+        name: 'Sharpshooter',
+        nameKr: '호크아이',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Hawkeye-border.png',
+        description: '기계 활과 특수 화살을 사용하여 민첩하고 정교한 공격을 하는 명궁입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Mage (Female)',
+    nameKr: '마법사 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-magician.png',
+    color: '#a371b8',
+    specs: [
+      {
+        name: 'Bard',
+        nameKr: '바드',
+        role: 'supporter',
+        image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Bard-border.png',
+        description: '신성한 하프 연주로 아군을 치유하고 적을 공격하는 선율의 지휘자입니다.',
+      },
+      {
+        name: 'Summoner',
+        nameKr: '서머너',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Summoner-border.png',
+        description: '다양한 정령을 소환하여 함께 전투를 벌이는 강력한 원소 마법사입니다.',
+      },
+      {
+        name: 'Arcanist',
+        nameKr: '아르카나',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Arcana-border.png',
+        description: '마법이 깃든 카드를 사용하여 변칙적이고 화려한 공격을 구사합니다.',
+      },
+      {
+        name: 'Sorceress',
+        nameKr: '소서리스',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Sorceress-border.png',
+        description: '강력한 원소 마법으로 넓은 범위의 적들을 한 번에 쓸어버리는 정통 마법사입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Martial Artist (Female)',
+    nameKr: '무도가 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-fighter_female.png',
+    color: '#c1834c',
+    specs: [
+      {
+        name: 'Battle Master',
+        nameKr: '배틀마스터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Battlemaster-border.png',
+        description: '빠른 몸놀림과 강력한 연계기로 적을 몰아붙이는 근접 전투의 달인입니다.',
+      },
+      {
+        name: 'Glaivier',
+        nameKr: '창술사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Lancemaster-border.png',
+        description: '창과 언월도를 자유자재로 바꾸며 예측불허의 공격을 구사합니다.',
+      },
+      {
+        name: 'Infighter',
+        nameKr: '인파이터',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Infighter-border.png',
+        description: '묵직한 헤비 건틀렛을 사용하여 파괴적인 충격 에너지를 적에게 쏟아붓습니다.',
+      },
+      {
+        name: 'Soulfist',
+        nameKr: '기공사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Soulmaster-border.png',
+        description: '내공을 활용하여 근거리와 원거리를 오가며 다채로운 공격을 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Martial Artist (Male)',
+    nameKr: '무도가 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-fighter_male.png',
+    color: '#c1834c',
+    specs: [
+      {
+        name: 'Breaker',
+        nameKr: '브레이커',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Breaker-border.png',
+        description: '헤비 건틀렛을 사용하며, 묵직하고 강력한 한 방으로 모든 것을 파괴합니다.',
+      },
+      {
+        name: 'Striker',
+        nameKr: '스트라이커',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Striker-border.png',
+        description: '강력한 발차기와 번개 같은 움직임으로 적을 제압하는 남성 무도가입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Specialist (Female)',
+    nameKr: '스페셜리스트 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-specialist.png',
+    color: '#e8ab5a',
+    specs: [
+      {
+        name: 'Artist',
+        nameKr: '도화가',
+        role: 'supporter',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Artist-border.png',
+        description: '환영의 힘이 담긴 붓으로 아군을 돕거나 적을 공격하는 전략적인 서포터입니다.',
+      },
+      {
+        name: 'Aeromancer',
+        nameKr: '기상술사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Aeromancer-border.png',
+        description: '우산을 사용하여 날씨를 자유자재로 바꾸며 다채로운 스킬을 구사합니다.',
+      },
+      {
+        name: 'Wildsoul',
+        nameKr: '환수사',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Wildsoul-border.png',
+        description: '환수의 힘이 봉인된 두루마리를 바탕으로 환수를 소환하거나 환수로 변신하여 전투를 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Warrior (Female)',
+    nameKr: '전사 (여)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-warrior.png',
+    color: '#a45141',
+    specs: [
+      {
+        name: 'Slayer',
+        nameKr: '슬레이어',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Slayer-border.png',
+        description: '대검을 사용하는 호쾌한 스타일의 여성 전사로, 적을 무자비하게 베어버립니다.',
+      },
+      {
+        name: 'Valkyrie',
+        nameKr: '발키리',
+        role: 'supporter',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Valkyrie-border.png',
+        description: '빛의 힘으로 아군을 치유하고 전장을 이끄는 서포트형 클래스입니다.',
+      },
+    ],
+  },
+  {
+    name: 'Warrior (Male)',
+    nameKr: '전사 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-warrior.png',
+    color: '#a45141',
+    specs: [
+      {
+        name: 'Berserker',
+        nameKr: '버서커',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Berserker-border.png',
+        description: '거대한 대검을 사용하여 적을 섬멸하는 분노의 화신입니다.',
+      },
+      {
+        name: 'Destroyer',
+        nameKr: '디스트로이어',
+        role: 'dealer',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Destroyer-border.png',
+        description: '강력한 중력 해머로 적을 분쇄하는 파괴적인 전사입니다.',
+      },
+      {
+        name: 'Holy Knight',
+        nameKr: '홀리나이트',
+        role: 'supporter',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Holyknight-border.png',
+        description: '신념의 검과 신앙의 힘으로 아군을 지원하고 전장을 이끄는 서포터입니다.',
+      },
+      {
+        name: 'Warlord',
+        nameKr: '워로드',
+        role: 'tanker',
+        image:
+          'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Warlord-border.png',
+        description: '건랜스와 방패를 이용해 아군을 보호하고 전장을 지휘하는 든든한 방패입니다.',
       },
     ],
   },

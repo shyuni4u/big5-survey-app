@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
-import { questions, gameClasses } from '@/lib/data'
+import { questions, wowClasses, lostarkClasses } from '@/lib/data'
 import type { TestData, UserAnswers, PersonalityScores } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -173,7 +173,7 @@ function TestContent() {
   const isLastPage = currentQuestionIndex + questionsPerPage >= shuffledQuestions.length
 
   if (currentStep === 'class-selection') {
-    const selectedClassData = gameClasses.find((cls) => cls.name === selectedClass)
+    const selectedClassData = wowClasses.find((cls) => cls.name === selectedClass)
 
     return (
       <div className="vscode-gradient min-h-screen">
@@ -196,7 +196,7 @@ function TestContent() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-                  {gameClasses.map((gameClass) => (
+                  {wowClasses.map((gameClass) => (
                     <Button
                       key={gameClass.name}
                       type="button"
@@ -282,7 +282,7 @@ function TestContent() {
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {selectedClassList.map((obj) => {
-                      const _class = gameClasses.find((c) => c.name === obj.class)!
+                      const _class = wowClasses.find((c) => c.name === obj.class)!
                       const _spec = _class.specs.find((s) => s.name === obj.spec)!
 
                       return (
