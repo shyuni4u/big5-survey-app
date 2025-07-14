@@ -20,6 +20,35 @@ interface RecommendationSectionProps {
   error?: string
 }
 
+export const SpriteIcon = ({
+  imageUrl,
+  position,
+  scale = 0.17,
+  spriteSize = 256,
+  imageSize = 'h-8 w-8',
+}: {
+  imageUrl: string
+  position: string
+  scale?: number
+  spriteSize?: number
+  imageSize?: string
+}) => (
+  <div className={cn('relative overflow-hidden rounded', imageSize)}>
+    <div
+      className="absolute"
+      style={{
+        backgroundImage: `url(${imageUrl})`,
+        backgroundPosition: position,
+        backgroundRepeat: 'no-repeat',
+        width: spriteSize,
+        height: spriteSize,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
+      }}
+    />
+  </div>
+)
+
 export default function RecommendationSection({ game, recommendations, isLoading, error }: RecommendationSectionProps) {
   const [visibleCards, setVisibleCards] = useState<number>(0)
 
@@ -237,14 +266,24 @@ export default function RecommendationSection({ game, recommendations, isLoading
                   )}
                 >
                   <CardContent className="flex h-full flex-col items-center justify-center p-4 text-center">
-                    <Image
-                      src={spec.image || '/placeholder.svg'}
-                      alt={spec.name}
-                      width={64}
-                      height={64}
-                      className={cn('mb-3 rounded-lg shadow-lg', scale.imageSize)}
-                      unoptimized
-                    />
+                    {game.toLowerCase() === 'dnf' ? (
+                      <SpriteIcon
+                        imageUrl={gameClass.image || '/placeholder.svg'}
+                        position={spec.position || '0px 0px'}
+                        scale={0.48}
+                        spriteSize={512}
+                        imageSize={'h-24 w-24'}
+                      />
+                    ) : (
+                      <Image
+                        src={spec.image || '/placeholder.svg'}
+                        alt={spec.name}
+                        width={64}
+                        height={64}
+                        className={cn('mb-3 rounded-lg shadow-lg', scale.imageSize)}
+                        unoptimized
+                      />
+                    )}
                     <h3 className={cn('mb-2 font-bold text-foreground', scale.titleSize)}>{gameClass.nameKr}</h3>
                     <h4 className={cn('mb-2 font-semibold text-foreground', scale.subtitleSize)}>{spec.nameKr}</h4>
                     <p className="mb-3 text-xs text-muted-foreground">
@@ -252,6 +291,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
                       {spec.role === 'dealer' && '⚔️ 딜러'}
                       {spec.role === 'healer' && '💚 힐러'}
                       {spec.role === 'supporter' && '✨ 서포터'}
+                      {spec.role === 'buffer' && '✨ 버퍼'}
                     </p>
                     <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
                   </CardContent>
@@ -296,14 +336,24 @@ export default function RecommendationSection({ game, recommendations, isLoading
 
                         {/* 직업 이미지 */}
                         <div className="flex-shrink-0">
-                          <Image
-                            src={spec.image || '/placeholder.svg'}
-                            alt={spec.name}
-                            width={56}
-                            height={56}
-                            className="h-14 w-14 rounded-lg shadow-lg"
-                            unoptimized
-                          />
+                          {game.toLowerCase() === 'dnf' ? (
+                            <SpriteIcon
+                              imageUrl={gameClass.image || '/placeholder.svg'}
+                              position={spec.position || '0px 0px'}
+                              scale={0.33}
+                              spriteSize={512}
+                              imageSize={'h-16 w-16'}
+                            />
+                          ) : (
+                            <Image
+                              src={spec.image || '/placeholder.svg'}
+                              alt={spec.name}
+                              width={56}
+                              height={56}
+                              className="h-14 w-14 rounded-lg shadow-lg"
+                              unoptimized
+                            />
+                          )}
                         </div>
                       </div>
 
@@ -322,6 +372,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
                           {spec.role === 'dealer' && '⚔️ 딜러'}
                           {spec.role === 'healer' && '💚 힐러'}
                           {spec.role === 'supporter' && '✨ 서포터'}
+                          {spec.role === 'buffer' && '✨ 버퍼'}
                         </p>
                         <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
                       </div>
