@@ -102,6 +102,55 @@ const gameClassSpecsBig5Profiles = {
     },
 };
 
+// const lostarkGameClassSpecsBig5Profiles = {
+//     "Warrior (Male)": {
+//         "Berserker": { role: "dealer", O: 40, C: 40, E: 80, A: 20, N: 40, desc: "묵직한 강타자" },
+//         "Warlord": { role: "tanker", O: 40, C: 90, E: 90, A: 80, N: 20, desc: "선봉장 리더" },
+//         "Destroyer": { role: "dealer", O: 40, C: 80, E: 60, A: 20, N: 40, desc: "묵직한 강타자" },
+//         "Holy Knight": { role: "supporter", O: 60, C: 80, E: 80, A: 90, N: 40, desc: "선봉장 리더/반응형 수호자" },
+//     },
+//     "Warrior (Female)": {
+//         "Slayer": { role: "dealer", O: 80, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+//         "Valkyrie": { role: "supporter", O: 60, C: 80, E: 80, A: 90, N: 40, desc: "선봉장 리더/반응형 수호자" },
+//     },
+//     "Martial Artist (Female)": {
+//         "Battle Master": { role: "dealer", O: 90, C: 60, E: 80, A: 40, N: 40, desc: "고속 전투가" },
+//         "Infighter": { role: "dealer", O: 60, C: 80, E: 80, A: 40, N: 40, desc: "묵직한 강타자" },
+//         "Soulfist": { role: "dealer", O: 90, C: 80, E: 60, A: 60, N: 40, desc: "비정형 전략가" },
+//         "Glaivier": { role: "dealer", O: 90, C: 60, E: 80, A: 40, N: 40, desc: "비정형 전략가/고속 전투가" },
+//     },
+//     "Martial Artist (Male)": {
+//         "Striker": { role: "dealer", O: 90, C: 60, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+//         "Breaker": { role: "dealer", O: 40, C: 80, E: 80, A: 20, N: 40, desc: "묵직한 강타자" },
+//     },
+//     "Hunter (Male)": {
+//         "Deadeye": { role: "dealer", O: 90, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+//         "Artillerist": { role: "dealer", O: 40, C: 90, E: 40, A: 40, N: 60, desc: "계획적 파괴자" },
+//         "Sharpshooter": { role: "dealer", O: 80, C: 80, E: 60, A: 60, N: 60, desc: "계획적 파괴자" },
+//         "Machinist": { role: "dealer", O: 90, C: 80, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
+//     },
+//     "Hunter (Female)": {
+//         "Gunslinger": { role: "dealer", O: 90, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+//     },
+//     "Mage (Female)": {
+//         "Bard": { role: "supporter", O: 80, C: 80, E: 80, A: 90, N: 40, desc: "반응형 수호자" },
+//         "Summoner": { role: "dealer", O: 60, C: 90, E: 40, A: 60, N: 60, desc: "계획적 파괴자" },
+//         "Arcanist": { role: "dealer", O: 90, C: 40, E: 80, A: 40, N: 40, desc: "비정형 전략가" },
+//         "Sorceress": { role: "dealer", O: 60, C: 90, E: 60, A: 60, N: 60, desc: "계획적 파괴자" },
+//     },
+//     "Assassin (Female)": {
+//         "Blade": { role: "dealer", O: 90, C: 60, E: 80, A: 20, N: 40, desc: "고속 전투가" },
+//         "Shadowhunter": { role: "dealer", O: 80, C: 60, E: 80, A: 20, N: 40, desc: "고속 전투가/묵직한 강타자" },
+//         "Reaper": { role: "dealer", O: 90, C: 40, E: 80, A: 20, N: 40, desc: "고속 전투가" },
+//         "Souleater": { role: "dealer", O: 90, C: 60, E: 60, A: 40, N: 40, desc: "비정형 전략가" },
+//     },
+//     "Specialist (Female)": {
+//         "Artist": { role: "supporter", O: 90, C: 80, E: 80, A: 90, N: 40, desc: "반응형 수호자" },
+//         "Aeromancer": { role: "dealer", O: 90, C: 60, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
+//         "Wildsoul": { role: "dealer", O: 90, C: 60, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
+//     },
+// };
+
 /**
  * World of Warcraft 직업 추천을 위한 Big5 더미 데이터를 생성합니다.
  * @param {number} numSamplesPerSpec - 각 전문화별로 생성할 샘플의 수.
