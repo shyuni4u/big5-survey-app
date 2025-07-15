@@ -102,55 +102,162 @@ const gameClassSpecsBig5Profiles = {
     },
 };
 
-// const lostarkGameClassSpecsBig5Profiles = {
-//     "Warrior (Male)": {
-//         "Berserker": { role: "dealer", O: 40, C: 40, E: 80, A: 20, N: 40, desc: "묵직한 강타자" },
-//         "Warlord": { role: "tanker", O: 40, C: 90, E: 90, A: 80, N: 20, desc: "선봉장 리더" },
-//         "Destroyer": { role: "dealer", O: 40, C: 80, E: 60, A: 20, N: 40, desc: "묵직한 강타자" },
-//         "Holy Knight": { role: "supporter", O: 60, C: 80, E: 80, A: 90, N: 40, desc: "선봉장 리더/반응형 수호자" },
-//     },
-//     "Warrior (Female)": {
-//         "Slayer": { role: "dealer", O: 80, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
-//         "Valkyrie": { role: "supporter", O: 60, C: 80, E: 80, A: 90, N: 40, desc: "선봉장 리더/반응형 수호자" },
-//     },
-//     "Martial Artist (Female)": {
-//         "Battle Master": { role: "dealer", O: 90, C: 60, E: 80, A: 40, N: 40, desc: "고속 전투가" },
-//         "Infighter": { role: "dealer", O: 60, C: 80, E: 80, A: 40, N: 40, desc: "묵직한 강타자" },
-//         "Soulfist": { role: "dealer", O: 90, C: 80, E: 60, A: 60, N: 40, desc: "비정형 전략가" },
-//         "Glaivier": { role: "dealer", O: 90, C: 60, E: 80, A: 40, N: 40, desc: "비정형 전략가/고속 전투가" },
-//     },
-//     "Martial Artist (Male)": {
-//         "Striker": { role: "dealer", O: 90, C: 60, E: 90, A: 40, N: 40, desc: "고속 전투가" },
-//         "Breaker": { role: "dealer", O: 40, C: 80, E: 80, A: 20, N: 40, desc: "묵직한 강타자" },
-//     },
-//     "Hunter (Male)": {
-//         "Deadeye": { role: "dealer", O: 90, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
-//         "Artillerist": { role: "dealer", O: 40, C: 90, E: 40, A: 40, N: 60, desc: "계획적 파괴자" },
-//         "Sharpshooter": { role: "dealer", O: 80, C: 80, E: 60, A: 60, N: 60, desc: "계획적 파괴자" },
-//         "Machinist": { role: "dealer", O: 90, C: 80, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
-//     },
-//     "Hunter (Female)": {
-//         "Gunslinger": { role: "dealer", O: 90, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
-//     },
-//     "Mage (Female)": {
-//         "Bard": { role: "supporter", O: 80, C: 80, E: 80, A: 90, N: 40, desc: "반응형 수호자" },
-//         "Summoner": { role: "dealer", O: 60, C: 90, E: 40, A: 60, N: 60, desc: "계획적 파괴자" },
-//         "Arcanist": { role: "dealer", O: 90, C: 40, E: 80, A: 40, N: 40, desc: "비정형 전략가" },
-//         "Sorceress": { role: "dealer", O: 60, C: 90, E: 60, A: 60, N: 60, desc: "계획적 파괴자" },
-//     },
-//     "Assassin (Female)": {
-//         "Blade": { role: "dealer", O: 90, C: 60, E: 80, A: 20, N: 40, desc: "고속 전투가" },
-//         "Shadowhunter": { role: "dealer", O: 80, C: 60, E: 80, A: 20, N: 40, desc: "고속 전투가/묵직한 강타자" },
-//         "Reaper": { role: "dealer", O: 90, C: 40, E: 80, A: 20, N: 40, desc: "고속 전투가" },
-//         "Souleater": { role: "dealer", O: 90, C: 60, E: 60, A: 40, N: 40, desc: "비정형 전략가" },
-//     },
-//     "Specialist (Female)": {
-//         "Artist": { role: "supporter", O: 90, C: 80, E: 80, A: 90, N: 40, desc: "반응형 수호자" },
-//         "Aeromancer": { role: "dealer", O: 90, C: 60, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
-//         "Wildsoul": { role: "dealer", O: 90, C: 60, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
-//     },
-// };
+/*
+const lostarkGameClassSpecsBig5Profiles = {
+    "Warrior (Male)": {
+        "Berserker": { role: "dealer", O: 40, C: 40, E: 80, A: 20, N: 40, desc: "묵직한 강타자" },
+        "Warlord": { role: "tanker", O: 40, C: 90, E: 90, A: 80, N: 20, desc: "선봉장 리더" },
+        "Destroyer": { role: "dealer", O: 40, C: 80, E: 60, A: 20, N: 40, desc: "묵직한 강타자" },
+        "Holy Knight": { role: "supporter", O: 60, C: 80, E: 80, A: 90, N: 40, desc: "선봉장 리더/반응형 수호자" },
+    },
+    "Warrior (Female)": {
+        "Slayer": { role: "dealer", O: 80, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+        "Valkyrie": { role: "supporter", O: 60, C: 80, E: 80, A: 90, N: 40, desc: "선봉장 리더/반응형 수호자" },
+    },
+    "Martial Artist (Female)": {
+        "Battle Master": { role: "dealer", O: 90, C: 60, E: 80, A: 40, N: 40, desc: "고속 전투가" },
+        "Infighter": { role: "dealer", O: 60, C: 80, E: 80, A: 40, N: 40, desc: "묵직한 강타자" },
+        "Soulfist": { role: "dealer", O: 90, C: 80, E: 60, A: 60, N: 40, desc: "비정형 전략가" },
+        "Glaivier": { role: "dealer", O: 90, C: 60, E: 80, A: 40, N: 40, desc: "비정형 전략가/고속 전투가" },
+    },
+    "Martial Artist (Male)": {
+        "Striker": { role: "dealer", O: 90, C: 60, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+        "Breaker": { role: "dealer", O: 40, C: 80, E: 80, A: 20, N: 40, desc: "묵직한 강타자" },
+    },
+    "Hunter (Male)": {
+        "Deadeye": { role: "dealer", O: 90, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+        "Artillerist": { role: "dealer", O: 40, C: 90, E: 40, A: 40, N: 60, desc: "계획적 파괴자" },
+        "Sharpshooter": { role: "dealer", O: 80, C: 80, E: 60, A: 60, N: 60, desc: "계획적 파괴자" },
+        "Machinist": { role: "dealer", O: 90, C: 80, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
+    },
+    "Hunter (Female)": {
+        "Gunslinger": { role: "dealer", O: 90, C: 40, E: 90, A: 40, N: 40, desc: "고속 전투가" },
+    },
+    "Mage (Female)": {
+        "Bard": { role: "supporter", O: 80, C: 80, E: 80, A: 90, N: 40, desc: "반응형 수호자" },
+        "Summoner": { role: "dealer", O: 60, C: 90, E: 40, A: 60, N: 60, desc: "계획적 파괴자" },
+        "Arcanist": { role: "dealer", O: 90, C: 40, E: 80, A: 40, N: 40, desc: "비정형 전략가" },
+        "Sorceress": { role: "dealer", O: 60, C: 90, E: 60, A: 60, N: 60, desc: "계획적 파괴자" },
+    },
+    "Assassin (Female)": {
+        "Blade": { role: "dealer", O: 90, C: 60, E: 80, A: 20, N: 40, desc: "고속 전투가" },
+        "Shadowhunter": { role: "dealer", O: 80, C: 60, E: 80, A: 20, N: 40, desc: "고속 전투가/묵직한 강타자" },
+        "Reaper": { role: "dealer", O: 90, C: 40, E: 80, A: 20, N: 40, desc: "고속 전투가" },
+        "Souleater": { role: "dealer", O: 90, C: 60, E: 60, A: 40, N: 40, desc: "비정형 전략가" },
+    },
+    "Specialist (Female)": {
+        "Artist": { role: "supporter", O: 90, C: 80, E: 80, A: 90, N: 40, desc: "반응형 수호자" },
+        "Aeromancer": { role: "dealer", O: 90, C: 60, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
+        "Wildsoul": { role: "dealer", O: 90, C: 60, E: 60, A: 60, N: 60, desc: "비정형 전략가" },
+    },
+};
+*/
 
+/*
+const gameClassSpecsBig5Profiles = {
+    "Slayer (M)": {
+        "Blade Master": { role: "dealer", O: 75, C: 75, E: 75, A: 35, N: 50, desc: "숙련된 검술, 콤보, 균형" },
+        "Soul Bender": { role: "dealer", O: 75, C: 90, E: 35, A: 50, N: 50, desc: "설치형, 디버프, 전략적" },
+        "Berserker": { role: "dealer", O: 35, C: 35, E: 75, A: 35, N: 75, desc: "저돌적, 고위험 고수익, 단순함" },
+        "Asura": { role: "dealer", O: 35, C: 75, E: 50, A: 75, N: 35, desc: "광범위, 제어, 안정적 딜링" },
+        "Ghostblade": { role: "dealer", O: 75, C: 75, E: 75, A: 35, N: 50, desc: "빠른 연계, 스타일리시, 원귀 협력" },
+    },
+    "Slayer (F)": {
+        "Sword Master": { role: "dealer", O: 90, C: 75, E: 75, A: 50, N: 50, desc: "원소 검술, 유연함, 다재다능" },
+        "Demon Slayer": { role: "dealer", O: 50, C: 50, E: 75, A: 35, N: 75, desc: "강력한 한방, 파괴적, 마검" },
+        "Vagabond": { role: "dealer", O: 75, C: 50, E: 90, A: 35, N: 50, desc: "화려함, 이도류, 빠른 속도" },
+        "Dark Templar": { role: "dealer", O: 75, C: 90, E: 35, A: 35, N: 50, desc: "암살, 홀딩, 제어" },
+        "Spectre": { role: "dealer", O: 75, C: 75, E: 75, A: 35, N: 50, desc: "빠른 연계, 스타일리시, 반응 속도" },
+    },
+    "Fighter (M)": {
+        "Nen Master": { role: "dealer", O: 50, C: 75, E: 75, A: 75, N: 35, desc: "넨 보호막, 공수 균형, 지원" },
+        "Striker": { role: "dealer", O: 50, C: 75, E: 90, A: 35, N: 50, desc: "정통파, 강력한 한방, 근접전" },
+        "Brawler": { role: "dealer", O: 90, C: 35, E: 75, A: 15, N: 75, desc: "상태이상, 비열함, 변칙적" },
+        "Grappler": { role: "dealer", O: 35, C: 75, E: 75, A: 35, N: 50, desc: "잡기 연계, 제압, 근접전" },
+    },
+    "Fighter (F)": {
+        "Nen Master": { role: "dealer", O: 50, C: 75, E: 75, A: 75, N: 35, desc: "넨 개화, 공수 균형, 유틸리티" },
+        "Striker": { role: "dealer", O: 50, C: 75, E: 75, A: 35, N: 50, desc: "콤보 중심, 근접전, 높은 숙련도" },
+        "Brawler": { role: "dealer", O: 90, C: 35, E: 75, A: 15, N: 75, desc: "독, 상태이상, 변칙적" },
+        "Grappler": { role: "dealer", O: 35, C: 75, E: 75, A: 35, N: 50, desc: "잡기 연계, 제압, 유술" },
+    },
+    "Gunner (M)": {
+        "Ranger": { role: "dealer", O: 75, C: 75, E: 90, A: 35, N: 50, desc: "스타일리시, 높은 조작 요구, 컨트롤" },
+        "Launcher": { role: "dealer", O: 35, C: 75, E: 35, A: 50, N: 35, desc: "장거리, 중화기, 포격" },
+        "Mechanic": { role: "dealer", O: 75, C: 90, E: 35, A: 50, N: 50, desc: "로봇 소환, 설치형, 전략가" },
+        "Spitfire": { role: "dealer", O: 90, C: 75, E: 75, A: 50, N: 50, desc: "속성탄, 전술적, 유틸리티" },
+        "Blitz": { role: "dealer", O: 50, C: 50, E: 90, A: 35, N: 75, desc: "기동성, 돌진, 화력" },
+    },
+    "Gunner (F)": {
+        "Ranger": { role: "dealer", O: 75, C: 75, E: 90, A: 35, N: 50, desc: "건블레이드, 체술, 스타일리시" },
+        "Launcher": { role: "dealer", O: 35, C: 75, E: 35, A: 50, N: 35, desc: "장거리, 포격, 위치 선정" },
+        "Mechanic": { role: "dealer", O: 75, C: 90, E: 35, A: 50, N: 50, desc: "G-시리즈, 로봇 소환, 지휘관" },
+        "Spitfire": { role: "dealer", O: 90, C: 75, E: 90, A: 50, N: 50, desc: "공중전, 속성탄, 기동성" },
+        "Paramedic": { role: "buffer", O: 50, C: 90, E: 75, A: 90, N: 35, desc: "치유, 보호, 버퍼" },
+    },
+    "Mage (M)": {
+        "Elemental Bomber": { role: "dealer", O: 75, C: 75, E: 50, A: 35, N: 50, desc: "원소 폭격, 광역 딜링, 파괴적" },
+        "Glacial Master": { role: "dealer", O: 75, C: 75, E: 75, A: 50, N: 50, desc: "얼음, 제어, 근접 마법" },
+        "Blood Mage": { role: "dealer", O: 75, C: 50, E: 50, A: 35, N: 90, desc: "혈기, 흡수, 고위험" },
+        "Swift Master": { role: "dealer", O: 75, C: 50, E: 90, A: 50, N: 50, desc: "바람, 기동성, 속도" },
+        "Dimension Walker": { role: "dealer", O: 90, C: 90, E: 35, A: 35, N: 75, desc: "차원, 계약, 이질적" },
+    },
+    "Mage (F)": {
+        "Elementalist": { role: "dealer", O: 75, C: 90, E: 35, A: 50, N: 50, desc: "광역 마법, 복잡한 캐스팅, 자원 관리" },
+        "Summoner": { role: "dealer", O: 75, C: 90, E: 35, A: 50, N: 50, desc: "지휘, 다중 관리, 전략적" },
+        "Battle Mage": { role: "dealer", O: 75, C: 75, E: 90, A: 35, N: 50, desc: "체이서, 근접 마법, 콤보" },
+        "Witch": { role: "dealer", O: 90, C: 35, E: 75, A: 50, N: 75, desc: "설치물, 예측불허, 괴짜" },
+        "Enchantress": { role: "buffer", O: 75, C: 75, E: 50, A: 90, N: 50, desc: "독특함, 전략적, 디버프 활용" },
+    },
+    "Priest (M)": {
+        "Crusader": { role: "buffer", O: 35, C: 90, E: 75, A: 90, N: 35, desc: "안정적, 체계적, 파티의 중심" },
+        "Monk": { role: "dealer", O: 50, C: 90, E: 75, A: 35, N: 50, desc: "빠른 연타, 콤보, 신의 주먹" },
+        "Exorcist": { role: "dealer", O: 50, C: 75, E: 50, A: 50, N: 50, desc: "물리/마법, 거병, 주술" },
+        "Avenger": { role: "dealer", O: 50, C: 50, E: 75, A: 35, N: 90, desc: "악마화, 변신, 파괴적" },
+    },
+    "Priest (F)": {
+        "Crusader": { role: "buffer", O: 35, C: 90, E: 75, A: 90, N: 35, desc: "신성력, 보호, 버퍼" },
+        "Inquisitor": { role: "dealer", O: 35, C: 75, E: 75, A: 15, N: 75, desc: "성화, 심판, 처단" },
+        "Shaman": { role: "dealer", O: 50, C: 75, E: 50, A: 75, N: 50, desc: "부적, 신룡, 원거리 마법" },
+        "Mistress": { role: "dealer", O: 50, C: 50, E: 75, A: 50, N: 75, desc: "변신, 돌진, 유틸리티" },
+    },
+    "Thief": {
+        "Rogue": { role: "dealer", O: 75, C: 75, E: 75, A: 35, N: 50, desc: "히트엔드, 빠른 속도, 콤보" },
+        "Necromancer": { role: "dealer", O: 75, C: 90, E: 35, A: 35, N: 90, desc: "발라크르, 사령술, 지휘" },
+        "Kunoichi": { role: "dealer", O: 90, C: 90, E: 75, A: 35, N: 50, desc: "인법, 화염, 육도윤회" },
+        "Shadow Dancer": { role: "dealer", O: 75, C: 90, E: 50, A: 15, N: 50, desc: "백어택, 암살, 그림자" },
+    },
+    "Knight": {
+        "Elven Knight": { role: "dealer", O: 50, C: 90, E: 75, A: 75, N: 35, desc: "체인러시, 연계, 방패" },
+        "Chaos": { role: "dealer", O: 75, C: 75, E: 50, A: 35, N: 75, desc: "악마 소환, 지휘, 하이브리드" },
+        "Paladin": { role: "dealer", O: 35, C: 75, E: 75, A: 90, N: 35, desc: "빛, 지원, 안정성" },
+        "Dragon Knight": { role: "dealer", O: 75, C: 50, E: 90, A: 50, N: 50, desc: "드래곤 탑승, 공중전, 파트너" },
+    },
+    "Lancer": {
+        "Vanguard": { role: "dealer", O: 35, C: 50, E: 75, A: 35, N: 75, desc: "저돌적, 광역 제압, 파괴적" },
+        "Skirmisher": { role: "dealer", O: 75, C: 75, E: 90, A: 35, N: 50, desc: "신기루, 빠른 속도, 대인전" },
+        "Dragoon": { role: "dealer", O: 50, C: 75, E: 75, A: 35, N: 50, desc: "마수 사냥, 공중 제압, 서번트 랜스" },
+        "Impaler": { role: "dealer", O: 75, C: 75, E: 50, A: 35, N: 75, desc: "어둠, 투창, 제어" },
+    },
+    "Agent": {
+        "Secret Agent": { role: "dealer", O: 50, C: 90, E: 50, A: 35, N: 35, desc: "정밀 사격, 암살, 냉철함" },
+        "Troubleshooter": { role: "dealer", O: 50, C: 50, E: 90, A: 35, N: 75, desc: "폭탄, 샷건, 광역 제압" },
+        "Hitman": { role: "dealer", O: 75, C: 75, E: 90, A: 50, N: 50, desc: "스타일리시, 오로라, 팀 시너지" },
+        "Specialist": { role: "dealer", O: 90, C: 75, E: 50, A: 50, N: 50, desc: "코어 에너지, 첨단 기술, 전략적" },
+    },
+    "Archer": {
+        "Muse": { role: "buffer", O: 75, C: 75, E: 90, A: 75, N: 50, desc: "리드미컬, 높은 조작 요구, 신속함" },
+        "Traveler": { role: "dealer", O: 90, C: 50, E: 90, A: 50, N: 50, desc: "자유로움, 신기루, 여행가" },
+        "Hunter": { role: "dealer", O: 50, C: 75, E: 50, A: 75, N: 35, desc: "팔케, 사냥, 명사수" },
+        "Vigilante": { role: "dealer", O: 75, C: 75, E: 75, A: 35, N: 75, desc: "요수화, 변신, 근접전" },
+        "Chimera": { role: "dealer", O: 75, C: 30, E: 80, A: 50, N: 75, desc: "다재다능, 변형, 전략적" },
+    },
+    "Side Story": {
+        "Dark Knight": { role: "dealer", O: 90, C: 90, E: 50, A: 35, N: 75, desc: "콤보 확장, 복잡성, 시공간" },
+        "Creator": { role: "dealer", O: 90, C: 75, E: 35, A: 50, N: 50, desc: "마우스 컨트롤, 창조, 시간 왜곡" },
+    },
+};
+*/
 /**
  * World of Warcraft 직업 추천을 위한 Big5 더미 데이터를 생성합니다.
  * @param {number} numSamplesPerSpec - 각 전문화별로 생성할 샘플의 수.
