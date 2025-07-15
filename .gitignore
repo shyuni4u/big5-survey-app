@@ -38,9 +38,12 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+.swc
 next-env.d.ts
 src/scripts/ml/__pycache__
 src/scripts/big5_survey_scripts.egg-info
 src/scripts/data.csv
 src/scripts/venv
 src/scripts/runs/psych_model/*
+playwright-report
+test-results
