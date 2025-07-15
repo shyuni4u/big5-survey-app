@@ -9,7 +9,6 @@ import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
 import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
 import { Footer } from '@/components/atoms/Footer'
-import { CoupangPartners } from '@/components/atoms/CoupangPartners'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
 import RecommendationSection from '@/components/molecules/RecommendationSection'
@@ -255,8 +254,6 @@ function ResultContent() {
           error={recommendationError}
         />
 
-        <CoupangPartners />
-
         <Card className="animate-slide-up border-border bg-card text-center shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl text-foreground md:text-3xl">성격 분석 결과</CardTitle>
@@ -276,8 +273,6 @@ function ResultContent() {
         </div>
 
         <AboutSection />
-
-        <CoupangPartners />
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button asChild size="lg" variant="outline" className="border-border bg-transparent hover:bg-secondary">
