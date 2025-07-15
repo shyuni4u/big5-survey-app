@@ -8,7 +8,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="ko" suppressHydrationWarning className={cn(pretendard.className, 'scroll-smooth')}>
       <body>
-        <GoogleAnalytics gaId="G-JJZRZVQ1NK" />
+        <GoogleAnalytics gaId="G-2FW5XLPK5V" />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>
