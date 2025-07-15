@@ -8,7 +8,6 @@ import { questions, getGameClasses } from '@/lib/data'
 import type { TestData, UserAnswers } from '@/lib/types'
 import { cn, SEPERATE_TOKEN, zipData } from '@/lib/utils'
 import { calculateScores } from '@/lib/personality-calculator'
-import { CoupangPartners } from '@/components/atoms/CoupangPartners'
 import { SpriteIcon } from '@/components/molecules/RecommendationSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -142,8 +141,6 @@ function TestContent() {
             <p className="text-muted-foreground">더 정확한 분석을 위해 현재 직업 정보를 알려주세요</p>
           </div>
         </header>
-
-        <CoupangPartners />
 
         <main className="mx-auto max-w-6xl px-4 pb-8">
           <div className="space-y-8">
@@ -330,8 +327,6 @@ function TestContent() {
           </p>
         </div>
       </header>
-
-      <CoupangPartners />
 
       <main className="mx-auto max-w-4xl px-4 pb-24">
         <Card className="animate-slide-up border-border bg-card shadow-lg">
