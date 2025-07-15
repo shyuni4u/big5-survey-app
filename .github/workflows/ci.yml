@@ -1,0 +1,37 @@
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Unit and Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository # GitHub 리포지토리 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js # Node.js 환경 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 프로젝트에 맞는 Node.js 버전 지정 (예: 18, 20)
+          cache: 'npm' # npm 캐싱을 사용하여 의존성 설치 속도 향상
+
+      - name: Install Dependencies # 프로젝트 의존성 설치
+        run: npm ci # 'npm ci'는 CI 환경에서 깨끗한 설치를 보장합니다.
+
+      - name: Type Check # TypeScript 타입 검사
+        run: npx tsc --noEmit
+
+      - name: Run Linter # 코드 린트 실행
+        run: npm run lint
+
+      - name: Run Tests # 유닛 및 통합 테스트 실행
+        run: npm test
