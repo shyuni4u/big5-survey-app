@@ -14,6 +14,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7797435335029081"
           crossOrigin="anonymous"
         ></script>
+        <ins
+          className="adsbygoogle"
+          style={{ display: 'block' }}
+          data-ad-format="autorelaxed"
+          data-ad-client="ca-pub-7797435335029081"
+          data-ad-slot="1476728961"
+        ></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       </head>
       <body>
         <GoogleAnalytics gaId="G-2FW5XLPK5V" />
