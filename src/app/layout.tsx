@@ -8,6 +8,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="ko" suppressHydrationWarning className={cn(pretendard.className, 'scroll-smooth')}>
       <head>
+        <meta name="google-adsense-account" content="ca-pub-7797435335029081" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7797435335029081"
