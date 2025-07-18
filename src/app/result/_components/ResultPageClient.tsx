@@ -8,6 +8,7 @@ import { games, traitInfo } from '@/lib/data'
 import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
 import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
+import { CoupangPartners } from '@/components/atoms/CoupangPartners'
 import { Footer } from '@/components/atoms/Footer'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
@@ -254,6 +255,8 @@ function ResultContent() {
           error={recommendationError}
         />
 
+        <CoupangPartners />
+
         <Card className="animate-slide-up border-border bg-card text-center shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl text-foreground md:text-3xl">성격 분석 결과</CardTitle>
@@ -271,6 +274,8 @@ function ResultContent() {
             <ResultCard key={trait} trait={trait as keyof typeof traitInfo} score={score} />
           ))}
         </div>
+
+        <CoupangPartners />
 
         <AboutSection />
 
