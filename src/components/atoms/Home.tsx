@@ -13,6 +13,7 @@ import type { Game } from '@/lib/types'
 import type { Metadata } from 'next'
 import { Footer } from '@/components/atoms/Footer'
 import { Header } from '@/components/atoms/Header'
+import { CoupangPartners } from '@/components/atoms/CoupangPartners'
 
 export const metadata: Metadata = {
   title: `성격 분석 결과 | Big5 게임 직업 추천`,
@@ -160,6 +161,7 @@ export default function Home() {
           </CardContent>
         </Card>
       </main>
+      <CoupangPartners />
       <Footer />
     </div>
   )
