@@ -42,21 +42,21 @@ export async function POST(req: NextRequest) {
   try {
     // Rate limiting check
     const { allowed, resetTime, remaining } = surveyRateLimiter.isAllowed(req)
-    
+
     if (!allowed) {
       return NextResponse.json(
-        { 
+        {
           error: 'Too many requests. Please try again later.',
-          resetTime 
+          resetTime,
         },
-        { 
+        {
           status: 429,
           headers: {
             'X-RateLimit-Limit': '10',
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': resetTime?.toString() || '',
-          }
-        }
+          },
+        },
       )
     }
 
@@ -66,14 +66,14 @@ export async function POST(req: NextRequest) {
     if (!body.app || !body.answers || !body.class || !body.specialization) {
       return NextResponse.json(
         { error: 'Missing required fields: app, answers, class, specialization' },
-        { 
+        {
           status: 400,
           headers: {
             'X-RateLimit-Limit': '10',
             'X-RateLimit-Remaining': remaining?.toString() || '0',
             'X-RateLimit-Reset': resetTime?.toString() || '',
-          }
-        }
+          },
+        },
       )
     }
 
@@ -87,15 +87,15 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error('[Supabase insert error]', error)
       return NextResponse.json(
-        { error: 'Database insertion failed' }, 
-        { 
+        { error: 'Database insertion failed' },
+        {
           status: 500,
           headers: {
             'X-RateLimit-Limit': '10',
             'X-RateLimit-Remaining': remaining?.toString() || '0',
             'X-RateLimit-Reset': resetTime?.toString() || '',
-          }
-        }
+          },
+        },
       )
     }
 
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
         'X-RateLimit-Limit': '10',
         'X-RateLimit-Remaining': remaining?.toString() || '0',
         'X-RateLimit-Reset': resetTime?.toString() || '',
-      }
+      },
     })
   } catch (err) {
     console.error('[API Uncaught Error]', err)
