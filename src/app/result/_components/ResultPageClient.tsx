@@ -16,6 +16,7 @@ import RecommendationSection from '@/components/molecules/RecommendationSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Share2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 Chart.register(...registerables)
 
@@ -60,7 +61,9 @@ function ResultContent() {
         setRecommendations(data.top_5_recommendations || [])
       } catch (error) {
         console.error('Failed to get recommendations locally:', error)
-        setRecommendationError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.')
+        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
+        setRecommendationError(errorMessage)
+        toast.error('AI 추천을 가져오는 데 실패했습니다. 페이지를 새로고침 해주세요.')
       } finally {
         setIsLoadingRecommendations(false)
       }
@@ -89,12 +92,14 @@ function ResultContent() {
               })
 
               console.info('결과가 성공적으로 저장되었습니다!', _class, _spec)
+              toast.success('결과가 성공적으로 저장되었습니다!')
             })
           } else {
             console.warn('클래스 정보가 없습니다. 결과를 저장하지 않습니다.')
           }
         } catch (error) {
           console.error('Failed to save results:', error)
+          toast.error('결과 저장 중 오류가 발생했습니다.')
         }
       }
 
@@ -106,6 +111,7 @@ function ResultContent() {
       fetchRecommendations(parsedData.personalityScores)
     } catch (error) {
       console.error('Failed to parse test data:', error)
+      toast.error('테스트 데이터를 불러오는 데 실패했습니다.')
       router.push('/')
     }
   }, [searchParams, router, game])
@@ -203,15 +209,16 @@ function ResultContent() {
         await navigator.share(shareData)
       } else {
         await navigator.clipboard.writeText(url)
-        alert('링크가 클립보드에 복사되었습니다!')
+        toast.success('링크가 클립보드에 복사되었습니다!')
       }
     } catch (error) {
       console.error('공유 실패:', error)
       try {
         await navigator.clipboard.writeText(url)
-        alert('링크가 클립보드에 복사되었습니다!')
+        toast.success('링크가 클립보드에 복사되었습니다!')
       } catch (clipboardError) {
         console.error('공유 실패:', clipboardError)
+        toast.error('공유하는 데 실패했습니다.')
       }
     }
   }

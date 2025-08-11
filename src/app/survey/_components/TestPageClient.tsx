@@ -13,6 +13,7 @@ import { SpriteIcon } from '@/components/molecules/RecommendationSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import toast from 'react-hot-toast'
 
 function TestContent() {
   const router = useRouter()
@@ -64,7 +65,9 @@ function TestContent() {
     for (let i = 0; i < questionsOnPage.length; i++) {
       const questionIndex = currentQuestionIndex + i
       if (userAnswers[questionIndex] === undefined) {
-        alert('현재 페이지의 모든 질문에 답변해주세요.')
+        toast.error('현재 페이지의 모든 질문에 답변해주세요.', {
+          duration: 3000,
+        })
         return
       }
     }
