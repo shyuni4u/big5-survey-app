@@ -13,7 +13,7 @@ import type { Game } from '@/lib/types'
 import type { Metadata } from 'next'
 import { Footer } from '@/components/atoms/Footer'
 import { Header } from '@/components/atoms/Header'
-import { CoupangPartners } from '@/components/atoms/CoupangPartners'
+import { KakaoAdFit } from '@/components/atoms/KakaoAdFit'
 
 export const metadata: Metadata = {
   title: `성격 분석 결과 | Big5 게임 직업 추천`,
@@ -161,7 +161,9 @@ export default function Home() {
           </CardContent>
         </Card>
       </main>
-      <CoupangPartners />
+      <div className="mx-auto max-w-4xl px-4">
+        <KakaoAdFit width={728} height={90} />
+      </div>
       <Footer />
     </div>
   )
