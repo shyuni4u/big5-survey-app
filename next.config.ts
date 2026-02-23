@@ -14,11 +14,6 @@ const nextConfig: NextConfig = {
         hostname: 'render.worldofwarcraft.com',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'ads-partners.coupang.com',
-        pathname: '/**',
-      },
     ],
   },
   reactStrictMode: true,
