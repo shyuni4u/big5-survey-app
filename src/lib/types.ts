@@ -1,6 +1,8 @@
+export type Trait = 'E' | 'A' | 'C' | 'N' | 'O'
+
 export type Question = {
   text: string
-  trait: 'E' | 'A' | 'C' | 'N' | 'O'
+  trait: Trait
   reverse: boolean
   weight: number
 }
@@ -61,4 +63,10 @@ export type GameSpec = {
   position?: string
   image?: string
   description: string
+}
+
+export type Recommendation = {
+  label: string
+  score: number
+  reason: string
 }
