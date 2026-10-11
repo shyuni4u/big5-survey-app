@@ -35,7 +35,17 @@ function ResultContent() {
   const [invalid, setInvalid] = useState(false)
   const [testData, setTestData] = useState<TestData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  // 추천은 동기 순수 함수라 상태가 아니라 파생값으로 둔다. game과 testData가 같은 렌더에서 짝을 이루고,
+  // 설문 원점수는 recommend 안에서 모집단 기준으로 정규화된다. 계산이 실패해도 페이지 나머지는 그대로 보여 준다.
+  const recommendations = useMemo<Recommendation[]>(() => {
+    if (!testData) return []
+    try {
+      return recommend(game, testData.personalityScores)
+    } catch (error) {
+      console.error('Failed to compute recommendations:', error)
+      return []
+    }
+  }, [game, testData])
 
   useEffect(() => {
     const dataParam = searchParams.get('data')
@@ -69,7 +79,7 @@ function ResultContent() {
 
       // 같은 결과(data 파라미터)는 브라우저 세션당 한 번만 저장한다.
       // savedResults 는 한 마운트 안에서의 effect 재실행을, sessionStorage 는 새로고침·재방문을 막는다.
-      // 저장에 실패하면 둘 다 지워 다음 시도(재시도 버튼, 새로고침)에서 다시 보낼 수 있게 한다.
+      // 저장에 실패하면 둘 다 지워 다음 시도(새로고침)에서 다시 보낼 수 있게 한다.
       const saveKey = `saved:${game}:${hashString(dataParam)}`
       const readSavedFlag = () => {
         try {
@@ -124,8 +134,6 @@ function ResultContent() {
         void saveResult()
       }
 
-      // 추천은 동기 순수 함수라 로딩 상태가 필요 없다. 설문 원점수는 recommend 안에서 모집단 기준으로 정규화된다.
-      setRecommendations(recommend(game, parsedData.personalityScores))
       setIsLoading(false)
     } catch (error) {
       console.error('Failed to parse test data:', error)

@@ -71,7 +71,7 @@ export type Recommendation = {
 }
 ```
 
-`big5`와 `signature`는 필수 필드다. 136개 전문화 중 하나라도 빠지면 타입 검사가 실패한다.
+`big5`와 `signature`는 필수 필드다. 전문화 중 하나라도 빠지면 타입 검사가 실패한다. (작성 시점 136개, master 머지 후 141개: 포식 악마사냥꾼, 가디언나이트, 차원술사, 제국기사 브레이커, 여인파이터 추가.)
 
 ### 4.2 역할 원형 (`recommend.ts` 상수)
 
@@ -114,7 +114,7 @@ C와 O는 모든 역할에서 20~95를 자유롭게 쓴다. 딜러 범위가 넓
 
 시그니처 특성은 그 전문화를 가장 잘 설명하는 축 1~2개를 고른다. 예: 비전 법사 `['C','O']`, 무법 도적 `['N','O']`, 분노 전사 `['E','C']`.
 
-던파의 남/여 동명 전직 9쌍(넨마스터, 스트라이커, 브롤러, 그래플러, 레인저, 런처, 메카닉, 스핏파이어, 크루세이더)은 실제 플레이 감각 차이로 프로필을 다르게 쓴다. 예: 남넨마는 보호막·지원 성격이 강해 A를 높이고, 여스트라이커는 빠른 콤보 중심이라 E를 높인다.
+던파의 남/여 동명 전직 10쌍(넨마스터, 스트라이커, 브롤러, 그래플러, 레인저, 런처, 메카닉, 스핏파이어, 크루세이더, 인파이터)은 실제 플레이 감각 차이로 프로필을 다르게 쓴다. 예: 남넨마는 보호막·지원 성격이 강해 A를 높이고, 여스트라이커는 빠른 콤보 중심이라 E를 높인다.
 
 ### 4.4 데이터 불변 조건 (테스트로 강제)
 
@@ -185,6 +185,8 @@ ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 
 ## 6. 결과 화면 변경
 
+> 머지 후 보충: master의 결과 화면 재설계(PR #18)가 단상 UI와 축하 문구를 없애고 "01 / 가장 먼저 만나볼 직업" 카드 그리드로 바꿨다. 이 절의 단상·축하 문구 서술은 작성 시점의 화면 기준이며, 실제 구현은 새 디자인 위에 아래 요구(로딩·오류 분기 제거, 0~100 적합도, 추천 이유 한 줄, "AI" 문구 없음)를 적용했다. `<details>`의 점수 설명도 규칙 기반 설명으로 바꿨다.
+
 `ResultPageClient.tsx`:
 
 - `predict` 호출을 `recommend(game, personalityScores)`로 바꾼다. 동기 호출이므로 `isLoadingRecommendations`, `recommendationError` 상태와 관련 분기를 없앤다.
@@ -218,7 +220,7 @@ ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 
 ### 8.1 데이터 불변 조건
 
-4.4의 조건을 게임 세 개 각각에 대해 검사한다. 던파 남/여 동명 전직 9쌍이 서로 다른 프로필을 갖는지도 명시적으로 확인한다.
+4.4의 조건을 게임 세 개 각각에 대해 검사한다. 던파 남/여 동명 전직 10쌍이 서로 다른 프로필을 갖는지도 명시적으로 확인한다.
 
 ### 8.2 계산 단위 테스트
 
@@ -282,7 +284,7 @@ ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 | 파일 | 변경 |
 |---|---|
 | `src/lib/types.ts` | `Trait`, `Recommendation` 추가, `GameSpec`에 `big5`, `signature` 필수 필드 |
-| `src/lib/data.ts` | 136개 전문화에 `big5`, `signature` 작성 |
+| `src/lib/data.ts` | 모든 전문화(머지 후 141개)에 `big5`, `signature` 작성 |
 | `src/lib/recommend.ts` | 신규. 상수(역할 원형, 가중치, 모집단 기준), `normalizeScores`, `specFit`, `roleFit`, `buildReason`, `rankSpecs`, `recommend` |
 | `src/lib/recommend.test.ts` | 신규. 8절의 세 묶음 |
 | `src/app/result/_components/ResultPageClient.tsx` | `predict` → `recommend`, 로딩/에러 상태 제거 |

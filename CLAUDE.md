@@ -12,19 +12,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run test` - Run Jest test suite
 - `npm run test:watch` - Run tests in watch mode
 
-### Python ML Model Development
-Located in `src/scripts/`:
+### Python ML Model Development (dormant)
+The app no longer runs a model; these tools are kept for a future real-data retrain. Located in `src/scripts/`:
 - `python -m venv venv` - Create Python virtual environment
 - `.\venv\Scripts\activate` - Activate virtual environment (Windows)
 - `pip install -r requirements.txt` - Install Python dependencies
-- `python train.py` - Train personality classification model
-- `python export_onnx.py` - Convert PyTorch model to ONNX format
-- `.\venv\Scripts\tensorboard.exe --logdir=runs/psych_model` - Monitor training progress
+- `npm run dataset -- --env .env.local` - Build `src/scripts/data/<game>.csv` from Supabase rows plus synthetic fill (needs `src/scripts/profiles/<game>.json`, which is raw-scale and separate from the normalized `big5` in `src/lib/data.ts`)
+- `python ml/train.py --csv data/wow.csv --model models/wow/model.pth` - Train a per-game classifier
+- `python ml/export_onnx.py --model models/wow/model.pth --onnx <out>/model.onnx` - Export ONNX + labels.json (no browser inference path consumes them today)
+- `.\venv\Scripts\tensorboard.exe --logdir=runs` - Monitor training progress
 
 ## Architecture Overview
 
 ### Application Structure
-This is a Big5 personality test application that recommends game classes/specializations based on psychological profiles. The app uses a Next.js frontend with AI/ML backend processing.
+This is a Big5 personality test application that recommends game classes/specializations based on psychological profiles. Recommendations are computed in the browser by a rule-based scorer (`src/lib/recommend.ts`); there is no model inference at runtime.
 
 ### Key Components
 
@@ -75,6 +76,7 @@ When adding new games (documented in `src/README.md`):
 1. Add the game and its classes/specs to `src/lib/data.ts`, including `big5` and `signature` for every spec (the type check fails otherwise)
 2. Add image domains to `next.config.ts` remotePatterns
 3. Run `npm test` — the data-invariant tests reject duplicate or too-close profiles, and add golden archetype tests for the new game in `src/lib/recommend.test.ts`
+4. If the dormant dataset builder should keep working, also add the spec to `src/scripts/profiles/<game>.json` (`npm run dataset` fails without it; `npm test` does not)
 
 ### Environment Setup
 - **Node.js** - Next.js development environment

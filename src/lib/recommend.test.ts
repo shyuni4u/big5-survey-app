@@ -149,7 +149,7 @@ describe.each(GAMES)('%s 프로필 데이터 불변 조건', (game) => {
   })
 })
 
-it('던파 남/여 동명 전직 9쌍은 서로 다른 프로필을 가진다', () => {
+it('던파 남/여 동명 전직 10쌍은 서로 다른 프로필을 가진다', () => {
   const specs = specsOf('dnf')
   const names = [
     'Nen Master',
@@ -161,6 +161,7 @@ it('던파 남/여 동명 전직 9쌍은 서로 다른 프로필을 가진다', 
     'Mechanic',
     'Spitfire',
     'Crusader',
+    'Monk',
   ]
   const tooClose: string[] = []
   for (const name of names) {

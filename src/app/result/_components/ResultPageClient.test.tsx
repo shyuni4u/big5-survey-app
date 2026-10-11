@@ -122,3 +122,16 @@ describe('ResultPageClient result saving', () => {
     expect(mockFetch).not.toHaveBeenCalled()
   })
 })
+
+describe('ResultPageClient recommendations', () => {
+  it.each(['WoW', 'LostArk', 'DNF'])(
+    'renders three rule-based recommendations with a fit score for %s',
+    async (game) => {
+      renderResult({ ...existingUser, userType: 'new' }, game)
+
+      await screen.findByRole('heading', { name: '이번 모험의 주인공은?' })
+      expect(screen.getAllByText(/^[0-9]+%$/)).toHaveLength(3)
+      expect(screen.getByText('01 / 가장 먼저 만나볼 직업')).toBeInTheDocument()
+    },
+  )
+})
