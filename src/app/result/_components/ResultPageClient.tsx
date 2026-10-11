@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { games, traitInfo } from '@/lib/data'
 import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
-import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
+import { SEPERATE_TOKEN, zipData, unzipData, hashString } from '@/lib/utils'
 import { AdpickBanner } from '@/components/atoms/AdpickBanner'
 import { Footer } from '@/components/atoms/Footer'
 import ResultCard from '@/components/molecules/ResultCard'
@@ -93,13 +93,35 @@ function ResultContent() {
       ) as PersonalityScores
       setTestData(parsedData)
 
-      const saveResult = async () => {
+      // 같은 결과(data 파라미터)는 브라우저 세션당 한 번만 저장한다.
+      // savedResults 는 한 마운트 안에서의 effect 재실행을, sessionStorage 는 새로고침·재방문을 막는다.
+      // 저장에 실패하면 둘 다 지워 다음 시도(재시도 버튼, 새로고침)에서 다시 보낼 수 있게 한다.
+      const saveKey = `saved:${game}:${hashString(dataParam)}`
+      const readSavedFlag = () => {
         try {
-          if (Array.isArray(parsedData.currentClass) && parsedData.currentClass.length > 0) {
-            for (const currentClass of parsedData.currentClass) {
-              const _class = currentClass.split(SEPERATE_TOKEN)[0]!
-              const _spec = currentClass.split(SEPERATE_TOKEN)[1]!
+          return sessionStorage.getItem(saveKey) === '1'
+        } catch {
+          return false
+        }
+      }
+      const writeSavedFlag = (saved: boolean) => {
+        try {
+          if (saved) sessionStorage.setItem(saveKey, '1')
+          else sessionStorage.removeItem(saveKey)
+        } catch {
+          // sessionStorage 를 쓸 수 없는 환경(프라이빗 모드 등)에서는 savedResults 만으로 가드한다.
+        }
+      }
 
+      const saveResult = async () => {
+        if (!Array.isArray(parsedData.currentClass) || parsedData.currentClass.length === 0) {
+          console.warn('클래스 정보가 없습니다. 결과를 저장하지 않습니다.')
+          return
+        }
+        try {
+          await Promise.all(
+            parsedData.currentClass.map(async (currentClass) => {
+              const [_class, _spec] = currentClass.split(SEPERATE_TOKEN)
               const response = await fetch('/api/survey-result', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -110,22 +132,21 @@ function ResultContent() {
                   specialization: _spec,
                 }),
               })
-
-              if (!response.ok) throw new Error('Save failed')
-            }
-            toast.success('선택한 직업 정보를 저장했어요.')
-          } else {
-            console.warn('클래스 정보가 없습니다. 결과를 저장하지 않습니다.')
-          }
+              if (!response.ok) throw new Error(`Save failed (${response.status}): ${_class} ${_spec}`)
+            }),
+          )
+          toast.success('선택한 직업 정보를 저장했어요.')
         } catch (error) {
+          savedResults.current.delete(saveKey)
+          writeSavedFlag(false)
           console.error('Failed to save results:', error)
           toast.error('결과 저장 중 오류가 발생했습니다.')
         }
       }
 
-      const saveKey = game + ':' + dataParam
-      if (parsedData.userType === 'existing' && !savedResults.current.has(saveKey)) {
+      if (parsedData.userType === 'existing' && !savedResults.current.has(saveKey) && !readSavedFlag()) {
         savedResults.current.add(saveKey)
+        writeSavedFlag(true) // 요청을 보내기 전에 먼저 표시해 동시 실행을 막는다.
         void saveResult()
       }
 
