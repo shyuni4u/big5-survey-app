@@ -14,7 +14,7 @@ it('resizes only for valid messages from the advertising frame and protects resu
   send('https://attacker.example', source, 400)
   send('https://www.adpick.co.kr', window, 400)
   expect(frame).toHaveAttribute('height', '100')
-  send('https://www.adpick.co.kr', source, '50')
+  send('https://www.adpick.co.kr', source, '50px')
   expect(frame).toHaveAttribute('height', '50')
   send('https://www.adpick.co.kr', source, 100000)
   send('https://www.adpick.co.kr', source, -1)

@@ -22,7 +22,10 @@ export function AdpickBanner() {
       ) return
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data
-        const nextHeight = Number(data?.height)
+        const rawHeight = data?.height
+        const nextHeight = typeof rawHeight === 'string' && /^\d+(?:\.\d+)?px$/.test(rawHeight)
+          ? Number(rawHeight.slice(0, -2))
+          : Number(rawHeight)
         if (data?.id === frameId && Number.isFinite(nextHeight) && nextHeight >= 0 && nextHeight <= 500) {
           setHeight(Math.ceil(nextHeight))
         }
