@@ -110,3 +110,23 @@ src
 ## **📄 라이센스**
 
 이 프로젝트는 MIT 라이센스 하에 배포됩니다.
+
+## GA4 방문·완료·공유 측정
+
+배포 환경의 `NEXT_PUBLIC_GA_ID`에 GA4 웹 스트림의 측정 ID(`G-...`)를 설정하고 다시 빌드합니다. 값이 없으면 Google 스크립트를 불러오거나 이벤트를 전송하지 않습니다.
+
+- `page_view`: 페이지 방문 (앱에서 수동 전송)
+- `survey_start`: 새 설문의 첫 답변
+- `survey_complete`: 40개 문항 답변 완료 (결과 링크 조회와 구분)
+- `share`: 링크 복사 성공 또는 네이티브 공유 API 성공. 실제 상대방 수신을 의미하지 않습니다.
+- `share_card_download`: PNG 다운로드 요청 성공. 사용자가 사진첩에 저장했는지는 알 수 없습니다.
+- `share_landing`: 공유 링크 또는 카드 QR로 유입된 페이지 조회
+- `share_test_start`: 공유받은 결과의 '나도 테스트하기' 클릭
+
+공유 링크는 `utm_source=play_persona`, `utm_medium=referral`, `utm_campaign=result_share`를 사용하며 `utm_content`로 `native`, `copy_link`, `card_qr`를 구분합니다. 카드 QR은 성격 결과 없이 해당 게임의 새 설문으로 연결됩니다. 공유 유입 경로는 같은 탭에서 30분간 이벤트의 `acquisition_source`로 이어집니다.
+
+GA4 관리 > 데이터 스트림 > 웹 스트림 > 향상된 측정에서 자동 페이지 조회(특히 브라우저 기록 변경)를 끄고 앱의 수동 `page_view`를 사용하세요. 자동 수집의 중복을 방지하고 결과 데이터가 담긴 전체 URL의 자동 전송을 피하기 위한 설정입니다. 앱 이벤트의 URL에서는 결과 점수·현재 직업·답변을 제거합니다.
+
+GA4에서 `survey_complete`를 주요 이벤트로 지정하고, 필요하면 `game`, `method`, `acquisition_source`, `landing_page`를 이벤트 범위 맞춤 측정기준으로 등록합니다. 보고서 > 획득에서 소스/매체와 캠페인을 확인하고, 탐색에서 `share_landing → survey_start → survey_complete` 퍼널을 구성합니다. 광고 차단이나 동의 설정에 따라 측정이 누락될 수 있습니다.
+
+실시간 보고서에서 본인 방문을 확인한 뒤 설문 완료와 공유 유입을 각각 테스트하세요. 로컬 테스트는 이벤트 큐와 QR 디코딩을 검증하며, GA 계정에 실제 수신됐는지는 실시간 보고서에서 별도 확인해야 합니다.

@@ -2,6 +2,8 @@ const { chromium } = require('playwright')
 const assert = require('node:assert/strict')
 const pako = require('pako')
 const fs = require('node:fs')
+const jsQR = require('jsqr')
+const { PNG } = require('pngjs')
 const base = process.env.TEST_BASE_URL || 'http://localhost:3000'
 const output = 'test-results/mobile'
 fs.mkdirSync(output, { recursive: true })
@@ -17,6 +19,9 @@ const decode = (url) =>
       acceptDownloads: true,
     })
     const page = await context.newPage()
+    await page.route('**/googletagmanager.com/**', (route) =>
+      route.fulfill({ body: '', contentType: 'application/javascript' }),
+    )
     const errors = []
     page.on('pageerror', (e) => errors.push(e.message))
     await page.addInitScript(() => {
@@ -40,6 +45,10 @@ const decode = (url) =>
     assert.equal(await page.locator(':focus').getAttribute('id'), 'q0v1')
     const first = await page.locator('legend').first().innerText()
     for (let i = 0; i < 5; i++) await page.locator(`label[for="q${i}v4"]`).tap()
+    if (process.env.TEST_ANALYTICS === '1') {
+      const events = await page.evaluate(() => (window.dataLayer || []).map((x) => Array.from(x)))
+      assert.equal(events.filter((x) => x[0] === 'event' && x[1] === 'survey_start').length, 1)
+    }
     await page.reload()
     await page.getByText('1 / 8 페이지').waitFor()
     assert.equal(await page.locator('legend').first().innerText(), first)
@@ -57,6 +66,10 @@ const decode = (url) =>
     }
     await page.getByRole('button', { name: '건너뛰고 결과 보기' }).tap()
     await page.getByRole('heading', { name: '이번 모험의 주인공은?' }).waitFor({ timeout: 60000 })
+    if (process.env.TEST_ANALYTICS === '1') {
+      const events = await page.evaluate(() => (window.dataLayer || []).map((x) => Array.from(x)))
+      assert.equal(events.filter((x) => x[0] === 'event' && x[1] === 'survey_complete').length, 1)
+    }
     const resultUrl = page.url()
     const result = decode(resultUrl)
     assert.equal(result.userType, 'new')
@@ -70,6 +83,14 @@ const decode = (url) =>
     const png = fs.readFileSync(`${output}/card.png`)
     assert.equal(png.readUInt32BE(16), 1080)
     assert.equal(png.readUInt32BE(20), 1350)
+    const pixels = PNG.sync.read(png)
+    const decodedQr = jsQR(new Uint8ClampedArray(pixels.data), pixels.width, pixels.height)
+    assert(decodedQr, 'QR must decode from downloaded card')
+    const qrUrl = new URL(decodedQr.data)
+    assert.equal(qrUrl.searchParams.get('utm_content'), 'card_qr')
+    assert.equal(qrUrl.searchParams.get('game'), 'LostArk')
+    assert.equal(qrUrl.pathname, '/survey')
+    assert.equal(qrUrl.searchParams.has('data'), false)
     await page.getByRole('button', { name: '링크 복사', exact: true }).tap()
     await page.getByRole('button', { name: '친구에게 결과 공유' }).tap()
     let copies = await page.evaluate(() => window.testCopies)
@@ -96,6 +117,15 @@ const decode = (url) =>
     assert.equal((await page.evaluate(() => window.testCopies)).length, 2)
     await page.goto(copies[0])
     await page.getByRole('heading', { name: '이번 모험의 주인공은?' }).waitFor({ timeout: 60000 })
+    await page.getByRole('link', { name: '나도 테스트하기', exact: true }).waitFor()
+    if (process.env.TEST_ANALYTICS === '1') {
+      const events = await page.evaluate(() =>
+        (window.dataLayer || []).map((x) => Array.from(x)).filter((x) => x[0] === 'event'),
+      )
+      assert.equal(events.filter((x) => x[1] === 'share_landing').length, 1)
+      assert(!JSON.stringify(events).includes('data='), 'result payload must not appear in analytics')
+      assert(!events.some((x) => x[1] === 'survey_complete'), 'shared results must not count as completions')
+    }
     for (const width of [320, 375, 430]) {
       await page.setViewportSize({ width, height: 844 })
       await fits()
@@ -117,6 +147,11 @@ const decode = (url) =>
     console.log(
       'PASS: 40 answers, missing-answer focus, reload/resume, previous, skip class, real model results for 3 games, 320–430px overflow, PNG 1080x1350, share payload, clipboard fallback, native share/cancel handlers, shared URL, invalid URL; no uncaught page errors',
     )
+    await page.goto(copies[0])
+    await page.getByRole('link', { name: '나도 테스트하기', exact: true }).click()
+    await page.getByText('1 / 8 페이지').waitFor()
+    await page.goto(decodedQr.data)
+    await page.getByText('1 / 8 페이지').waitFor()
     await context.close()
   } finally {
     await browser.close()

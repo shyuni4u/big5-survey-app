@@ -3,7 +3,9 @@ import { useState } from 'react'
 import { Download, Share2, Link2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { games, getGameClasses, traitInfo } from '@/lib/data'
-import { zipData } from '@/lib/utils'
+import { shareUrl } from '@/lib/sharing'
+import { track } from '@/lib/analytics'
+import QRCode from 'qrcode'
 import type { PersonalityScores } from '@/lib/types'
 import toast from 'react-hot-toast'
 
@@ -21,11 +23,11 @@ export default function ShareResult({
   const spec = cls?.specs.find((s) => `${cls.name}_${s.name}` === recommendation)
   const gameName = games.find((g) => g.id === game)?.name || game
   const title = spec ? `${gameName} 속 나의 추천 직업은 ${spec.nameKr}!` : '나의 게임 성향 프로필'
-  const url = () =>
-    `${window.location.origin}/result?data=${zipData({ userType: 'new', personalityScores: scores })}&game=${encodeURIComponent(game)}`
+  const url = (method: 'native' | 'copy_link') => shareUrl(window.location.origin, game, method, scores)
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(url())
+      await navigator.clipboard.writeText(url('copy_link'))
+      track('share', { game, method: 'copy_link', content_type: 'personality_result' })
       toast.success('결과 링크를 복사했어요.')
     } catch {
       toast.error('링크를 복사하지 못했어요. 브라우저의 공유 기능을 이용해주세요.')
@@ -37,7 +39,8 @@ export default function ShareResult({
       return
     }
     try {
-      await navigator.share({ title, text: `${title} 너는 어떤 직업이 나올까?`, url: url() })
+      await navigator.share({ title, text: `${title} 너는 어떤 직업이 나올까?`, url: url('native') })
+      track('share', { game, method: 'native', content_type: 'personality_result' })
     } catch (e) {
       if (!(e instanceof Error && e.name === 'AbortError')) await copy()
     }
@@ -78,8 +81,16 @@ export default function ShareResult({
         ctx.fillStyle = '#70e8c5'
         ctx.fillRect(80, y + 20, (920 * score) / 100, 10)
       })
-      text('친구는 어떤 직업일까?', 80, 1180, 36)
-      text('Big5 성향 탐색 · 게임 추천은 재미로 참고해주세요', 80, 1240, 23, '#b6c2d4')
+      text('친구는 어떤 직업일까?', 80, 1150, 34)
+      text(window.location.host, 80, 1210, 30, '#70e8c5')
+      text('QR을 스캔하고 나도 테스트하기', 80, 1255, 22, '#b6c2d4')
+      const qr = document.createElement('canvas')
+      await QRCode.toCanvas(qr, shareUrl(window.location.origin, game, 'card_qr'), {
+        width: 200,
+        margin: 4,
+        errorCorrectionLevel: 'M',
+      })
+      ctx.drawImage(qr, 800, 1080, 200, 200)
       const blob = await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('encode'))), 'image/png'),
       )
@@ -88,6 +99,7 @@ export default function ShareResult({
       a.href = objectUrl
       a.download = `play-persona-${game}.png`
       a.click()
+      track('share_card_download', { game, method: 'card_qr' })
       setTimeout(() => URL.revokeObjectURL(objectUrl), 10000)
       toast.success('결과 카드를 저장했어요. 링크도 함께 보내보세요!')
     } catch {

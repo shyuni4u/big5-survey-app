@@ -19,6 +19,8 @@ import { Share2 } from 'lucide-react'
 import ShareResult from '@/components/molecules/ShareResult'
 import { Header } from '@/components/atoms/Header'
 import toast from 'react-hot-toast'
+import { shareUrl } from '@/lib/sharing'
+import { track } from '@/lib/analytics'
 
 Chart.register(...registerables)
 
@@ -217,7 +219,13 @@ function ResultContent() {
   )
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/result?data=${withResultData}&game=${game}` // result?data=eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1WsqpWclWyMjPQUXKEUM5KVqbGOkp-QMpIR8lfycrYsFZHKbm0qCg1r8Q5J7EYqCc6thYAWRMcFw
+    if (!testData) return
+    const url = shareUrl(
+      window.location.origin,
+      game,
+      typeof navigator.share === 'function' ? 'native' : 'copy_link',
+      testData.personalityScores,
+    )
 
     const shareData = {
       title: 'Big5 성격 분석 결과',
@@ -228,15 +236,22 @@ function ResultContent() {
     try {
       if (navigator.share) {
         await navigator.share(shareData)
+        track('share', { game, method: 'native', content_type: 'personality_result' })
       } else {
-        await navigator.clipboard.writeText(url)
+        await navigator.clipboard.writeText(
+          shareUrl(window.location.origin, game, 'copy_link', testData.personalityScores),
+        )
+        track('share', { game, method: 'copy_link', content_type: 'personality_result' })
         toast.success('링크가 클립보드에 복사되었습니다!')
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') return
       console.error('공유 실패:', error)
       try {
-        await navigator.clipboard.writeText(url)
+        await navigator.clipboard.writeText(
+          shareUrl(window.location.origin, game, 'copy_link', testData.personalityScores),
+        )
+        track('share', { game, method: 'copy_link', content_type: 'personality_result' })
         toast.success('링크가 클립보드에 복사되었습니다!')
       } catch (clipboardError) {
         console.error('공유 실패:', clipboardError)
@@ -285,6 +300,19 @@ function ResultContent() {
       </header>
 
       <main className="mx-auto max-w-5xl space-y-10 px-4 py-8">
+        {searchParams.get('ref') === 'share' && (
+          <section className="rounded-2xl border border-primary/40 bg-primary/10 p-5 sm:flex sm:items-center sm:justify-between sm:gap-4">
+            <div>
+              <p className="font-semibold">친구의 결과, 나와는 얼마나 다를까요?</p>
+              <p className="mt-1 text-sm text-muted-foreground">내 성향에 어울리는 직업도 찾아보세요.</p>
+            </div>
+            <Button asChild className="mt-4 h-12 w-full shrink-0 sm:mt-0 sm:w-auto">
+              <Link href={`/survey?type=new&game=${game}`} onClick={() => track('share_test_start', { game })}>
+                나도 테스트하기
+              </Link>
+            </Button>
+          </section>
+        )}
         {/* AI 추천 결과 섹션 */}
         <RecommendationSection
           game={game}
