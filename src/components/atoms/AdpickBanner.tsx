@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 // Publisher ID from the account's generated native banner code (not a secret).
 const affiliateId = '5fa8cc'
 const frameId = 'AdpickAdFrame_result_banner'
-const bannerUrl = `https://www.adpick.co.kr/nativeAD/ad.php?bannerType=type10&limit=1&affid=${affiliateId}&frameId=${frameId}&popup=false`
+const bannerUrl = `https://www.adpick.co.kr/nativeAD/ad.php?bannerType=type1&limit=1&affid=${affiliateId}&frameId=${frameId}&popup=false`
 
 export function AdpickBanner() {
   const frameRef = useRef<HTMLIFrameElement>(null)
