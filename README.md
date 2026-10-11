@@ -77,6 +77,7 @@ src
 - **점수**: 역할 적합도(A·E·N으로 역할 원형과의 거리)와 전문화 적합도(시그니처 가중 거리)를 35:65로 섞습니다. 상수는 `src/lib/recommend.ts` 상단에 있습니다.
 - **검증**: 게임별 성향 유형(힐러형, 탱커형, 도박 외향 딜러 등)에 대한 골든 테스트가 상위 3개의 역할과 전문화를 고정합니다.
 - **학습 스크립트**: `src/scripts/ml/`의 PyTorch 학습·ONNX 변환 스크립트와 체크포인트는 실제 설문 데이터가 충분히 쌓였을 때 재학습하기 위해 남겨 둔 것으로, 현재 앱은 사용하지 않습니다.
+- **실데이터 보정**: Supabase SQL Editor에서 `select app, class, specialization, answers from survey_results;` 결과를 CSV 또는 JSON으로 내보낸 뒤 `node src/scripts/profile-calibration.js survey_results.csv` 를 실행하면, 응답자 모집단의 평균·표준편차(`src/lib/recommend.ts`의 `POPULATION_BASELINE` 갱신용), 실데이터 평균이 프로필과 크게 다른 전문화, 서로 가까운 전문화 쌍(실데이터에서 갈리는 특성 포함)을 출력합니다. 이 리포트를 보고 값을 조정하고 테스트로 확인합니다.
 
 ## **📝 향후 계획 (TODO)**
 
