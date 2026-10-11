@@ -34,10 +34,11 @@
 설문 응답 → calculateScores → PersonalityScores (E/A/C/N/O, 0~100)
                                       │
                                       ▼
-                     recommend(game, scores)  ← 새 모듈 src/lib/recommend.ts (순수, 동기)
-                        ├─ roleFit(scores, spec.role)      역할 원형과의 거리 (A·E·N)
-                        ├─ specFit(scores, spec.big5, spec.signature)  가중 거리 (5개 특성)
-                        └─ score = 0.35·roleFit + 0.65·specFit → 정렬된 Recommendation[]
+                     recommend(game, raw)  ← 새 모듈 src/lib/recommend.ts (순수, 동기)
+                        ├─ u = normalizeScores(raw)        응답자 모집단 기준 정규화 (5.0)
+                        ├─ roleFit(u, spec.role)           역할 원형과의 거리 (A·E·N)
+                        ├─ specFit(u, spec.big5, spec.signature)  가중 거리 (5개 특성)
+                        └─ score = 0.35·roleFit + 0.65·specFit → 정렬된 Recommendation[]  (= rankSpecs(game, u))
                                       │
                                       ▼
                        RecommendationSection (상위 3개 단상 UI + 적합도 + 한 줄 이유)
@@ -126,7 +127,20 @@ C와 O는 모든 역할에서 20~95를 자유롭게 쓴다. 딜러 범위가 넓
 
 ## 5. 점수 계산 (`src/lib/recommend.ts`)
 
-입력 `u`는 `PersonalityScores`(0~100). 특성 순서는 E, A, C, N, O.
+입력 `raw`는 설문에서 계산된 `PersonalityScores`(0~100). 특성 순서는 E, A, C, N, O. 아래 수식의 `u`는 5.0에서 정규화한 값이다.
+
+### 5.0 모집단 정규화
+
+설문 점수의 절대값은 문항 구성과 응답자 집단에 따라 치우친다. 2026-10-11 Supabase 내보내기(완전 중복 제거 후 응답자 2,310명)에서 평균은 E 39, A 53, C 56, N 49, O 55, 표준편차는 E 21, A 15, C 18, N 20, O 16이었다. 특히 외향성은 응답자의 95%가 77 이하다. 절대값으로 매칭하면 E 85~90인 전문화는 거의 추천되지 않고(로아에서 4개 전문화가 435명 중 한 번도 1위에 오르지 못함), 중심에 있는 전문화 하나가 와우 1위의 29%를 차지했다.
+
+그래서 매칭 전에 응답자 모집단을 기준으로 점수를 정규화한다. 모집단 평균을 50, 표준편차 1을 25점으로 두고 0~100으로 자른다.
+
+```
+u_t = clamp( 50 + 25 · (raw_t − MEAN_t) / SD_t , 0, 100 )
+POPULATION_BASELINE = { mean: { E: 39, A: 53, C: 56, N: 49, O: 55 }, sd: { E: 21, A: 15, C: 18, N: 20, O: 16 } }
+```
+
+"게이머 평균"이 50, 상위 16%가 75, 상위 2.5%가 100이 된다. 전문화 프로필(4.3)과 역할 원형(4.2), 골든 테스트 입력(8.3)은 모두 이 정규화된 척도 위의 값이다. 상수는 `recommend.ts` 상단에 두고 출처(내보내기 날짜, 표본 수)를 주석으로 남긴다. 데이터가 더 쌓이면 8.4의 스크립트가 출력하는 모집단 통계로 갱신한다. 결과 화면의 레이더 차트와 특성 카드는 기존처럼 원점수를 보여 준다(이번 범위에서는 바꾸지 않음).
 
 전문화 적합도:
 
@@ -151,7 +165,7 @@ score = round( ROLE_WEIGHT · roleFit + SPEC_WEIGHT · specFit )
 ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 ```
 
-`recommend(game, scores)`는 그 게임의 모든 전문화에 대해 점수를 내고 내림차순으로 정렬한 `Recommendation[]`을 반환한다. 동점은 라벨 코드포인트 순으로 고정해 결과가 결정적이게 한다. 알 수 없는 게임 키는 빈 배열을 반환한다. 화면은 상위 3개만 쓴다.
+`rankSpecs(game, u)`는 정규화된 점수로 그 게임의 모든 전문화에 점수를 내고 내림차순으로 정렬한 `Recommendation[]`을 반환한다. `recommend(game, raw)`는 `rankSpecs(game, normalizeScores(raw))`이며 화면은 이것을 호출한다. 동점은 라벨 코드포인트 순으로 고정해 결과가 결정적이게 한다. 알 수 없는 게임 키는 빈 배열을 반환한다. 화면은 상위 3개만 쓴다.
 
 상수(`ROLE_ARCHETYPES`, `SIGNATURE_WEIGHT`, `ROLE_WEIGHT`, `SPEC_WEIGHT`, 불변 조건의 최소 거리 10)는 파일 상단 한 곳에 두고, 골든 테스트가 깨지면 이 값과 프로필 데이터를 조정한다.
 
@@ -210,12 +224,13 @@ ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 
 - `specFit`: 프로필과 같은 입력이면 100, 시그니처 특성의 차이가 비시그니처보다 거리에 더 크게 반영됨, 결과가 0~100 범위.
 - `roleFit`: 중립(50) 입력은 dealer가 최고, A90·E55·N25는 healer가 최고.
-- `recommend`: 내림차순 정렬, 동점 시 라벨 순, 알 수 없는 게임은 빈 배열, 반환 개수는 그 게임 전문화 수와 같음, `score`는 정수.
+- `normalizeScores`: 모집단 평균 입력은 모든 특성이 50, 평균+1표준편차 입력은 75, 0~100 밖은 잘린다.
+- `recommend`/`rankSpecs`: 내림차순 정렬, 동점 시 라벨 순, 알 수 없는 게임은 빈 배열, 반환 개수는 그 게임 전문화 수와 같음, `score`는 정수. `recommend(game, raw)`는 `rankSpecs(game, normalizeScores(raw))`와 같다.
 - `reason`: 시그니처 1개/2개, 높음/낮음 조합이 표대로 나온다.
 
 ### 8.3 골든 성향 테스트
 
-게임마다 성향 유형을 고정하고 상위 3개의 역할과 대표 전문화를 검사한다. 프로필 값과 상수를 조정할 때 이 테스트가 기준이 된다.
+게임마다 성향 유형을 고정하고 상위 3개의 역할과 대표 전문화를 검사한다. 프로필 값과 상수를 조정할 때 이 테스트가 기준이 된다. 입력은 정규화된 척도(5.0)의 값이며 `rankSpecs(game, u)`를 직접 호출한다. 원점수 끝단 검사는 하나만 둔다: `recommend('wow', {E:60, A:90, C:80, N:20, O:50})`의 상위 3개는 모두 힐러여야 한다.
 
 와우 (E, A, C, N, O 순):
 
@@ -254,12 +269,13 @@ ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 
 실제 설문 응답이 쌓이면 손으로 쓴 프로필 중 구분이 잘 안 되는 전문화 쌍을 실데이터 방향으로 벌린다. 이를 반복 가능하게 하는 Node 스크립트 `src/scripts/profile-calibration.js`를 둔다.
 
-- 입력: Supabase SQL Editor에서 `select app, class, specialization, answers from survey_results;` 결과를 JSON으로 내보낸 파일. 결과 페이지 새로고침으로 생기는 완전 중복 행은 한 번만 센다.
+- 입력: Supabase SQL Editor에서 `select app, class, specialization, answers from survey_results;` 결과를 CSV(SQL Editor의 다운로드 형식) 또는 JSON으로 내보낸 파일. 결과 페이지 새로고침으로 생기는 완전 중복 행은 한 번만 센다.
+- 출력 0: 중복 제거 후 응답자 모집단의 특성별 평균·표준편차(5.0의 `POPULATION_BASELINE` 갱신용).
 - 출력 1: 표본이 `--min-n`(기본 5) 이상인 전문화 중 실데이터 평균이 현재 프로필과 10 이상 다른 특성.
 - 출력 2: 현재 프로필에서 거리가 `--near`(기본 15) 미만인 전문화 쌍과, 양쪽 표본이 충분하면 실데이터에서 두 전문화가 가장 크게 갈리는 특성.
 - 사람이 리포트를 보고 `data.ts`의 `big5`를 고치고, 4.4의 불변 조건 테스트와 8.3의 골든 테스트로 확인한다. 자동으로 값을 바꾸지는 않는다.
 
-2026-10-11 기준으로 앱의 Supabase 프로젝트(ref `jzgzgghnjrqktimwkbkk`)는 anon 키로 조회하면 0행이 보인다(읽기 정책이 없거나 비어 있음). 실데이터 보정은 데이터 접근이 열린 뒤 이 스크립트로 수행한다.
+2026-10-11에 사용자가 내보낸 CSV(5,134행, 중복 제거 후 응답자 2,310명, 와우 1,839·로아 435·던파 38)로 1차 보정을 했다. 전문화별 Big5 평균은 거의 같아서(전문화 내 표준편차 15~20, 전문화 평균 간 편차 3) 프로필을 데이터로 정의할 수는 없었다. 대신 (1) 모집단 평균·표준편차를 5.0의 정규화 기준으로 삼고, (2) 가까운 쌍 5개(와우 황폐 기원사~정기 주술사, 비전 법사~잠행 도적; 로아 블레이드~데빌헌터, 스카우터~기공사, 배틀마스터~스트라이커)를 실데이터에서 더 크게 갈리는 특성 방향으로 벌렸고, (3) 정규화 후에도 와우 1위의 21%를 차지하던 야수 사냥꾼 주변(야수·냉기 법사·사격)을 조금 옮겨 19%로 낮췄다. 던파는 표본이 적어 손대지 않았다.
 
 ## 9. 손대는 파일
 
@@ -267,7 +283,7 @@ ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 |---|---|
 | `src/lib/types.ts` | `Trait`, `Recommendation` 추가, `GameSpec`에 `big5`, `signature` 필수 필드 |
 | `src/lib/data.ts` | 136개 전문화에 `big5`, `signature` 작성 |
-| `src/lib/recommend.ts` | 신규. 상수, `specFit`, `roleFit`, `buildReason`, `recommend` |
+| `src/lib/recommend.ts` | 신규. 상수(역할 원형, 가중치, 모집단 기준), `normalizeScores`, `specFit`, `roleFit`, `buildReason`, `rankSpecs`, `recommend` |
 | `src/lib/recommend.test.ts` | 신규. 8절의 세 묶음 |
 | `src/app/result/_components/ResultPageClient.tsx` | `predict` → `recommend`, 로딩/에러 상태 제거 |
 | `src/components/molecules/RecommendationSection.tsx` | props 축소, 점수 표시, 이유 한 줄, 문구 정리 |
@@ -280,3 +296,4 @@ ROLE_WEIGHT = 0.35,  SPEC_WEIGHT = 0.65
 - 실제 유저 응답이 충분히 쌓이면 역할 원형·프로필·가중치를 데이터로 보정하거나 모델을 재학습한다.
 - 상위 3개의 직업(class) 중복 제한이 필요하면 정렬 후 후처리로 추가한다.
 - 기존 유저가 고른 현재 직업과의 적합도를 함께 보여 주는 기능.
+- 결과 화면의 특성 점수를 모집단 백분위("게이머 중 상위 n%")로도 보여 주기. 추천은 정규화 점수를 쓰는데 차트는 원점수를 보여 주는 차이를 줄인다.

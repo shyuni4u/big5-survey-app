@@ -16,6 +16,7 @@
 - 특성 순서는 항상 E, A, C, N, O. `PersonalityScores`는 0~100 정수.
 - 역할 원형(A/E/N): tanker 65/80/25, healer 90/55/25, supporter 85/65/30, buffer 85/60/30, dealer 40/55/50.
 - 상수: `SIGNATURE_WEIGHT = 2`, `ROLE_WEIGHT = 0.35`, `SPEC_WEIGHT = 0.65`, `MIN_PROFILE_DISTANCE = 10`.
+- 모집단 기준 `POPULATION_BASELINE` (2026-10-11 Supabase 내보내기, 중복 제거 후 응답자 2,310명): mean E 39, A 53, C 56, N 49, O 55 / sd E 21, A 15, C 18, N 20, O 16. 정규화: `u_t = clamp(50 + 25 · (raw_t − mean_t) / sd_t, 0, 100)`. 전문화 프로필, 역할 원형, 골든 테스트 입력은 모두 정규화된 척도의 값이다. `recommend(game, raw)`는 정규화 후 `rankSpecs`를 호출한다.
 - 역할별 A·E·N 허용 범위: tanker A 55~80 E 65~90 N 15~35, healer A 80~95 E 45~75 N 15~35, supporter/buffer A 75~95 E 50~80 N 20~45, dealer A 15~90 E 15~90 N 20~85.
 - 추천 이유 문구 표(특성: 높음 / 낮음): E "외향적이고 활동적인" / "차분하고 독립적인", A "배려심 깊고 협력적인" / "경쟁적이고 자기 주도적인", C "계획적이고 꼼꼼한" / "즉흥적이고 자유로운", N "감정이 풍부하고 열정적인" / "담대하고 안정적인", O "호기심 많고 새로운 것을 즐기는" / "정석을 선호하고 확실한 것을 좋아하는". 50 이상이면 높음.
 - 화면 문구에서 "AI"라는 단어를 쓰지 않는다. 추천 섹션 축하 문구는 "축하합니다! 당신의 성향에 꼭 맞는 직업을 찾았습니다".
@@ -414,19 +415,19 @@ const PROFILES = {
     'Druid_Balance': P(40, 55, 70, 45, 85, ['O', 'C']), // 조화: 주기 관리, 자연 마법
     'Druid_Feral': P(35, 35, 80, 40, 55, ['C', 'E']), // 야성: 은신과 출혈, 정교함
     'Evoker_Augmentation': P(55, 75, 80, 35, 90, ['A', 'O']), // 증강: 팀을 강화하는 딜러
-    'Evoker_Devastation': P(55, 50, 70, 45, 80, ['O', 'E']), // 황폐: 강화 주문, 폭발적 캐스터
-    'Hunter_Beast Mastery': P(25, 55, 45, 45, 45, ['E', 'C']), // 야수 조련: 펫과 솔로, 단순
-    'Hunter_Marksmanship': P(25, 35, 85, 55, 50, ['C', 'N']), // 사격: 정밀, 인내
+    'Evoker_Devastation': P(55, 50, 65, 45, 85, ['O', 'E']), // 황폐: 강화 주문, 폭발적 캐스터 (실데이터: 정기보다 O 높고 C 낮음)
+    'Hunter_Beast Mastery': P(20, 55, 40, 50, 40, ['E', 'C']), // 야수 조련: 펫과 솔로, 단순 (실데이터: 중심에서 조금 떨어뜨려 쏠림 완화)
+    'Hunter_Marksmanship': P(30, 40, 80, 50, 50, ['C', 'N']), // 사격: 정밀, 인내 (실데이터: 내향·평균형 영역을 나눠 갖도록 중심 쪽으로)
     'Hunter_Survival': P(60, 45, 55, 40, 85, ['O', 'E']), // 생존: 덫과 폭탄, 변칙 근접
-    'Mage_Arcane': P(25, 30, 95, 55, 85, ['C', 'O']), // 비전: 복잡한 로테이션, 지적 도전
+    'Mage_Arcane': P(20, 30, 95, 55, 85, ['C', 'O']), // 비전: 복잡한 로테이션, 지적 도전 (실데이터: 잠행보다 E 낮음)
     'Mage_Fire': P(65, 35, 55, 25, 70, ['N', 'E']), // 화염: 치명타 도박, 폭딜
-    'Mage_Frost': P(35, 50, 75, 65, 50, ['N', 'C']), // 냉기(법사): 제어, 안정, 예측 가능
+    'Mage_Frost': P(35, 50, 70, 60, 50, ['N', 'C']), // 냉기(법사): 제어, 안정, 예측 가능 (실데이터: 내향·평균형 영역을 나눠 갖도록 중심 쪽으로)
     'Monk_Windwalker': P(70, 45, 80, 40, 60, ['C', 'E']), // 풍운: 콤보, 숙련 요구, 민첩
     'Paladin_Retribution': P(60, 60, 60, 40, 35, ['A', 'O']), // 징벌: 정석, 팀 유틸
     'Priest_Shadow': P(20, 30, 60, 75, 75, ['N', 'E']), // 암흑: 지속 피해, 내향적이고 감정적
     'Rogue_Assassination': P(15, 20, 85, 50, 55, ['E', 'A']), // 암살: 독과 출혈, 고독한 인내
     'Rogue_Outlaw': P(70, 40, 45, 20, 80, ['N', 'O']), // 무법: 무작위 주사위, 도박
-    'Rogue_Subtlety': P(20, 25, 90, 45, 80, ['C', 'O']), // 잠행: 은신, 복잡한 그림자 플레이
+    'Rogue_Subtlety': P(25, 25, 90, 45, 80, ['C', 'O']), // 잠행: 은신, 복잡한 그림자 플레이 (실데이터: 비전보다 E 높음)
     'Shaman_Elemental': P(50, 45, 65, 50, 70, ['O', 'C']), // 정기: 원소 캐스터, 폭발
     'Shaman_Enhancement': P(65, 55, 70, 40, 70, ['E', 'A']), // 고양: 근접+주문, 바쁜 유틸
     'Warlock_Affliction': P(15, 25, 80, 60, 70, ['E', 'C']), // 고통: 지속 피해, 솔로 인내
@@ -444,7 +445,7 @@ const PROFILES = {
     'Warrior (Male)_Holy Knight': P(70, 90, 85, 25, 40, ['A', 'C']), // 홀리나이트: 굳건한 전방 지원
     'Warrior (Female)_Valkyrie': P(75, 80, 75, 30, 65, ['E', 'A']), // 발키리: 역동적인 신규 서포터
     // 딜러
-    'Assassin (Female)_Blade': P(85, 30, 55, 35, 70, ['E', 'O']), // 블레이드: 빠르고 현란한 연계
+    'Assassin (Female)_Blade': P(90, 30, 55, 30, 70, ['E', 'O']), // 블레이드: 빠르고 현란한 연계 (실데이터: 데빌헌터보다 E 높고 N 낮음)
     'Assassin (Female)_Reaper': P(40, 25, 80, 40, 65, ['E', 'C']), // 리퍼: 은신 백어택, 정교한 타이밍
     'Assassin (Female)_Shadowhunter': P(70, 30, 45, 45, 60, ['O', 'C']), // 데모닉: 변신 폭딜, 직관적
     'Assassin (Female)_Souleater': P(35, 30, 70, 60, 85, ['O', 'N']), // 소울이터: 낫과 어둠, 비정형
@@ -456,12 +457,12 @@ const PROFILES = {
     'Mage (Female)_Summoner': P(25, 50, 90, 50, 70, ['C', 'E']), // 서머너: 소환수 관리, 전략적 인내
     'Mage (Female)_Arcanist': P(65, 45, 55, 25, 90, ['N', 'O']), // 아르카나: 카드 무작위, 변칙
     'Mage (Female)_Sorceress': P(40, 55, 85, 60, 55, ['N', 'C']), // 소서리스: 캐스팅, 안정적 위치 선정
-    'Martial Artist (Female)_Battle Master': P(85, 45, 65, 40, 55, ['E', 'C']), // 배틀마스터: 기동 근접
+    'Martial Artist (Female)_Battle Master': P(85, 45, 60, 45, 55, ['E', 'C']), // 배틀마스터: 기동 근접 (실데이터: 스트라이커보다 N 높고 C 낮음)
     'Martial Artist (Female)_Glaivier': P(65, 45, 80, 40, 70, ['C', 'O']), // 창술사: 자세 전환, 기술적
     'Martial Artist (Female)_Infighter': P(70, 50, 75, 30, 40, ['N', 'O']), // 인파이터: 묵직하고 꾸준함
-    'Martial Artist (Female)_Soulfist': P(50, 50, 80, 55, 85, ['O', 'C']), // 기공사: 기 관리, 비정형 폭딜
+    'Martial Artist (Female)_Soulfist': P(50, 45, 80, 60, 80, ['O', 'C']), // 기공사: 기 관리, 비정형 폭딜 (실데이터: 스카우터보다 O 낮고 N 높음)
     'Martial Artist (Male)_Breaker': P(75, 35, 45, 35, 35, ['C', 'O']), // 브레이커: 단순하고 강력
-    'Martial Artist (Male)_Striker': P(90, 40, 70, 30, 60, ['E', 'N']), // 스트라이커: 빠른 연계, 열혈
+    'Martial Artist (Male)_Striker': P(90, 40, 75, 25, 60, ['E', 'N']), // 스트라이커: 빠른 연계, 열혈 (실데이터: 배틀마스터보다 C 높고 N 낮음)
     'Specialist (Female)_Aeromancer': P(55, 60, 70, 45, 90, ['O', 'A']), // 기상술사: 날씨, 우아한 변칙
     'Specialist (Female)_Wildsoul': P(65, 55, 55, 40, 85, ['O', 'E']), // 환수사: 환수 변신, 장난기
     'Warrior (Female)_Slayer': P(90, 30, 40, 25, 55, ['E', 'N']), // 슬레이어: 광전사, 돌진
@@ -592,7 +593,7 @@ Expected: `삽입 완료: 136개 전문화`, grep 결과 `136`. `git status`에 
 - [ ] **Step 6: 타입 검사와 테스트 통과 확인**
 
 Run: `npx tsc --noEmit && npx jest src/lib/recommend.test.ts && npm run lint`
-Expected: tsc 오류 없음 (136개 전문화 모두 필드가 있어야 통과). 불변 조건 테스트 13개 PASS (게임별 4개 × 3 + 던파 남/여 1개). 거리 테스트가 실패하면 `tooClose` 목록에 나온 쌍의 값을 벌려 고친다. 참고로 이 표는 작성 시점에 가장 가까운 쌍이 와우 14.1, 로아 13.2, 던파 12.2로 검증됐다.
+Expected: tsc 오류 없음 (136개 전문화 모두 필드가 있어야 통과). 불변 조건 테스트 13개 PASS (게임별 4개 × 3 + 던파 남/여 1개). 거리 테스트가 실패하면 `tooClose` 목록에 나온 쌍의 값을 벌려 고친다. 참고로 이 표는 작성 시점에 가장 가까운 쌍이 와우 13.2, 로아 16.6, 던파 12.2로 검증됐다.
 
 - [ ] **Step 7: 커밋**
 
@@ -614,8 +615,12 @@ EOF
 - Modify: `src/lib/recommend.test.ts`
 
 **Interfaces:**
-- Consumes: `specFit`, `roleFit`, `buildReason` (Task 1), `spec.big5`/`spec.signature` (Task 2), `getGameClasses`
-- Produces: `recommend(game: string, scores: PersonalityScores): Recommendation[]` (점수 내림차순, 동점은 라벨 코드포인트 순, 알 수 없는 게임은 `[]`)
+- Consumes: `specFit`, `roleFit`, `buildReason`, `TRAITS` (Task 1), `spec.big5`/`spec.signature` (Task 2), `getGameClasses`
+- Produces:
+  - `POPULATION_BASELINE: { mean: PersonalityScores; sd: PersonalityScores }`, `SD_SCALE = 25`
+  - `normalizeScores(raw: PersonalityScores): PersonalityScores` (모집단 평균 → 50, +1sd → 75, 0~100으로 자름)
+  - `rankSpecs(game: string, scores: PersonalityScores): Recommendation[]` (정규화된 점수 입력. 점수 내림차순, 동점은 라벨 코드포인트 순, 알 수 없는 게임은 `[]`)
+  - `recommend(game: string, raw: PersonalityScores): Recommendation[]` = `rankSpecs(game, normalizeScores(raw))`. 화면(Task 4)은 이것을 호출한다.
 
 - [ ] **Step 1: 실패하는 테스트 추가**
 
@@ -624,11 +629,14 @@ EOF
 ```ts
 import {
   buildReason,
+  normalizeScores,
   profileDistance,
+  rankSpecs,
   recommend,
   roleFit,
   specFit,
   MIN_PROFILE_DISTANCE,
+  POPULATION_BASELINE,
   ROLE_ARCHETYPES,
   TRAITS,
 } from '@/lib/recommend'
@@ -637,8 +645,46 @@ import {
 파일 끝에 추가:
 
 ```ts
+describe('normalizeScores', () => {
+  it('모집단 평균 입력은 모든 특성이 50이다', () => {
+    const normalized = normalizeScores(POPULATION_BASELINE.mean)
+    for (const trait of TRAITS) expect(normalized[trait]).toBe(50)
+  })
+
+  it('평균 + 1표준편차 입력은 모든 특성이 75이다', () => {
+    const plusOne = scores(39 + 21, 53 + 15, 56 + 18, 49 + 20, 55 + 16)
+    const normalized = normalizeScores(plusOne)
+    for (const trait of TRAITS) expect(normalized[trait]).toBeCloseTo(75, 5)
+  })
+
+  it('0~100 밖은 잘린다', () => {
+    const high = normalizeScores(scores(100, 100, 100, 100, 100))
+    for (const trait of TRAITS) expect(high[trait]).toBe(100)
+    const low = normalizeScores(scores(0, 0, 0, 0, 0))
+    for (const trait of ['A', 'C', 'N', 'O'] as const) expect(low[trait]).toBe(0)
+    // E는 평균 39, 표준편차 21이라 0점이 50 - 25*39/21 ≈ 3.6으로 남는다
+    expect(low.E).toBeCloseTo(50 - (25 * 39) / 21, 5)
+  })
+
+  it('입력 객체를 바꾸지 않는다', () => {
+    const raw = scores(60, 60, 60, 60, 60)
+    normalizeScores(raw)
+    expect(raw).toEqual(scores(60, 60, 60, 60, 60))
+  })
+})
+
 describe('recommend', () => {
   const neutral = scores(50, 50, 50, 50, 50)
+
+  it('정규화한 뒤 rankSpecs를 호출한 결과와 같다', () => {
+    const raw = scores(60, 90, 80, 20, 50)
+    expect(recommend('wow', raw)).toEqual(rankSpecs('wow', normalizeScores(raw)))
+  })
+
+  it('원점수 힐러형(E60 A90 C80 N20 O50)은 상위 3개가 모두 힐러다', () => {
+    const top3 = recommend('wow', scores(60, 90, 80, 20, 50)).slice(0, 3)
+    for (const r of top3) expect(specsOf('wow').find((s) => s.label === r.label)!.spec.role).toBe('healer')
+  })
 
   it('게임의 모든 전문화를 점수 내림차순으로 돌려준다', () => {
     const result = recommend('wow', neutral)
@@ -673,11 +719,11 @@ describe('recommend', () => {
   })
 })
 
-/** 골든 성향 테스트. 설계 문서 8.3. 입력 순서는 E, A, C, N, O. */
+/** 골든 성향 테스트. 설계 문서 8.3. 입력은 정규화된 척도의 값이라 rankSpecs를 직접 호출한다. 순서는 E, A, C, N, O. */
 const roleOf = (game: string, label: string) => specsOf(game).find((s) => s.label === label)!.spec.role
 const specNameOf = (label: string) => label.split('_')[1]
 const top3 = (game: string, s: PersonalityScores) =>
-  recommend(game, s)
+  rankSpecs(game, s)
     .slice(0, 3)
     .map((r) => ({ label: r.label, spec: specNameOf(r.label), role: roleOf(game, r.label) }))
 const countIn = (items: { spec: string }[], names: string[]) => items.filter((i) => names.includes(i.spec)).length
@@ -772,6 +818,31 @@ import type { GameSpec, PersonalityScores, Recommendation, Trait } from '@/lib/t
 파일 끝:
 
 ```ts
+/**
+ * 응답자 모집단 기준. 2026-10-11 Supabase survey_results 내보내기에서 완전 중복 행을 제거한 응답자 2,310명의
+ * 특성별 평균과 표준편차. 설문 원점수는 이 기준으로 정규화한 뒤(평균 50, 표준편차 1 = 25점) 프로필과 비교한다.
+ * 데이터가 더 쌓이면 src/scripts/profile-calibration.js가 출력하는 모집단 통계로 갱신한다. 설계 문서 5.0
+ */
+export const POPULATION_BASELINE: { mean: PersonalityScores; sd: PersonalityScores } = {
+  mean: { E: 39, A: 53, C: 56, N: 49, O: 55 },
+  sd: { E: 21, A: 15, C: 18, N: 20, O: 16 },
+}
+/** 정규화 척도에서 표준편차 1에 해당하는 점수 */
+export const SD_SCALE = 25
+
+/**
+ * 설문 원점수를 응답자 모집단 기준으로 정규화한다. 모집단 평균이 50, 평균 + 1표준편차가 75가 되고 0~100으로 자른다.
+ * 입력 객체는 바꾸지 않는다.
+ */
+export function normalizeScores(raw: PersonalityScores): PersonalityScores {
+  const normalized: PersonalityScores = { ...raw }
+  for (const trait of TRAITS) {
+    const z = (raw[trait] - POPULATION_BASELINE.mean[trait]) / POPULATION_BASELINE.sd[trait]
+    normalized[trait] = Math.min(100, Math.max(0, 50 + SD_SCALE * z))
+  }
+  return normalized
+}
+
 function compareLabel(a: string, b: string): number {
   if (a < b) return -1
   if (a > b) return 1
@@ -779,10 +850,10 @@ function compareLabel(a: string, b: string): number {
 }
 
 /**
- * 게임의 모든 전문화에 점수를 매겨 내림차순으로 돌려준다. 화면은 상위 3개를 쓴다.
+ * 정규화된 점수로 게임의 모든 전문화에 점수를 매겨 내림차순으로 돌려준다. 화면은 상위 3개를 쓴다.
  * 점수 = round(ROLE_WEIGHT * 역할 적합도 + SPEC_WEIGHT * 전문화 적합도). 동점은 라벨 코드포인트 순.
  */
-export function recommend(game: string, scores: PersonalityScores): Recommendation[] {
+export function rankSpecs(game: string, scores: PersonalityScores): Recommendation[] {
   return getGameClasses(game)
     .flatMap((gameClass) =>
       gameClass.specs.map((spec) => ({
@@ -795,12 +866,17 @@ export function recommend(game: string, scores: PersonalityScores): Recommendati
     )
     .sort((a, b) => b.score - a.score || compareLabel(a.label, b.label))
 }
+
+/** 설문 원점수를 받아 정규화한 뒤 순위를 매긴다. 결과 화면은 이 함수를 호출한다. */
+export function recommend(game: string, raw: PersonalityScores): Recommendation[] {
+  return rankSpecs(game, normalizeScores(raw))
+}
 ```
 
 - [ ] **Step 4: 테스트 통과 확인**
 
 Run: `npx prettier --write src/lib/recommend.ts src/lib/recommend.test.ts && npx jest src/lib/recommend.test.ts && npx tsc --noEmit && npm run lint`
-Expected: 전부 PASS. 골든 테스트가 실패하면 프로필 값이나 상수를 조정하되, 역할 조건(힐러형은 전부 힐러, 버퍼형은 1위 버퍼)과 기대 집합은 바꾸지 않는다. 작성 시점 검증값: 힐러형 1~3위 Paladin_Holy 95, Priest_Holy 95, Shaman_Restoration 94. 버퍼형 1~3위 Paramedic 96, Crusader(F) 95, Crusader(M) 93.
+Expected: 전부 PASS. 골든 테스트가 실패하면 프로필 값이나 상수를 조정하되, 역할 조건(힐러형은 전부 힐러, 버퍼형은 1위 버퍼)과 기대 집합은 바꾸지 않는다. 작성 시점 검증값(rankSpecs, 정규화 척도 입력): 힐러형 1~3위 Paladin_Holy 95, Priest_Holy 95, Shaman_Restoration 94. 버퍼형 1~3위 Paramedic 96, Crusader(F) 95, Crusader(M) 93. 원점수 힐러형 `recommend('wow', E60 A90 C80 N20 O50)`은 정규화되어 (75, 100, 83, 14, 42)가 되고 1~3위 Paladin_Holy 91, Priest_Holy 88, Druid_Restoration 85.
 
 - [ ] **Step 5: 커밋**
 
@@ -1204,9 +1280,11 @@ EOF
 
 **Interfaces:**
 - Consumes: `src/lib/data.ts`의 `big5`/`signature` 줄 형식(Task 2가 만든 Prettier 포맷: `        big5: { E: 55, A: 85, C: 80, N: 25, O: 70 },` 와 `        signature: ['A', 'C'],`)
-- Produces: `parseProfiles(source)`, `summarize(rows)`, `buildReport(profiles, summary, { minN, near })`. CLI: `node src/scripts/profile-calibration.js <survey_results.json> [--min-n 5] [--near 15]`
+- Produces: `parseCsv(text)`, `readRows(path)`, `parseProfiles(source)`, `summarize(rows)`, `buildReport(profiles, summary, { minN, near })`. CLI: `node src/scripts/profile-calibration.js <survey_results.csv|json> [--min-n 5] [--near 15]`
 
-목적: Supabase `survey_results`를 JSON으로 내보낸 파일을 읽어, (1) 실데이터 평균이 현재 프로필과 10 이상 다른 전문화, (2) 현재 프로필에서 서로 가까운 쌍과 실데이터에서 그 둘이 실제로 갈리는 특성을 출력한다. 사람이 이 리포트를 보고 `data.ts` 값을 고친다.
+목적: Supabase `survey_results`를 CSV(SQL Editor 다운로드 형식) 또는 JSON으로 내보낸 파일을 읽어, (0) 중복 제거 후 응답자 모집단의 특성별 평균·표준편차(`POPULATION_BASELINE` 갱신용), (1) 실데이터 평균이 현재 프로필과 10 이상 다른 전문화, (2) 현재 프로필에서 서로 가까운 쌍과 실데이터에서 그 둘이 실제로 갈리는 특성을 출력한다. 사람이 이 리포트를 보고 `data.ts`와 `recommend.ts`의 값을 고친다.
+
+CSV 형식(Supabase SQL Editor 다운로드): 첫 줄 헤더 `app,class,specialization,answers`, `answers`는 큰따옴표로 감싼 JSON이며 안의 큰따옴표는 두 번 겹쳐 쓴다. 예: `WoW,Mage,Fire,"{""E"":61,""A"":62,""C"":63,""N"":48,""O"":73}"`.
 
 - [ ] **Step 1: 실패하는 테스트 작성**
 
@@ -1215,9 +1293,29 @@ EOF
 ```js
 const fs = require('fs')
 const path = require('path')
-const { parseProfiles, summarize, buildReport } = require('./profile-calibration')
+const { parseCsv, parseProfiles, summarize, buildReport } = require('./profile-calibration')
 
 const dataTs = fs.readFileSync(path.join(__dirname, '..', 'lib', 'data.ts'), 'utf8')
+
+describe('parseCsv', () => {
+  it('Supabase 내보내기 형식(큰따옴표로 감싼 JSON, 겹친 큰따옴표)을 행 객체로 읽는다', () => {
+    const csv =
+      'app,class,specialization,answers\r\n' +
+      'WoW,Mage,Fire,"{""E"":61,""A"":62,""C"":63,""N"":48,""O"":73}"\r\n' +
+      'LostArk,Warrior (Male),Holy Knight,"{""E"":59,""A"":34,""C"":34,""N"":52,""O"":74}"\n'
+    const rows = parseCsv(csv)
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toEqual({ app: 'WoW', class: 'Mage', specialization: 'Fire', answers: '{"E":61,"A":62,"C":63,"N":48,"O":73}' })
+    expect(rows[1].class).toBe('Warrior (Male)')
+    expect(rows[1].specialization).toBe('Holy Knight')
+  })
+
+  it('BOM과 빈 줄을 무시한다', () => {
+    const rows = parseCsv('﻿app,class,specialization,answers\n\nDNF,Thief,Rogue,"{""E"":1,""A"":2,""C"":3,""N"":4,""O"":5}"\n\n')
+    expect(rows).toHaveLength(1)
+    expect(rows[0].app).toBe('DNF')
+  })
+})
 
 describe('parseProfiles', () => {
   it('data.ts에서 세 게임의 프로필을 모두 읽는다', () => {
@@ -1225,7 +1323,7 @@ describe('parseProfiles', () => {
     expect(Object.keys(profiles.wow)).toHaveLength(39)
     expect(Object.keys(profiles.lostark)).toHaveLength(28)
     expect(Object.keys(profiles.dnf)).toHaveLength(69)
-    expect(profiles.wow['Mage_Arcane']).toEqual({ role: 'dealer', E: 25, A: 30, C: 95, N: 55, O: 85, signature: ['C', 'O'] })
+    expect(profiles.wow['Mage_Arcane']).toEqual({ role: 'dealer', E: 20, A: 30, C: 95, N: 55, O: 85, signature: ['C', 'O'] })
   })
 })
 
@@ -1241,6 +1339,18 @@ describe('summarize', () => {
     expect(summary.wow['Mage_Arcane'].n).toBe(2)
     expect(summary.wow['Mage_Arcane'].mean.E).toBe(30)
     expect(summary.dnf).toBeUndefined()
+  })
+
+  it('모집단 통계는 게임을 가리지 않고 서로 다른 응답 벡터마다 한 번씩 센다', () => {
+    const rows = [
+      { app: 'WoW', class: 'Mage', specialization: 'Arcane', answers: { E: 20, A: 50, C: 50, N: 50, O: 50 } },
+      { app: 'WoW', class: 'Mage', specialization: 'Fire', answers: { E: 20, A: 50, C: 50, N: 50, O: 50 } },
+      { app: 'DNF', class: 'Thief', specialization: 'Rogue', answers: { E: 60, A: 50, C: 50, N: 50, O: 50 } },
+    ]
+    const { population } = summarize(rows)
+    expect(population.n).toBe(2)
+    expect(population.mean.E).toBe(40)
+    expect(population.sd.E).toBe(20)
   })
 })
 
@@ -1284,6 +1394,12 @@ describe('buildReport', () => {
     expect(text).toContain('Mage_Arcane ~ Rogue_Subtlety')
     expect(text).toContain('실데이터 부족')
   })
+
+  it('모집단 통계가 있으면 POPULATION_BASELINE 갱신용 줄을 맨 앞에 출력한다', () => {
+    const summary = { population: { n: 2310, mean: { E: 38.8, A: 53.4, C: 55.6, N: 48.7, O: 54.6 }, sd: { E: 20.9, A: 14.7, C: 17.8, N: 19.6, O: 16.1 } } }
+    const lines = buildReport(profiles, summary, { minN: 5, near: 15 })
+    expect(lines[0]).toBe('모집단(응답자 2310명) 평균 E 39, A 53, C 56, N 49, O 55 / 표준편차 E 21, A 15, C 18, N 20, O 16')
+  })
 })
 ```
 
@@ -1303,12 +1419,13 @@ Expected: FAIL. `Cannot find module './profile-calibration'`.
  * 구분이 잘 안 되는 전문화 쌍을 실데이터 방향으로 벌릴 수 있도록 리포트를 출력합니다.
  *
  * 사용법:
- *   node src/scripts/profile-calibration.js <survey_results.json> [--min-n 5] [--near 15]
+ *   node src/scripts/profile-calibration.js <survey_results.csv|json> [--min-n 5] [--near 15]
  *
- * survey_results.json: Supabase SQL Editor에서 아래 쿼리를 실행하고 결과를 JSON으로 내보낸 파일
+ * 입력: Supabase SQL Editor에서 아래 쿼리를 실행하고 결과를 CSV(다운로드 버튼) 또는 JSON으로 내보낸 파일
  *   select app, class, specialization, answers from survey_results;
  *
  * 출력:
+ *   0) 중복 제거 후 응답자 모집단의 특성별 평균·표준편차 (src/lib/recommend.ts의 POPULATION_BASELINE 갱신용)
  *   1) 표본이 min-n 이상인 전문화 중 실데이터 평균이 프로필과 10 이상 다른 특성
  *   2) 현재 프로필에서 거리가 near 미만인 쌍과, 실데이터에서 그 둘이 가장 크게 갈리는 특성
  */
@@ -1317,6 +1434,57 @@ const path = require('path')
 
 const TRAITS = ['E', 'A', 'C', 'N', 'O']
 const GAMES = ['wow', 'lostark', 'dnf']
+
+/** RFC 4180 방식 CSV를 헤더 키의 객체 배열로 읽는다. 큰따옴표 안의 쉼표·개행·겹친 큰따옴표를 처리하고 BOM과 빈 줄은 무시한다. */
+function parseCsv(text) {
+  const source = text.replace(/^﻿/, '')
+  const records = []
+  let row = []
+  let field = ''
+  let inQuotes = false
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i]
+    if (inQuotes) {
+      if (ch === '"') {
+        if (source[i + 1] === '"') {
+          field += '"'
+          i++
+        } else {
+          inQuotes = false
+        }
+      } else {
+        field += ch
+      }
+    } else if (ch === '"') {
+      inQuotes = true
+    } else if (ch === ',') {
+      row.push(field)
+      field = ''
+    } else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && source[i + 1] === '\n') i++
+      row.push(field)
+      field = ''
+      if (row.length > 1 || row[0] !== '') records.push(row)
+      row = []
+    } else {
+      field += ch
+    }
+  }
+  if (field !== '' || row.length > 0) {
+    row.push(field)
+    records.push(row)
+  }
+  const [header, ...body] = records
+  if (!header) return []
+  const keys = header.map((h) => h.trim())
+  return body.map((cells) => Object.fromEntries(keys.map((key, i) => [key, cells[i] === undefined ? '' : cells[i]])))
+}
+
+/** 확장자에 따라 CSV 또는 JSON 파일을 행 배열로 읽는다. */
+function readRows(inputPath) {
+  const text = fs.readFileSync(inputPath, 'utf8')
+  return inputPath.toLowerCase().endsWith('.csv') ? parseCsv(text) : JSON.parse(text)
+}
 
 /** data.ts 소스에서 게임별 전문화 프로필을 읽는다. Prettier 포맷의 들여쓰기(직업 4칸, 전문화 8칸)에 의존한다. */
 function parseProfiles(source) {
@@ -1347,10 +1515,14 @@ function parseProfiles(source) {
   return profiles
 }
 
-/** 응답 행을 게임/전문화별 n과 평균으로 요약한다. 완전히 같은 행(결과 페이지 새로고침 중복)은 한 번만 센다. */
+/**
+ * 응답 행을 게임/전문화별 n과 평균으로 요약한다. 완전히 같은 행(결과 페이지 새로고침 중복)은 한 번만 센다.
+ * `summary.population`에는 게임을 가리지 않고 서로 다른 응답 벡터마다 한 번씩 센 모집단 평균·표준편차를 넣는다.
+ */
 function summarize(rows) {
   const summary = {}
   const seen = new Set()
+  const vectors = new Map()
   for (const row of rows) {
     let answers = row.answers
     if (typeof answers === 'string') {
@@ -1363,7 +1535,9 @@ function summarize(rows) {
     if (!answers || TRAITS.some((trait) => typeof answers[trait] !== 'number')) continue
     const game = String(row.app).toLowerCase()
     const label = `${row.class}_${row.specialization}`
-    const key = `${game}|${label}|${TRAITS.map((trait) => answers[trait]).join(',')}`
+    const vectorKey = TRAITS.map((trait) => answers[trait]).join(',')
+    vectors.set(vectorKey, answers)
+    const key = `${game}|${label}|${vectorKey}`
     if (seen.has(key)) continue
     seen.add(key)
     if (!summary[game]) summary[game] = {}
@@ -1380,6 +1554,14 @@ function summarize(rows) {
       bucket.mean = Object.fromEntries(TRAITS.map((trait) => [trait, bucket.sum[trait] / bucket.n]))
     }
   }
+  const all = [...vectors.values()]
+  if (all.length > 0) {
+    const mean = Object.fromEntries(TRAITS.map((trait) => [trait, all.reduce((sum, a) => sum + a[trait], 0) / all.length]))
+    const sd = Object.fromEntries(
+      TRAITS.map((trait) => [trait, Math.sqrt(all.reduce((sum, a) => sum + (a[trait] - mean[trait]) ** 2, 0) / all.length)]),
+    )
+    summary.population = { n: all.length, mean, sd }
+  }
   return summary
 }
 
@@ -1388,6 +1570,11 @@ const distance = (a, b) => Math.sqrt(TRAITS.reduce((sum, trait) => sum + (a[trai
 /** 리포트 줄 배열을 만든다. */
 function buildReport(profiles, summary, { minN = 5, near = 15 } = {}) {
   const lines = []
+  if (summary.population) {
+    const { n, mean, sd } = summary.population
+    const fmt = (stats) => TRAITS.map((trait) => `${trait} ${Math.round(stats[trait])}`).join(', ')
+    lines.push(`모집단(응답자 ${n}명) 평균 ${fmt(mean)} / 표준편차 ${fmt(sd)}`)
+  }
   for (const game of GAMES) {
     const stats = summary[game] || {}
     const labels = Object.keys(profiles[game])
@@ -1431,20 +1618,20 @@ function buildReport(profiles, summary, { minN = 5, near = 15 } = {}) {
 function main() {
   const [input, ...flags] = process.argv.slice(2)
   if (!input) {
-    console.error('사용법: node src/scripts/profile-calibration.js <survey_results.json> [--min-n 5] [--near 15]')
+    console.error('사용법: node src/scripts/profile-calibration.js <survey_results.csv|json> [--min-n 5] [--near 15]')
     process.exit(1)
   }
   const option = (name, fallback) => {
     const i = flags.indexOf(name)
     return i >= 0 ? Number(flags[i + 1]) : fallback
   }
-  const rows = JSON.parse(fs.readFileSync(input, 'utf8'))
+  const rows = readRows(input)
   const source = fs.readFileSync(path.join(__dirname, '..', 'lib', 'data.ts'), 'utf8')
   const lines = buildReport(parseProfiles(source), summarize(rows), { minN: option('--min-n', 5), near: option('--near', 15) })
   console.log(lines.join('\n'))
 }
 
-module.exports = { parseProfiles, summarize, buildReport }
+module.exports = { parseCsv, readRows, parseProfiles, summarize, buildReport }
 
 if (require.main === module) main()
 ```
@@ -1452,14 +1639,14 @@ if (require.main === module) main()
 - [ ] **Step 4: 테스트 통과 확인**
 
 Run: `npx prettier --write src/scripts/profile-calibration.js src/scripts/profile-calibration.test.js && npx jest src/scripts/profile-calibration.test.js && npm run lint`
-Expected: 테스트 6개 PASS. lint가 `require` 사용을 지적하면(`@typescript-eslint/no-require-imports`) 두 파일 맨 위에 `/* eslint-disable @typescript-eslint/no-require-imports */`를 추가한다.
+Expected: 테스트 10개 PASS. lint가 `require` 사용을 지적하면(`@typescript-eslint/no-require-imports`) 두 파일 맨 위에 `/* eslint-disable @typescript-eslint/no-require-imports */`를 추가한다.
 
 - [ ] **Step 5: README에 사용법 추가**
 
 "🧠 추천 방식" 절 끝에 항목을 추가한다.
 
 ```markdown
-- **실데이터 보정**: Supabase SQL Editor에서 `select app, class, specialization, answers from survey_results;` 결과를 JSON으로 내보낸 뒤 `node src/scripts/profile-calibration.js survey_results.json` 을 실행하면, 실데이터 평균이 프로필과 크게 다른 전문화와 서로 가까운 전문화 쌍(실데이터에서 갈리는 특성 포함)을 출력합니다. 이 리포트를 보고 `src/lib/data.ts`의 `big5`를 조정하고 테스트로 확인합니다.
+- **실데이터 보정**: Supabase SQL Editor에서 `select app, class, specialization, answers from survey_results;` 결과를 CSV 또는 JSON으로 내보낸 뒤 `node src/scripts/profile-calibration.js survey_results.csv` 를 실행하면, 응답자 모집단의 평균·표준편차(`src/lib/recommend.ts`의 `POPULATION_BASELINE` 갱신용), 실데이터 평균이 프로필과 크게 다른 전문화, 서로 가까운 전문화 쌍(실데이터에서 갈리는 특성 포함)을 출력합니다. 이 리포트를 보고 값을 조정하고 테스트로 확인합니다.
 ```
 
 - [ ] **Step 6: 전체 검증과 커밋**
