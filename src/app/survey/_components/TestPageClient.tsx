@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import toast from 'react-hot-toast'
+import { track } from '@/lib/analytics'
 
 function TestContent() {
   const router = useRouter()
@@ -36,6 +37,7 @@ function TestContent() {
     }[]
   >([])
 
+  const [completed, setCompleted] = useState(false)
   const [ready, setReady] = useState(false)
   const [missing, setMissing] = useState<number | null>(null)
   const [storageAvailable, setStorageAvailable] = useState(true)
@@ -75,6 +77,7 @@ function TestContent() {
         ) {
           setShuffledQuestions(saved.order.map((i: number) => questions[i]))
           setUserAnswers(saved.answers)
+          setCompleted(saved.completed === true)
           setCurrentQuestionIndex(saved.page)
           toast.success('이전에 답한 문항을 불러왔어요.')
           setReady(true)
@@ -99,6 +102,7 @@ function TestContent() {
       localStorage.setItem(
         storageKey,
         JSON.stringify({
+          completed,
           signature: JSON.stringify(questions),
           order: shuffledQuestions.map((q) => questions.indexOf(q)),
           answers: userAnswers,
@@ -108,13 +112,14 @@ function TestContent() {
     } catch {
       setStorageAvailable(false)
     }
-  }, [ready, storageKey, shuffledQuestions, userAnswers, currentQuestionIndex])
+  }, [ready, storageKey, shuffledQuestions, userAnswers, currentQuestionIndex, completed])
 
   useEffect(() => {
     if (ready) document.getElementById('survey-heading')?.focus()
   }, [currentQuestionIndex, currentStep, ready])
 
   const handleAnswerChange = (questionIndex: number, value: number) => {
+    if (Object.keys(userAnswers).length === 0) track('survey_start', { game })
     setMissing(null)
     setUserAnswers((prev) => ({
       ...prev,
@@ -141,6 +146,10 @@ function TestContent() {
     if (currentQuestionIndex + questionsPerPage < shuffledQuestions.length) {
       setCurrentQuestionIndex((prev) => prev + questionsPerPage)
     } else {
+      if (!completed) {
+        track('survey_complete', { game, question_count: questions.length })
+        setCompleted(true)
+      }
       setCurrentStep('class-selection')
     }
   }

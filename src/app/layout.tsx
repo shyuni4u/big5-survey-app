@@ -2,7 +2,8 @@ import { pretendard } from '@/lib/fonts/pretendard'
 import './globals.css'
 import { cn } from '@/lib/utils'
 import { ThemeProvider } from 'next-themes'
-import { GoogleAnalytics } from '@next/third-parties/google'
+import { Suspense } from 'react'
+import Analytics from '@/components/Analytics'
 import { Toaster } from 'react-hot-toast'
 import ErrorBoundary from '@/components/ErrorBoundary'
 
@@ -12,7 +13,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="ko" suppressHydrationWarning className={cn(pretendard.variable, 'scroll-smooth font-sans')}>
       <body>
-        {gaId && <GoogleAnalytics gaId={gaId} />}
+        <Suspense fallback={null}>
+          <Analytics gaId={gaId} />
+        </Suspense>
         <ThemeProvider attribute="class" forcedTheme="dark">
           <ErrorBoundary>{children}</ErrorBoundary>
           <Toaster
