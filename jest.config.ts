@@ -1,5 +1,5 @@
 // jest.config.js
-import nextJest from 'next/jest'
+import nextJest from 'next/jest.js'
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
@@ -26,4 +26,4 @@ const customJestConfig = {
 
 // createJestConfig is  a function that returns a promise and wraps the test config object.
 // So we have to call it in the next way
-module.exports = createJestConfig(customJestConfig)
+export default createJestConfig(customJestConfig)

@@ -1,10 +1,13 @@
 import torch
 import json
+import os
 from model import PsychModel  # model.py의 PsychModel 클래스를 임포트
 
 # --- 설정 ---
 MODEL_CHECKPOINT_PATH = "model.pth"
 ONNX_MODEL_PATH = "model.onnx"  # ONNX 모델을 저장할 경로
+# 출력 인덱스 → 레이블 매핑 파일. model.onnx와 같은 디렉터리(public/models/<game>/)에 함께 배치해야 합니다.
+LABELS_JSON_PATH = os.path.join(os.path.dirname(ONNX_MODEL_PATH) or ".", "labels.json")
 
 # --- 1. 체크포인트 로드 및 모델 초기화 ---
 print(f"'{MODEL_CHECKPOINT_PATH}'에서 체크포인트를 로드합니다...")
@@ -12,7 +15,9 @@ print(f"'{MODEL_CHECKPOINT_PATH}'에서 체크포인트를 로드합니다...")
 checkpoint = torch.load(MODEL_CHECKPOINT_PATH, map_location="cpu", weights_only=False)
 
 # 체크포인트에서 클래스 개수와 레이블 이름들을 가져옵니다.
-label_classes = list(checkpoint["label_classes"])
+# label_classes는 sklearn LabelEncoder.classes_ (정렬된 "Class_Spec" 문자열)이며,
+# 모델 출력 인덱스 i는 label_classes[i]에 대응합니다.
+label_classes = [str(label) for label in checkpoint["label_classes"]]
 num_classes = len(label_classes)
 
 # 모델 구조를 불러오고 학습된 가중치를 적용합니다.
@@ -40,7 +45,10 @@ torch.onnx.export(
 
 print("✅ ONNX 모델 변환 완료!")
 
-# --- 3. 클래스 레이블을 JSON 형식으로 출력 ---
-# 이 출력을 복사하여 onnx.ts 파일에 붙여넣으세요.
-print("\n📋 아래의 클래스 배열을 복사하여 onnx.ts 파일에 붙여넣으세요:\n")
-print(json.dumps(label_classes, indent=2, ensure_ascii=False))
+# --- 3. 클래스 레이블을 labels.json으로 내보내기 ---
+# 브라우저 추론(src/lib/onnx.ts)은 이 파일을 fetch해서 출력 인덱스에 레이블을 붙입니다.
+# model.onnx와 labels.json을 반드시 함께 public/models/<game>/ 에 복사하세요.
+with open(LABELS_JSON_PATH, "w", encoding="utf-8", newline="\n") as f:
+    f.write(json.dumps(label_classes, indent=2, ensure_ascii=False) + "\n")
+
+print(f"✅ 클래스 레이블 {num_classes}개를 '{LABELS_JSON_PATH}'에 저장했습니다.")
