@@ -47,6 +47,8 @@ export default function RecommendationSection({ game, recommendations }: Recomme
   const [visibleCards, setVisibleCards] = useState<number>(0)
 
   useEffect(() => {
+    // 추천이 바뀌면(다른 게임 추천 받기) 카드와 축하 문구가 처음부터 다시 차례로 나타나도록 되돌린다.
+    setVisibleCards(0)
     if (recommendations.length > 0) {
       const timer = setInterval(() => {
         setVisibleCards((prev) => {
@@ -115,7 +117,7 @@ export default function RecommendationSection({ game, recommendations }: Recomme
       case 1:
         return {
           cardWidth: 'w-56', // 1위: 더 큰 카드
-          cardHeight: 'h-96', // 1위: 더 높은 카드
+          cardHeight: 'min-h-96', // 1위: 더 높은 카드 (내용이 길면 늘어난다)
           imageSize: cn('w-20', game.toLowerCase() === 'lostark' ? 'h-24' : 'h-20'), // 1위: 더 큰 이미지
           titleSize: 'text-xl', // 1위: 더 큰 제목
           subtitleSize: 'text-base', // 1위: 더 큰 부제목
@@ -126,7 +128,7 @@ export default function RecommendationSection({ game, recommendations }: Recomme
       case 2:
         return {
           cardWidth: 'w-48', // 2위: 기본 크기
-          cardHeight: 'h-80',
+          cardHeight: 'min-h-80',
           imageSize: cn('w-16', game.toLowerCase() === 'lostark' ? 'h-20' : 'h-16'),
           titleSize: 'text-lg',
           subtitleSize: 'text-sm',
@@ -137,7 +139,7 @@ export default function RecommendationSection({ game, recommendations }: Recomme
       case 3:
         return {
           cardWidth: 'w-44', // 3위: 더 작은 카드
-          cardHeight: 'h-72', // 3위: 더 낮은 카드
+          cardHeight: 'min-h-72', // 3위: 더 낮은 카드 (내용이 길면 늘어난다)
           imageSize: cn('w-14', game.toLowerCase() === 'lostark' ? 'h-16' : 'h-14'), // 3위: 더 작은 이미지
           titleSize: 'text-base', // 3위: 더 작은 제목
           subtitleSize: 'text-sm', // 3위: 더 작은 부제목
@@ -148,7 +150,7 @@ export default function RecommendationSection({ game, recommendations }: Recomme
       default:
         return {
           cardWidth: 'w-48',
-          cardHeight: 'h-80',
+          cardHeight: 'min-h-80',
           imageSize: 'h-16 w-16',
           titleSize: 'text-lg',
           subtitleSize: 'text-sm',
@@ -218,13 +220,13 @@ export default function RecommendationSection({ game, recommendations }: Recomme
                 {/* 단상 카드 - 내용만 포함 */}
                 <Card
                   className={cn(
-                    'cursor-pointer border-2 transition-all duration-500 hover:scale-105',
+                    'flex cursor-pointer flex-col border-2 transition-all duration-500 hover:scale-105',
                     scale.cardWidth,
                     scale.cardHeight,
                     getRankStyle(item.rank),
                   )}
                 >
-                  <CardContent className="flex h-full flex-col items-center justify-center p-4 text-center">
+                  <CardContent className="flex flex-1 flex-col items-center justify-center p-4 text-center">
                     {game.toLowerCase() === 'dnf' ? (
                       <SpriteIcon
                         imageUrl={gameClass.image || '/placeholder.svg'}
