@@ -1,4 +1,4 @@
-import { zipData, unzipData, SEPERATE_TOKEN } from './utils'
+import { zipData, unzipData, SEPERATE_TOKEN, hashString } from './utils'
 import { TestData, PersonalityScores } from './types'
 
 describe('Utility Functions', () => {
@@ -47,5 +47,17 @@ describe('Utility Functions', () => {
 
   it('should correctly handle the SEPERATE_TOKEN', () => {
     expect(SEPERATE_TOKEN).toBe(' ') // SEPERATE_TOKEN이 제대로 정의되었는지 확인
+  })
+})
+
+describe('hashString', () => {
+  it('returns a short hex string that is stable for the same input', () => {
+    const a = hashString('eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1Wsqp')
+    expect(a).toMatch(/^[0-9a-f]{8}$/)
+    expect(hashString('eJyrViotTi0KqSxIVbJSykstV9JRKkgtKs7PS8zJLKkMTs4vSi1Wsqp')).toBe(a)
+  })
+
+  it('returns different values for inputs that differ in one character', () => {
+    expect(hashString('abc')).not.toBe(hashString('abd'))
   })
 })
