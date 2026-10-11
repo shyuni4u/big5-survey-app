@@ -7,17 +7,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn-lostark.game.onstove.com',
-        pathname: '/2018/obt/assets/images/**',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'render.worldofwarcraft.com',
-        pathname: '/character/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'ads-partners.coupang.com',
-        pathname: '/banners/**',
+        pathname: '/**',
       },
     ],
   },

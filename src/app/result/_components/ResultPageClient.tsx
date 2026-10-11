@@ -8,7 +8,7 @@ import { games, traitInfo } from '@/lib/data'
 import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
 import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
-import { CoupangPartners } from '@/components/atoms/CoupangPartners'
+import { KakaoAdFit } from '@/components/atoms/KakaoAdFit'
 import { Footer } from '@/components/atoms/Footer'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
@@ -361,7 +361,7 @@ function ResultContent() {
         </div>
       </main>
 
-      <CoupangPartners />
+      <KakaoAdFit width={320} height={100} />
       <Footer />
     </div>
   )
