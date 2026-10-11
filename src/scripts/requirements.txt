@@ -1,0 +1,7 @@
+numpy==2.5.4
+onnx==1.23.2
+onnxruntime==1.31.0
+pandas==3.0.6
+scikit-learn==1.9.1
+tensorboard==2.21.0
+torch==2.14.1  # CPU 빌드: pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.1
