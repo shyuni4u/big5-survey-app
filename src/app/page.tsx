@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   keywords: ['Big5', '성격 테스트', '게임', '직업 추천', '성격 분석'],
   openGraph: {
     title: `Big5 성격 분석 | 게임 직업 추천`,
-    description: `당신의 성격에 맞는 완벽한 게임 직업을 찾아보세요!`,
+    description: `나의 성향을 알아보고 새로운 게임 직업을 발견하세요!`,
     type: 'website',
   },
 }

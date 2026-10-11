@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:mobile": "node tests/mobile-flow.cjs"
   },
   "dependencies": {
     "@next/third-parties": "^15.3.5",

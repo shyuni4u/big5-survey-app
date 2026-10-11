@@ -47,3 +47,6 @@ src/scripts/venv
 src/scripts/runs/psych_model/*
 playwright-report
 test-results
+
+# Local verification scratch files
+/.tmp/

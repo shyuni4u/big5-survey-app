@@ -10,10 +10,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const gaId = process.env.NEXT_PUBLIC_GA_ID
 
   return (
-    <html lang="ko" suppressHydrationWarning className={cn(pretendard.className, 'scroll-smooth')}>
+    <html lang="ko" suppressHydrationWarning className={cn(pretendard.variable, 'scroll-smooth font-sans')}>
       <body>
         {gaId && <GoogleAnalytics gaId={gaId} />}
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" forcedTheme="dark">
           <ErrorBoundary>{children}</ErrorBoundary>
           <Toaster
             position="top-center"
