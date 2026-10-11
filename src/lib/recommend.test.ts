@@ -1,5 +1,14 @@
-import { buildReason, profileDistance, roleFit, specFit, ROLE_ARCHETYPES } from '@/lib/recommend'
-import type { PersonalityScores } from '@/lib/types'
+import {
+  buildReason,
+  profileDistance,
+  roleFit,
+  specFit,
+  MIN_PROFILE_DISTANCE,
+  ROLE_ARCHETYPES,
+  TRAITS,
+} from '@/lib/recommend'
+import { getGameClasses } from '@/lib/data'
+import type { GameSpec, PersonalityScores } from '@/lib/types'
 
 const scores = (E: number, A: number, C: number, N: number, O: number): PersonalityScores => ({ E, A, C, N, O })
 
@@ -70,4 +79,91 @@ describe('buildReason', () => {
   it('50은 높음으로 본다', () => {
     expect(buildReason(scores(50, 50, 50, 50, 50), ['A'])).toBe('배려심 깊고 협력적인 성향과 잘 맞아요')
   })
+})
+
+const GAMES = ['wow', 'lostark', 'dnf'] as const
+
+/** 설계 문서 4.3의 역할별 A·E·N 허용 범위 */
+const ROLE_TRAIT_RANGES: Record<GameSpec['role'], { A: [number, number]; E: [number, number]; N: [number, number] }> = {
+  tanker: { A: [55, 80], E: [65, 90], N: [15, 35] },
+  healer: { A: [80, 95], E: [45, 75], N: [15, 35] },
+  supporter: { A: [75, 95], E: [50, 80], N: [20, 45] },
+  buffer: { A: [75, 95], E: [50, 80], N: [20, 45] },
+  dealer: { A: [15, 90], E: [15, 90], N: [20, 85] },
+}
+
+const specsOf = (game: string) =>
+  getGameClasses(game).flatMap((gameClass) =>
+    gameClass.specs.map((spec) => ({ label: `${gameClass.name}_${spec.name}`, spec })),
+  )
+
+describe.each(GAMES)('%s 프로필 데이터 불변 조건', (game) => {
+  const specs = specsOf(game)
+
+  it('전문화가 하나 이상 있다', () => {
+    expect(specs.length).toBeGreaterThan(0)
+  })
+
+  it('모든 전문화에 0~100 정수 big5와 1~2개의 서로 다른 시그니처가 있다', () => {
+    const violations: string[] = []
+    for (const { label, spec } of specs) {
+      for (const trait of TRAITS) {
+        const value = spec.big5[trait]
+        if (!Number.isInteger(value) || value < 0 || value > 100) violations.push(`${label}.${trait}=${value}`)
+      }
+      const unique = new Set(spec.signature).size
+      if (spec.signature.length < 1 || spec.signature.length > 2 || unique !== spec.signature.length) {
+        violations.push(`${label}.signature=[${spec.signature.join(',')}]`)
+      }
+    }
+    expect(violations).toEqual([])
+  })
+
+  it('A·E·N이 역할별 허용 범위 안에 있다', () => {
+    const violations: string[] = []
+    for (const { label, spec } of specs) {
+      const ranges = ROLE_TRAIT_RANGES[spec.role]
+      for (const trait of ['A', 'E', 'N'] as const) {
+        const [lo, hi] = ranges[trait]
+        const value = spec.big5[trait]
+        if (value < lo || value > hi) violations.push(`${label} (${spec.role}) ${trait}=${value} not in ${lo}~${hi}`)
+      }
+    }
+    expect(violations).toEqual([])
+  })
+
+  it(`프로필이 같은 쌍이 없고 가장 가까운 쌍도 거리 ${MIN_PROFILE_DISTANCE} 이상이다`, () => {
+    const tooClose: string[] = []
+    for (let i = 0; i < specs.length; i++) {
+      for (let j = i + 1; j < specs.length; j++) {
+        const distance = profileDistance(specs[i].spec.big5, specs[j].spec.big5)
+        if (distance < MIN_PROFILE_DISTANCE)
+          tooClose.push(`${specs[i].label} ~ ${specs[j].label} = ${distance.toFixed(1)}`)
+      }
+    }
+    expect(tooClose).toEqual([])
+  })
+})
+
+it('던파 남/여 동명 전직 9쌍은 서로 다른 프로필을 가진다', () => {
+  const specs = specsOf('dnf')
+  const names = [
+    'Nen Master',
+    'Striker',
+    'Brawler',
+    'Grappler',
+    'Ranger',
+    'Launcher',
+    'Mechanic',
+    'Spitfire',
+    'Crusader',
+  ]
+  const tooClose: string[] = []
+  for (const name of names) {
+    const pair = specs.filter((s) => s.spec.name === name)
+    expect(pair).toHaveLength(2)
+    const distance = profileDistance(pair[0].spec.big5, pair[1].spec.big5)
+    if (distance < MIN_PROFILE_DISTANCE) tooClose.push(`${name}: ${distance.toFixed(1)}`)
+  }
+  expect(tooClose).toEqual([])
 })
