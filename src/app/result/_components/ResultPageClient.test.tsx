@@ -24,7 +24,7 @@ jest.mock('chart.js', () => ({
   registerables: [],
 }))
 
-jest.mock('@/components/atoms/KakaoAdFit', () => ({ KakaoAdFit: () => null }))
+jest.mock('@/components/atoms/AdpickBanner', () => ({ AdpickBanner: () => null }))
 // ShareResult 는 qrcode 로 캔버스를 그린다. 저장 로직과 무관하므로 비운다.
 jest.mock('@/components/molecules/ShareResult', () => ({ __esModule: true, default: () => null }))
 

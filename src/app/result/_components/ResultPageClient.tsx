@@ -8,7 +8,7 @@ import { games, traitInfo } from '@/lib/data'
 import { predict } from '@/lib/onnx'
 import type { TestData, PersonalityScores } from '@/lib/types'
 import { SEPERATE_TOKEN, zipData, unzipData, hashString } from '@/lib/utils'
-import { KakaoAdFit } from '@/components/atoms/KakaoAdFit'
+import { AdpickBanner } from '@/components/atoms/AdpickBanner'
 import { Footer } from '@/components/atoms/Footer'
 import ResultCard from '@/components/molecules/ResultCard'
 import AboutSection from '@/components/molecules/AboutSection'
@@ -410,7 +410,7 @@ function ResultContent() {
         </div>
       </main>
 
-      <KakaoAdFit width={320} height={100} />
+      <AdpickBanner />
       <Footer />
     </div>
   )
