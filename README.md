@@ -39,8 +39,10 @@
 
 3. 환경변수 설정  
    .env.local 파일을 생성하고 Supabase 관련 환경 변수를 추가합니다.  
-   NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL  
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+   SUPABASE_URL=YOUR_SUPABASE_URL  
+   SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY  
+   SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY (학습 데이터셋 빌드에만 필요, 서버/클라이언트 코드에서는 쓰지 않음)  
+   NEXT_PUBLIC_KAKAO_AD_UNIT=YOUR_ADFIT_UNIT
 
 4. **개발 서버 실행**  
    npm run dev
@@ -66,19 +68,27 @@ src
 │ ├── onnx.ts \# ONNX 모델 추론 로직  
 │ └── utils.ts \# 유틸리티 함수 (cn, 데이터 압축/해제)  
 └── scripts/  
- ├── model.py \# PyTorch 모델 정의  
- ├── train.py \# 모델 학습 스크립트  
- ├── export_onnx.py \# ONNX 변환 스크립트  
+ ├── dataset/ \# 학습 데이터셋 빌더 (Supabase 실데이터 + 합성 데이터)  
+ ├── profiles/ \# 전문화별 Big5 추정 프로필 (합성 데이터의 중심값)  
+ ├── ml/model.py \# PyTorch 모델 정의  
+ ├── ml/train.py \# 모델 학습 스크립트  
+ ├── ml/export_onnx.py \# ONNX + labels.json 변환 스크립트  
+ ├── models/<game>/ \# 게임별 학습 체크포인트(model.pth)  
  └── create-tables.sql \# Supabase 테이블 생성 DDL
 
 ## **🧠 모델 및 학습**
 
-- **모델**: 5가지 성격 특성(A, C, E, N, O)을 입력받아 39개의 WoW 직업-전문화 조합 중 하나로 분류하는 다중 분류(Multi-class Classification) 모델입니다.
-- **학습**:
-  - data.csv 파일의 데이터를 기반으로 train.py 스크립트를 실행하여 모델을 학습합니다.
-  - 학습 과정은 TensorBoard를 통해 모니터링할 수 있습니다. (tensorboard.sh 실행)
+- **모델**: 5가지 성격 특성(A, C, E, N, O)을 입력받아 게임별 직업-전문화 조합(WoW 40, 로스트아크 30, 던전앤파이터 71) 중 하나로 분류하는 다중 분류(Multi-class Classification) 모델입니다. 게임마다 모델을 따로 학습합니다.
+- **학습 데이터**: `npm run dataset -- --env .env.local` 이 Supabase `survey_results`의 실데이터를 받아 `src/scripts/data/<game>.csv`를 만듭니다.
+  - 클래스/전문화 이름은 `src/lib/data.ts` 기준으로 정규화하고, 거기 없는 라벨이나 깨진 답변은 버립니다.
+  - 전문화마다 목표 건수(기본 500)에 모자란 만큼 합성 데이터를 보충합니다. 합성 데이터의 중심값은 실데이터가 50건 이상이면 실데이터 평균, 그 미만이면 `src/scripts/profiles/<game>.json`의 추정 프로필과 실데이터 평균을 건수 비율로 섞은 값입니다. 표준편차는 10, 시드는 고정(`--seed`)이라 재현 가능합니다.
+  - 새 직업을 추가할 때는 `data.ts`와 `profiles/<game>.json`에 함께 넣어야 합니다. 프로필이 빠지면 빌더가 실패합니다.
+- **학습** (`src/scripts` 디렉터리에서, `python -m venv venv` 후 `pip install -r requirements.txt`):
+  - `venv/Scripts/python.exe ml/train.py --csv data/wow.csv --model models/wow/model.pth --log-dir runs/wow`
+  - 체크포인트의 라벨 집합이 CSV와 다르면(직업 추가/삭제) 자동으로 처음부터 학습합니다. 검증 정확도가 가장 높았던 가중치만 저장됩니다.
+  - 학습 과정은 TensorBoard로 볼 수 있습니다. (`venv/Scripts/tensorboard.exe --logdir=runs`)
 - **추론**:
-  - 학습된 model.pth 파일은 export_onnx.py를 통해 웹 환경에 최적화된 model.onnx 파일로 변환됩니다.
+  - `venv/Scripts/python.exe ml/export_onnx.py --model models/wow/model.pth --onnx ../../public/models/wow/model.onnx` 가 `model.onnx`와 출력 인덱스 → 라벨 매핑 `labels.json`을 함께 씁니다. 두 파일은 항상 같이 갱신해야 하며, `src/lib/onnx.test.ts`가 `data.ts`의 라벨 집합과 `labels.json`이 일치하는지 검사합니다.
   - 클라이언트 측에서는 onnxruntime-web 라이브러리를 사용해 변환된 모델을 로드하고, 사용자의 성격 분석 결과를 입력하여 실시간으로 직업을 추천받습니다.
 
 ## **📝 개발 로드맵**

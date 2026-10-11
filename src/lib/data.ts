@@ -389,6 +389,13 @@ export const wowClasses: GameClass[] = [
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_demonhunter_spectank.jpg',
         description: '방어와 생존에 집중한 근접 탱커 스타일 전문화입니다.',
       },
+      {
+        name: 'Devourer',
+        nameKr: '포식',
+        role: 'dealer',
+        image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_demonhunter_void.jpg',
+        description: '영혼 파편을 수확해 공허 탈태로 변신하고 중거리에서 공허의 힘을 퍼붓는 딜러 전문화입니다.',
+      },
     ],
   },
   {
@@ -760,6 +767,22 @@ export const lostarkClasses: GameClass[] = [
     ],
   },
   {
+    name: 'Guardianknight',
+    nameKr: '가디언나이트',
+    image: '/icons/lostark/guardianknight.svg',
+    color: '#b5452f',
+    specs: [
+      {
+        name: 'Guardianknight',
+        nameKr: '가디언나이트',
+        role: 'dealer',
+        image: '/icons/lostark/guardianknight.svg',
+        description:
+          '거대한 할버드를 휘두르며 가디언 엠버레스의 힘으로 화신화 상태에 돌입해 적을 섬멸하는 근접 딜러입니다.',
+      },
+    ],
+  },
+  {
     name: 'Hunter (Female)',
     nameKr: '헌터 (여)',
     image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-hunter_female.png',
@@ -947,6 +970,22 @@ export const lostarkClasses: GameClass[] = [
         image:
           'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Wildsoul-border.png',
         description: '환수의 힘이 봉인된 두루마리를 바탕으로 환수를 소환하거나 환수로 변신하여 전투를 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Specialist (Male)',
+    nameKr: '스페셜리스트 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-specialist.png',
+    color: '#e8ab5a',
+    specs: [
+      {
+        name: 'Dimensionalist',
+        nameKr: '차원술사',
+        role: 'dealer',
+        image: '/icons/lostark/dimensionalist.svg',
+        description:
+          '차원 시계의 시침과 분침을 검처럼 뽑아 시간을 되돌리거나 공간을 가르며 싸우는 고기동 근접 딜러입니다.',
       },
     ],
   },
@@ -1260,6 +1299,22 @@ export const dnfClasses: GameClass[] = [
       },
     ],
   },
+  // 제국기사
+  {
+    name: 'Imperial Knight',
+    nameKr: '제국기사',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_17.png',
+    color: '#d94f6b',
+    specs: [
+      {
+        name: 'Breaker',
+        nameKr: '브레이커',
+        role: 'dealer',
+        position: '0 0',
+        description: '전용 무기 앵커와 체인을 휘두르며 빠른 기동력으로 전장을 휩쓰는 저돌적인 딜러',
+      },
+    ],
+  },
   // 나이트
   {
     name: 'Knight',
@@ -1449,6 +1504,13 @@ export const dnfClasses: GameClass[] = [
         role: 'dealer',
         position: '-600px 0',
         description: '원죄의 힘을 자유자재로 다루며 타락의 낫으로 적의 영혼을 거두는 자',
+      },
+      {
+        name: 'Monk',
+        nameKr: '인파이터',
+        role: 'dealer',
+        position: '-800px 0',
+        description: '위빙으로 적의 공격을 흘려내고 텐션을 개방해 강화된 주먹을 몰아치는 권격가',
       },
       {
         name: 'Shaman',
