@@ -53,3 +53,13 @@ export function unzipData(encodedData: string): TestData {
     throw new Error('Invalid data format')
   }
 }
+
+// 짧은 비암호화 해시 (FNV-1a 32bit). sessionStorage 키처럼 긴 문자열을 식별자로 줄일 때 사용
+export function hashString(input: string): string {
+  let hash = 0x811c9dc5
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0')
+}

@@ -35,9 +35,9 @@ describe('parseCsv', () => {
 describe('parseProfiles', () => {
   it('data.ts에서 세 게임의 프로필을 모두 읽는다', () => {
     const profiles = parseProfiles(dataTs)
-    expect(Object.keys(profiles.wow)).toHaveLength(39)
-    expect(Object.keys(profiles.lostark)).toHaveLength(28)
-    expect(Object.keys(profiles.dnf)).toHaveLength(69)
+    expect(Object.keys(profiles.wow)).toHaveLength(40)
+    expect(Object.keys(profiles.lostark)).toHaveLength(30)
+    expect(Object.keys(profiles.dnf)).toHaveLength(71)
     expect(profiles.wow['Mage_Arcane']).toEqual({
       role: 'dealer',
       E: 20,

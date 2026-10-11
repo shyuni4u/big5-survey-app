@@ -1,169 +1,98 @@
 'use client'
-
 import { useState } from 'react'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { ArrowRight, Check, Sparkles, Share2, Compass } from 'lucide-react'
 import { games } from '@/lib/data'
-import type { Game } from '@/lib/types'
-import type { Metadata } from 'next'
-import { Footer } from '@/components/atoms/Footer'
-import { Header } from '@/components/atoms/Header'
-import { KakaoAdFit } from '@/components/atoms/KakaoAdFit'
-
-export const metadata: Metadata = {
-  title: `성격 분석 결과 | Big5 게임 직업 추천`,
-  description: `당신의 Big5 성격 분석 결과와 추천 게임 직업을 확인해보세요. 과학적 분석을 바탕으로 한 맞춤형 추천입니다.`,
-  robots: 'noindex', // 개인 결과 페이지는 검색 결과에서 제외
-}
+import { Button } from '@/components/ui/button'
+import { Header } from './Header'
+import { Footer } from './Footer'
+import { cn } from '@/lib/utils'
 
 export default function Home() {
-  const [selectedGame, setSelectedGame] = useState<Game>(games[1]) // 선택된 게임 상태
-
-  // 게임 선택 핸들러
-  const handleGameSelect = (game: Game) => {
-    setSelectedGame(game)
-  }
+  const [game, setGame] = useState(games[1].id)
   return (
     <div className="min-h-screen">
-      {/* Header */}
       <Header />
-
-      {/* Main Content */}
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        <Card className="animate-slide-up bg-card shadow-lg">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary shadow-lg">
-              <svg className="h-10 w-10 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
+      <main className="mx-auto max-w-5xl px-5 py-12 md:py-20">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+          <section>
+            <p className="eyebrow">
+              <Sparkles size={16} /> 성격으로 찾는 나의 플레이 스타일
+            </p>
+            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight md:text-6xl">
+              현실의 나와
+              <br />
+              게임 속 직업이
+              <br />
+              <span className="text-primary">만난다면?</span>
+            </h1>
+            <p className="mt-6 max-w-md text-base leading-8 text-muted-foreground">
+              새로운 모험을 시작할 때도, 부캐가 고민될 때도.
+              <br />
+              나의 성향을 알아보고 어울리는 직업을 발견하세요.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3 text-xs text-muted-foreground">
+              {['40문항', '회원가입 없이', '이 기기에서 이어하기'].map((t) => (
+                <span key={t} className="rounded-full border px-3 py-2">
+                  {t}
+                </span>
+              ))}
             </div>
-            <CardTitle className="text-2xl text-foreground md:text-3xl">성격 분석 테스트</CardTitle>
-            <CardDescription className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              과학적으로 검증된 Big5 성격 모델을 통해 당신의 성격을 분석하고, 그에 맞는 게임 직업을 추천해드립니다.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-8">
-            <div className="space-y-4 text-center">
-              <p className="text-muted-foreground">
-                <strong className="text-primary">40개의 질문</strong>을 통해 5가지 성격 차원을 분석합니다
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {['외향성', '친화성', '성실성', '신경증', '개방성'].map((trait) => (
-                  <Badge key={trait} variant="secondary" className="border-primary/20 bg-primary/10 text-primary">
-                    {trait}
-                  </Badge>
-                ))}
-              </div>
+          </section>
+          <section
+            className="rounded-3xl border bg-card p-6 shadow-2xl shadow-black/20 md:p-8"
+            aria-labelledby="game-heading"
+          >
+            <p className="eyebrow">YOUR NEXT ADVENTURE</p>
+            <h2 id="game-heading" className="mt-3 text-2xl font-bold">
+              어디로 떠나볼까요?
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">직업을 추천받을 게임을 선택하세요.</p>
+            <div className="my-7 space-y-3" role="group" aria-label="게임 선택">
+              {games.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={game === item.id}
+                  onClick={() => setGame(item.id)}
+                  className={cn(
+                    'flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-colors',
+                    game === item.id
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border bg-background/40 hover:bg-secondary',
+                  )}
+                >
+                  <Image src={item.image} alt="" width={44} height={44} className="rounded-lg" />
+                  <span className="flex-1 font-semibold">{item.name}</span>
+                  {game === item.id && <Check className="text-primary" size={20} />}
+                </button>
+              ))}
             </div>
-
-            {/* Game Selection */}
-            <div className="space-y-6">
-              <h3 className="text-center text-xl font-semibold text-foreground">어떤 게임을 플레이하시나요?</h3>
-              <div className="flex flex-wrap justify-center gap-4">
-                {games.map((game, index) => (
-                  <motion.div
-                    key={game.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ y: -8 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Card
-                      className={cn(
-                        'group relative flex h-36 w-28 cursor-pointer items-center overflow-hidden rounded-lg border align-middle transition-all duration-300',
-                        selectedGame?.id === game.id
-                          ? 'border-primary bg-primary/5 shadow-lg shadow-primary/20'
-                          : 'border-border bg-card hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10',
-                      )}
-                      onClick={() => handleGameSelect(game)}
-                    >
-                      <div className="flex min-h-16 w-16 items-center justify-center">
-                        <Image
-                          src={game.image || '/placeholder.svg'}
-                          alt={game.name}
-                          width={64}
-                          height={64}
-                          className="rounded-xl object-cover transition-transform duration-300 group-hover:scale-110"
-                        />
-                      </div>
-                      <h3 className="text-center text-sm font-medium text-foreground transition-colors duration-200 group-hover:text-primary">
-                        {game.name}
-                      </h3>
-
-                      {/* Hover gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                      {/* Selection indicator */}
-                      {selectedGame?.id === game.id && (
-                        <motion.div
-                          layoutId="selection-indicator"
-                          className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5"
-                          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                        />
-                      )}
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+            <Button asChild className="h-14 w-full rounded-xl text-base">
+              <Link href={`/survey?type=new&game=${game}`}>
+                내 직업 발견하기 <ArrowRight />
+              </Link>
+            </Button>
+            <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
+              Big5 기반의 성향 탐색 · 게임 추천은 재미로 참고해주세요
+            </p>
+          </section>
+        </div>
+        <div className="mt-16 grid gap-6 border-t pt-8 md:grid-cols-3">
+          {[
+            { icon: Compass, title: '나도 몰랐던 나의 성향', text: '다섯 가지 성격 특성으로 나의 스타일을 살펴봐요.' },
+            { icon: Sparkles, title: '세 가지 새로운 가능성', text: '추천 직업 TOP 3를 비교하며 다음 모험을 골라요.' },
+            { icon: Share2, title: '친구는 어떤 직업일까?', text: '결과 카드를 저장하고 서로의 추천을 공유해요.' },
+          ].map(({ icon: Icon, title, text }) => (
+            <div key={title}>
+              <Icon className="mb-3 text-primary" size={20} />
+              <h2 className="font-semibold">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
             </div>
-
-            <div className="space-y-6">
-              <h3 className="text-center text-xl font-semibold text-foreground">어떤 유형의 사용자이신가요?</h3>
-              <div className="grid gap-6 md:grid-cols-2">
-                <Link href={`/survey?type=existing&game=${selectedGame.id}`} className="block">
-                  <Card className="h-full transform cursor-pointer bg-secondary transition-all duration-200 hover:scale-105 hover:border-primary/50">
-                    <CardHeader className="text-center">
-                      <div className="mb-3 text-4xl">🎮</div>
-                      <CardTitle className="text-foreground">기존 유저</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 text-center">
-                      <p className="text-sm text-muted-foreground">
-                        현재 플레이 중인 직업이 있으신가요? 성격 분석과 함께 현재 직업 정보를 제공해주시면 더 정확한
-                        분석을 받을 수 있습니다.
-                      </p>
-                      <Button className="pointer-events-none bg-primary text-primary-foreground hover:bg-primary/90">
-                        테스트 시작하기
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                <Link href={`/survey?type=new&game=${selectedGame.id}`} className="block">
-                  <Card className="h-full transform cursor-pointer bg-secondary transition-all duration-200 hover:scale-105 hover:border-green-400/50">
-                    <CardHeader className="text-center">
-                      <div className="mb-3 text-4xl">✨</div>
-                      <CardTitle className="text-foreground">신규 유저</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 text-center">
-                      <p className="text-sm text-muted-foreground">
-                        처음 시작하시거나 새로운 직업을 찾고 계신가요? 성격 성향을 분석해서 가장 적합한 직업을
-                        추천해드립니다.
-                      </p>
-                      <Button className="pointer-events-none bg-green-600 text-white hover:bg-green-700">
-                        테스트 시작하기
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
       </main>
-      <div className="mx-auto max-w-4xl px-4">
-        <KakaoAdFit width={728} height={90} />
-      </div>
       <Footer />
     </div>
   )

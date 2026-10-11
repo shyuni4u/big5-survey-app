@@ -313,7 +313,7 @@ export const aboutContent: AboutContent[] = [
   {
     title: '점수는 어떻게 계산되나요?',
     content:
-      "각 문항에 대한 답변은 1점에서 5점까지의 점수로 변환됩니다. 일부 문항은 '역채점' 문항으로, 점수가 반대로 계산됩니다 (예: 1점은 5점으로, 2점은 4점으로). 이는 응답 편향을 줄이고 테스트의 정확도를 높이기 위함입니다. 각 성격 특성에 해당하는 문항들의 점수를 합산하여 최종 점수가 산출되며, 이 점수는 백분율로 변환되어 다른 사람들과 비교할 수 있는 상대적인 위치를 보여줍니다.",
+      "각 문항에 대한 답변은 1점에서 5점까지의 점수로 변환됩니다. 일부 문항은 '역채점' 문항으로, 점수가 반대로 계산됩니다 (예: 1점은 5점으로, 2점은 4점으로). 이는 응답 편향을 줄이고 테스트의 정확도를 높이기 위함입니다. 각 성격 특성에 해당하는 문항들의 점수를 합산하여 최종 점수가 산출되며, 이 점수는 문항 가중치와 역채점을 반영하여 0~100점 척도로 환산합니다. 다른 사람과 비교한 백분위가 아니며, 높거나 낮다고 더 좋은 성격을 의미하지 않습니다.",
   },
   {
     title: '테스트 결과 활용하기',
@@ -398,6 +398,15 @@ export const wowClasses: GameClass[] = [
         signature: ['E', 'O'],
         image: 'https://render.worldofwarcraft.com/us/icons/56/ability_demonhunter_spectank.jpg',
         description: '방어와 생존에 집중한 근접 탱커 스타일 전문화입니다.',
+      },
+      {
+        name: 'Devourer',
+        nameKr: '포식',
+        role: 'dealer',
+        big5: { E: 55, A: 30, C: 65, N: 60, O: 85 },
+        signature: ['O', 'N'],
+        image: 'https://render.worldofwarcraft.com/us/icons/56/classicon_demonhunter_void.jpg',
+        description: '영혼 파편을 수확해 공허 탈태로 변신하고 중거리에서 공허의 힘을 퍼붓는 딜러 전문화입니다.',
       },
     ],
   },
@@ -846,6 +855,24 @@ export const lostarkClasses: GameClass[] = [
     ],
   },
   {
+    name: 'Guardianknight',
+    nameKr: '가디언나이트',
+    image: '/icons/lostark/guardianknight.svg',
+    color: '#b5452f',
+    specs: [
+      {
+        name: 'Guardianknight',
+        nameKr: '가디언나이트',
+        role: 'dealer',
+        big5: { E: 80, A: 55, C: 65, N: 30, O: 55 },
+        signature: ['E', 'C'],
+        image: '/icons/lostark/guardianknight.svg',
+        description:
+          '거대한 할버드를 휘두르며 가디언 엠버레스의 힘으로 화신화 상태에 돌입해 적을 섬멸하는 근접 딜러입니다.',
+      },
+    ],
+  },
+  {
     name: 'Hunter (Female)',
     nameKr: '헌터 (여)',
     image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-hunter_female.png',
@@ -1069,6 +1096,24 @@ export const lostarkClasses: GameClass[] = [
         image:
           'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-Wildsoul-border.png',
         description: '환수의 힘이 봉인된 두루마리를 바탕으로 환수를 소환하거나 환수로 변신하여 전투를 펼칩니다.',
+      },
+    ],
+  },
+  {
+    name: 'Specialist (Male)',
+    nameKr: '스페셜리스트 (남)',
+    image: 'https://cdn-lostark.game.onstove.com/2018/obt/assets/images/pc/information/class/mark-specialist.png',
+    color: '#e8ab5a',
+    specs: [
+      {
+        name: 'Dimensionalist',
+        nameKr: '차원술사',
+        role: 'dealer',
+        big5: { E: 70, A: 45, C: 70, N: 40, O: 90 },
+        signature: ['O', 'E'],
+        image: '/icons/lostark/dimensionalist.svg',
+        description:
+          '차원 시계의 시침과 분침을 검처럼 뽑아 시간을 되돌리거나 공간을 가르며 싸우는 고기동 근접 딜러입니다.',
       },
     ],
   },
@@ -1448,6 +1493,24 @@ export const dnfClasses: GameClass[] = [
       },
     ],
   },
+  // 제국기사
+  {
+    name: 'Imperial Knight',
+    nameKr: '제국기사',
+    image: 'https://bbscdn.df.nexon.com/pg/characters/img/thum/thum_char_17.png',
+    color: '#d94f6b',
+    specs: [
+      {
+        name: 'Breaker',
+        nameKr: '브레이커',
+        role: 'dealer',
+        big5: { E: 85, A: 30, C: 40, N: 60, O: 70 },
+        signature: ['E', 'N'],
+        position: '0 0',
+        description: '전용 무기 앵커와 체인을 휘두르며 빠른 기동력으로 전장을 휩쓰는 저돌적인 딜러',
+      },
+    ],
+  },
   // 나이트
   {
     name: 'Knight',
@@ -1679,6 +1742,15 @@ export const dnfClasses: GameClass[] = [
         signature: ['E', 'N'],
         position: '-600px 0',
         description: '원죄의 힘을 자유자재로 다루며 타락의 낫으로 적의 영혼을 거두는 자',
+      },
+      {
+        name: 'Monk',
+        nameKr: '인파이터',
+        role: 'dealer',
+        big5: { E: 75, A: 35, C: 65, N: 50, O: 45 },
+        signature: ['E', 'C'],
+        position: '-800px 0',
+        description: '위빙으로 적의 공격을 흘려내고 텐션을 개방해 강화된 주먹을 몰아치는 권격가',
       },
       {
         name: 'Shaman',

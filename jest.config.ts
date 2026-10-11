@@ -9,6 +9,7 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 /** @type {import('jest').Config} */
 const customJestConfig = {
+  roots: ['<rootDir>/src'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'], // 이 파일을 생성할 것입니다
   moduleNameMapper: {
     // Handle module aliases (this should match your tsconfig.json paths)

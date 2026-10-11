@@ -47,3 +47,10 @@ src/scripts/venv
 src/scripts/runs/psych_model/*
 playwright-report
 test-results
+
+# ML datasets / training runs (generated, contain user rows)
+src/scripts/data/
+src/scripts/runs/
+
+# Local verification scratch files
+/.tmp/

@@ -4,24 +4,23 @@ import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
-import { questions, getGameClasses } from '@/lib/data'
+import { questions, getGameClasses, games } from '@/lib/data'
 import type { TestData, UserAnswers } from '@/lib/types'
 import { cn, SEPERATE_TOKEN, zipData } from '@/lib/utils'
 import { calculateScores } from '@/lib/personality-calculator'
+import Link from 'next/link'
 import { SpriteIcon } from '@/components/molecules/RecommendationSection'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import toast from 'react-hot-toast'
+import { track } from '@/lib/analytics'
 
 function TestContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const userType = searchParams.get('type') as 'existing' | 'new' | null
-  const game = searchParams.get('game')
-  if (!game) {
-    router.push('/')
-    throw new Error('게임 정보가 필요합니다.')
-  }
+  const game = searchParams.get('game') || ''
 
   const gameClasses = getGameClasses(game)
 
@@ -38,19 +37,90 @@ function TestContent() {
     }[]
   >([])
 
+  const [completed, setCompleted] = useState(false)
+  const [ready, setReady] = useState(false)
+  const [missing, setMissing] = useState<number | null>(null)
+  const [storageAvailable, setStorageAvailable] = useState(true)
+  const storageKey = 'persona-survey-v1-' + game + '-' + userType
   const questionsPerPage = 5
 
   useEffect(() => {
-    if (!userType || !['existing', 'new'].includes(userType)) {
+    if (!games.some((g) => g.id === game) || !userType || !['existing', 'new'].includes(userType)) {
       router.push('/')
       return
     }
 
-    const shuffled = [...questions].sort(() => Math.random() - 0.5)
+    try {
+      const raw = localStorage.getItem(storageKey)
+      if (raw) {
+        const saved = JSON.parse(raw)
+        if (
+          saved.signature === JSON.stringify(questions) &&
+          Array.isArray(saved.order) &&
+          saved.order.length === questions.length &&
+          new Set(saved.order).size === questions.length &&
+          saved.order.every((i: number) => Number.isInteger(i) && i >= 0 && i < questions.length) &&
+          saved.answers &&
+          Object.entries(saved.answers).every(
+            ([k, v]) =>
+              Number.isInteger(Number(k)) &&
+              Number(k) >= 0 &&
+              Number(k) < questions.length &&
+              Number.isInteger(v) &&
+              Number(v) >= 1 &&
+              Number(v) <= 5,
+          ) &&
+          Number.isInteger(saved.page) &&
+          saved.page >= 0 &&
+          saved.page < questions.length &&
+          saved.page % 5 === 0
+        ) {
+          setShuffledQuestions(saved.order.map((i: number) => questions[i]))
+          setUserAnswers(saved.answers)
+          setCompleted(saved.completed === true)
+          setCurrentQuestionIndex(saved.page)
+          toast.success('이전에 답한 문항을 불러왔어요.')
+          setReady(true)
+          return
+        }
+      }
+    } catch {
+      setStorageAvailable(false)
+    }
+    const shuffled = [...questions]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
     setShuffledQuestions(shuffled)
-  }, [userType, router])
+    setReady(true)
+  }, [userType, router, game, storageKey])
+
+  useEffect(() => {
+    if (!ready) return
+    try {
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          completed,
+          signature: JSON.stringify(questions),
+          order: shuffledQuestions.map((q) => questions.indexOf(q)),
+          answers: userAnswers,
+          page: currentQuestionIndex,
+        }),
+      )
+    } catch {
+      setStorageAvailable(false)
+    }
+  }, [ready, storageKey, shuffledQuestions, userAnswers, currentQuestionIndex, completed])
+
+  useEffect(() => {
+    if (ready) document.getElementById('survey-heading')?.focus()
+  }, [currentQuestionIndex, currentStep, ready])
 
   const handleAnswerChange = (questionIndex: number, value: number) => {
+    if (Object.keys(userAnswers).length === 0) track('survey_start', { game })
+    setMissing(null)
     setUserAnswers((prev) => ({
       ...prev,
       [questionIndex]: value,
@@ -63,7 +133,12 @@ function TestContent() {
     for (let i = 0; i < questionsOnPage.length; i++) {
       const questionIndex = currentQuestionIndex + i
       if (userAnswers[questionIndex] === undefined) {
-        alert('현재 페이지의 모든 질문에 답변해주세요.')
+        setMissing(questionIndex)
+        document.getElementById(`q${questionIndex}v1`)?.focus()
+        document.getElementById(`question-${questionIndex}`)?.scrollIntoView({
+          block: 'center',
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        })
         return
       }
     }
@@ -71,11 +146,11 @@ function TestContent() {
     if (currentQuestionIndex + questionsPerPage < shuffledQuestions.length) {
       setCurrentQuestionIndex((prev) => prev + questionsPerPage)
     } else {
-      if (userType === 'existing') {
-        setCurrentStep('class-selection')
-      } else {
-        goToResults()
+      if (!completed) {
+        track('survey_complete', { game, question_count: questions.length })
+        setCompleted(true)
       }
+      setCurrentStep('class-selection')
     }
   }
 
@@ -111,15 +186,20 @@ function TestContent() {
   const goToResults = () => {
     const calculatedScores = calculateScores(userAnswers, shuffledQuestions)
     const testData: TestData = {
-      userType: userType!,
+      userType: selectedClassList.length ? 'existing' : 'new',
       personalityScores: calculatedScores,
       currentClass: selectedClassList.map((item) => [item.class, item.spec].join(SEPERATE_TOKEN)),
+    }
+    try {
+      localStorage.removeItem(storageKey)
+    } catch {
+      /* Storage may be unavailable. */
     }
     const hashedData = zipData(testData)
     router.replace(`/result?data=${hashedData}&game=${game}`)
   }
 
-  if (!userType) {
+  if (!userType || !ready) {
     return <div>Loading...</div>
   }
 
@@ -135,16 +215,28 @@ function TestContent() {
       <div className="vscode-gradient min-h-screen">
         <header className="border-b border-border bg-card/80 backdrop-blur-sm">
           <div className="mx-auto max-w-7xl px-4 py-6 text-center">
-            <h1 className="mb-2 font-display text-2xl font-bold text-primary md:text-3xl">
-              현재 플레이 중인 직업 선택
+            <h1
+              id="survey-heading"
+              tabIndex={-1}
+              className="mb-2 font-display text-2xl font-bold text-primary outline-none md:text-3xl"
+            >
+              마지막으로, 지금 플레이하는 직업이 있나요?
             </h1>
-            <p className="text-muted-foreground">더 정확한 분석을 위해 현재 직업 정보를 알려주세요</p>
+            <p className="text-muted-foreground">
+              선택 사항이에요. 입력한 성격 점수와 직업은 추천 모델 개선을 위해 저장됩니다.
+            </p>
           </div>
         </header>
 
-
-
-        <main className="mx-auto max-w-6xl px-4 pb-8">
+        <main className="mx-auto max-w-6xl px-4 py-8">
+          <div className="mb-6 flex flex-wrap justify-center gap-3">
+            <Button variant="outline" onClick={() => setCurrentStep('personality')}>
+              답변 돌아보기
+            </Button>
+            <Button onClick={goToResults}>
+              {selectedClassList.length ? '선택한 직업과 함께 결과 보기' : '건너뛰고 결과 보기'}
+            </Button>
+          </div>
           <div className="space-y-8">
             <Card className="border-border bg-card shadow-lg">
               <CardHeader>
@@ -306,9 +398,8 @@ function TestContent() {
               <Button
                 type="button"
                 onClick={goToResults}
-                disabled={selectedClassList.length === 0}
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 결과 보기
               </Button>
@@ -325,71 +416,86 @@ function TestContent() {
         <div className="mx-auto max-w-7xl px-4 py-6 text-center">
           <h1 className="mb-2 font-display text-2xl font-bold text-primary md:text-3xl">성격 분석 테스트</h1>
           <p className="text-muted-foreground">
-            {userType === 'existing' ? '기존 유저' : '신규 유저'} • 솔직하게 답변해주세요
+            {games.find((g) => g.id === game)?.name} · 정답은 없어요. 평소의 나를 떠올려보세요.
           </p>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 pb-24">
+      <main className="mx-auto max-w-4xl px-4 pb-32 pt-6">
+        <div className="mb-5 flex items-center justify-between text-xs text-muted-foreground">
+          <Link href="/" className="underline underline-offset-4">
+            게임 선택으로
+          </Link>
+          <span>{storageAvailable ? '이 기기에 자동 저장 중' : '이 브라우저에서는 자동 저장이 어려워요'}</span>
+        </div>
+        <p className="mb-4 text-sm text-primary">
+          {Math.floor(currentQuestionIndex / 5) + 1} / 8 페이지 ·{' '}
+          {currentQuestionIndex >= 30 ? '거의 다 왔어요!' : '나를 알아가는 중'}
+        </p>
         <Card className="animate-slide-up border-border bg-card shadow-lg">
           <CardContent className="space-y-8 p-6 md:p-8">
             {questionsToShow.map((question, index) => {
               const questionIndex = currentQuestionIndex + index
               return (
-                <div key={questionIndex} className="border-b border-border pb-6 last:border-b-0">
-                  <h4 className="mb-4 text-lg font-medium leading-relaxed text-foreground md:text-xl">
+                <fieldset
+                  id={`question-${questionIndex}`}
+                  key={questionIndex}
+                  aria-describedby={missing === questionIndex ? `error-${questionIndex}` : undefined}
+                  className={cn(
+                    'min-w-0 border-b border-border pb-6 last:border-b-0',
+                    missing === questionIndex && 'rounded-lg ring-2 ring-primary ring-offset-4 ring-offset-card',
+                  )}
+                >
+                  <legend className="mb-4 text-lg font-medium leading-relaxed text-foreground md:text-xl">
                     <span className="font-semibold text-primary">{questionIndex + 1}.</span> {question.text}
-                  </h4>
+                  </legend>
                   <div className="grid grid-cols-5 gap-2 md:gap-3">
                     {[
-                      { value: 1, label: '전혀 아니다', color: 'red' },
-                      { value: 2, label: '아니다', color: 'orange' },
-                      { value: 3, label: '보통', color: 'gray' },
-                      { value: 4, label: '그렇다', color: 'cyan' },
-                      { value: 5, label: '매우 그렇다', color: 'blue' },
-                    ].map(({ value, label, color }) => (
+                      { value: 1, label: '전혀 아니다' },
+                      { value: 2, label: '아니다' },
+                      { value: 3, label: '보통' },
+                      { value: 4, label: '그렇다' },
+                      { value: 5, label: '매우 그렇다' },
+                    ].map(({ value, label }) => (
                       <div key={value}>
                         <input
                           type="radio"
                           id={`q${questionIndex}v${value}`}
                           name={`q${questionIndex}`}
                           value={value}
-                          className="sr-only"
+                          className="peer sr-only"
                           checked={userAnswers[questionIndex] === value}
                           onChange={() => handleAnswerChange(questionIndex, value)}
                         />
                         <label
                           htmlFor={`q${questionIndex}v${value}`}
                           className={cn(
-                            'flex min-h-[50px] cursor-pointer items-center justify-center rounded border-2 p-2 text-center transition-all duration-200 hover:scale-105 md:min-h-[70px] md:p-4',
+                            'flex min-h-[64px] cursor-pointer items-center justify-center rounded border-2 p-1 text-center transition-all duration-200 hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-card md:min-h-[70px] md:p-4',
                             userAnswers[questionIndex] === value
-                              ? color === 'red'
-                                ? 'border-red-400 bg-red-400/20 text-red-400'
-                                : color === 'orange'
-                                  ? 'border-orange-400 bg-orange-400/20 text-orange-400'
-                                  : color === 'gray'
-                                    ? 'border-gray-400 bg-gray-400/20 text-gray-400'
-                                    : color === 'cyan'
-                                      ? 'border-cyan-400 bg-cyan-400/20 text-cyan-400'
-                                      : 'border-blue-400 bg-blue-400/20 text-blue-400'
+                              ? 'border-primary bg-primary/15 text-primary'
                               : 'border-border bg-secondary text-muted-foreground hover:border-primary/50 hover:bg-secondary/80',
                           )}
                         >
-                          <span className="whitespace-pre-line text-xs font-medium leading-tight md:text-sm">
+                          <span className="whitespace-normal break-keep text-xs font-medium leading-tight md:text-sm">
                             {label}
                           </span>
                         </label>
                       </div>
                     ))}
                   </div>
-                </div>
+                  {missing === questionIndex && (
+                    <p id={`error-${questionIndex}`} role="alert" className="mt-3 text-sm text-primary">
+                      이 문항에 답변을 선택해주세요.
+                    </p>
+                  )}
+                </fieldset>
               )
             })}
           </CardContent>
         </Card>
       </main>
 
-      <div className="sticky bottom-0 w-full border-t border-border bg-card/95 p-4 backdrop-blur-sm">
+      <div className="fixed bottom-0 z-20 w-full border-t border-border bg-card/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-sm">
         <div className="mx-auto flex max-w-4xl items-center gap-4">
           <div className="flex-1">
             <div className="mb-1 flex justify-between text-sm">
@@ -402,15 +508,21 @@ function TestContent() {
           </div>
           <div className="h-10 w-px bg-border" />
           <div className="flex items-center gap-2">
-            <Button type="button" onClick={handlePrev} disabled={currentQuestionIndex === 0} variant="outline">
+            <Button
+              className="h-12"
+              type="button"
+              onClick={handlePrev}
+              disabled={currentQuestionIndex === 0}
+              variant="outline"
+            >
               이전
             </Button>
             <Button
               type="button"
               onClick={handleNext}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {isLastPage ? (userType === 'existing' ? '직업 선택하기' : '결과 보기') : '다음'}
+              {isLastPage ? '답변 완료' : '다음'}
             </Button>
           </div>
         </div>
@@ -419,10 +531,15 @@ function TestContent() {
   )
 }
 
+function TestRoute() {
+  const params = useSearchParams()
+  return <TestContent key={params.toString()} />
+}
+
 export default function TestPageClient() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <TestContent />
+      <TestRoute />
     </Suspense>
   )
 }

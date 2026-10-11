@@ -215,10 +215,10 @@ describe('recommend', () => {
 
   it('게임의 모든 전문화를 점수 내림차순으로 돌려준다', () => {
     const result = recommend('wow', neutral)
-    expect(result).toHaveLength(39)
+    expect(result).toHaveLength(40)
     const values = result.map((r) => r.score)
     expect(values).toEqual([...values].sort((a, b) => b - a))
-    expect(new Set(result.map((r) => r.label)).size).toBe(39)
+    expect(new Set(result.map((r) => r.label)).size).toBe(40)
   })
 
   it('점수는 0~100 정수이고 reason이 비어 있지 않다', () => {

@@ -47,8 +47,8 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['var(--font-noto)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-cinzel)', 'serif'],
+        sans: ['var(--font-pretendard)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-pretendard)', 'system-ui', 'sans-serif'],
       },
     },
   },

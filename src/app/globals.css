@@ -6,11 +6,11 @@
   :root {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 224 35% 10%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
+    --primary: 166 75% 68%;
     --primary-foreground: 222.2 84% 4.9%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -33,6 +33,25 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(ellipse at 15% 0%, hsl(166 75% 68% / 0.07), transparent 50%);
+    min-height: 100vh;
+  }
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 4px;
+  }
+}
+
+.eyebrow {
+  @apply flex items-center gap-2 text-xs font-semibold tracking-widest text-primary;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
