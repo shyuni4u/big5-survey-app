@@ -14,16 +14,22 @@
  *   0) 중복 제거 후 응답자 모집단의 특성별 평균·표준편차 (src/lib/recommend.ts의 POPULATION_BASELINE 갱신용)
  *   1) 표본이 min-n 이상인 전문화 중 실데이터 평균이 프로필과 10 이상 다른 특성
  *   2) 현재 프로필에서 거리가 near 미만인 쌍과, 실데이터에서 그 둘이 가장 크게 갈리는 특성
+ *
+ * 1)과 2)의 실데이터 평균은 이 입력 파일 자신의 모집단 평균·표준편차로 정규화한 값(평균 50, 표준편차 25점)입니다.
+ * data.ts의 프로필이 정규화된 척도 위의 값이기 때문입니다(설계 문서 5.0). 모집단 통계가 없는 요약만 원점수로 비교하며,
+ * 그 줄에는 [원점수, 모집단 통계 없음]이 붙습니다.
  */
 const fs = require('fs')
 const path = require('path')
 
 const TRAITS = ['E', 'A', 'C', 'N', 'O']
 const GAMES = ['wow', 'lostark', 'dnf']
+/** 정규화 척도에서 표준편차 1에 해당하는 점수. src/lib/recommend.ts의 SD_SCALE과 같다. */
+const SD_SCALE = 25
 
 /** RFC 4180 방식 CSV를 헤더 키의 객체 배열로 읽는다. 큰따옴표 안의 쉼표·개행·겹친 큰따옴표를 처리하고 BOM과 빈 줄은 무시한다. */
 function parseCsv(text) {
-  const source = text.replace(/^﻿/, '')
+  const source = text.replace(/^\uFEFF/, '')
   const records = []
   let row = []
   let field = ''
@@ -102,8 +108,24 @@ function parseProfiles(source) {
 }
 
 /**
+ * 원점수 평균을 모집단 기준(평균 50, 표준편차 1 = 25점)으로 정규화해 0~100으로 자른다.
+ * src/lib/recommend.ts의 normalizeScores와 같은 변환이다. 표준편차가 0인 특성은 50으로 둔다.
+ */
+function normalizeMean(mean, population) {
+  return Object.fromEntries(
+    TRAITS.map((trait) => {
+      const sd = population.sd[trait]
+      if (sd === 0) return [trait, 50]
+      const z = (mean[trait] - population.mean[trait]) / sd
+      return [trait, Math.min(100, Math.max(0, 50 + SD_SCALE * z))]
+    }),
+  )
+}
+
+/**
  * 응답 행을 게임/전문화별 n과 평균으로 요약한다. 완전히 같은 행(결과 페이지 새로고침 중복)은 한 번만 센다.
  * `summary.population`에는 게임을 가리지 않고 서로 다른 응답 벡터마다 한 번씩 센 모집단 평균·표준편차를 넣는다.
+ * 전문화별 `mean`은 원점수 평균이고, `normMean`은 이 모집단 통계로 정규화한 평균이다(프로필과 같은 척도).
  */
 function summarize(rows) {
   const summary = {}
@@ -134,13 +156,8 @@ function summarize(rows) {
       bucket.sum[trait] += answers[trait]
     })
   }
-  for (const game of Object.keys(summary)) {
-    for (const label of Object.keys(summary[game])) {
-      const bucket = summary[game][label]
-      bucket.mean = Object.fromEntries(TRAITS.map((trait) => [trait, bucket.sum[trait] / bucket.n]))
-    }
-  }
   const all = [...vectors.values()]
+  let population = null
   if (all.length > 0) {
     const mean = Object.fromEntries(
       TRAITS.map((trait) => [trait, all.reduce((sum, a) => sum + a[trait], 0) / all.length]),
@@ -151,16 +168,31 @@ function summarize(rows) {
         Math.sqrt(all.reduce((sum, a) => sum + (a[trait] - mean[trait]) ** 2, 0) / all.length),
       ]),
     )
-    summary.population = { n: all.length, mean, sd }
+    population = { n: all.length, mean, sd }
   }
+  for (const game of Object.keys(summary)) {
+    for (const label of Object.keys(summary[game])) {
+      const bucket = summary[game][label]
+      bucket.mean = Object.fromEntries(TRAITS.map((trait) => [trait, bucket.sum[trait] / bucket.n]))
+      if (population) bucket.normMean = normalizeMean(bucket.mean, population)
+    }
+  }
+  if (population) summary.population = population
   return summary
 }
 
 const distance = (a, b) => Math.sqrt(TRAITS.reduce((sum, trait) => sum + (a[trait] - b[trait]) ** 2, 0))
 
-/** 리포트 줄 배열을 만든다. */
+/**
+ * 리포트 줄 배열을 만든다. 프로필(data.ts)은 정규화된 척도 위의 값이므로, 모집단 통계가 있으면 전문화별 정규화 평균
+ * (`normMean`)과 비교한다. 모집단 통계가 없는 요약(직접 만든 요약)은 원점수 평균(`mean`)으로 비교하고 줄 끝에 그 사실을 적는다.
+ */
 function buildReport(profiles, summary, { minN = 5, near = 15 } = {}) {
   const lines = []
+  const normalized = Boolean(summary.population)
+  const meanOf = (bucket) => (normalized ? bucket.normMean : bucket.mean)
+  const scaleLabel = normalized ? '(정규화 척도)' : ''
+  const scaleNote = normalized ? '' : ' [원점수, 모집단 통계 없음]'
   if (summary.population) {
     const { n, mean, sd } = summary.population
     const fmt = (stats) => TRAITS.map((trait) => `${trait} ${Math.round(stats[trait])}`).join(', ')
@@ -177,11 +209,11 @@ function buildReport(profiles, summary, { minN = 5, near = 15 } = {}) {
       if (!bucket || bucket.n < minN) continue
       const diffs = TRAITS.map((trait) => ({
         trait,
-        diff: Math.round(bucket.mean[trait] - profiles[game][label][trait]),
+        diff: Math.round(meanOf(bucket)[trait] - profiles[game][label][trait]),
       })).filter((d) => Math.abs(d.diff) >= 10)
       if (diffs.length > 0) {
         const text = diffs.map((d) => `${d.trait} ${d.diff > 0 ? '+' : ''}${d.diff}`).join(', ')
-        lines.push(`  ${label} (n=${bucket.n}) 실데이터가 프로필과 10 이상 다름: ${text}`)
+        lines.push(`  ${label} (n=${bucket.n}) 실데이터${scaleLabel}가 프로필과 10 이상 다름: ${text}${scaleNote}`)
       }
     }
 
@@ -195,10 +227,12 @@ function buildReport(profiles, summary, { minN = 5, near = 15 } = {}) {
         const sa = stats[a]
         const sb = stats[b]
         if (sa && sb && sa.n >= minN && sb.n >= minN) {
-          const best = TRAITS.map((trait) => ({ trait, gap: sa.mean[trait] - sb.mean[trait] })).sort(
+          const ma = meanOf(sa)
+          const mb = meanOf(sb)
+          const best = TRAITS.map((trait) => ({ trait, gap: ma[trait] - mb[trait] })).sort(
             (x, y) => Math.abs(y.gap) - Math.abs(x.gap),
           )[0]
-          hint = `실데이터에서 가장 크게 갈리는 특성: ${best.trait} (${a} ${sa.mean[best.trait].toFixed(0)} vs ${b} ${sb.mean[best.trait].toFixed(0)})`
+          hint = `실데이터${scaleLabel}에서 가장 크게 갈리는 특성: ${best.trait} (${a} ${ma[best.trait].toFixed(0)} vs ${b} ${mb[best.trait].toFixed(0)})${scaleNote}`
         }
         lines.push(`  가까운 쌍 d=${d.toFixed(1)}: ${a} ~ ${b} | ${hint}`)
       }
