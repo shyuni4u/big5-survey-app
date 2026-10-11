@@ -1,4 +1,5 @@
-import type { GameSpec, PersonalityScores, Trait } from '@/lib/types'
+import { getGameClasses } from '@/lib/data'
+import type { GameSpec, PersonalityScores, Recommendation, Trait } from '@/lib/types'
 
 export const TRAITS: readonly Trait[] = ['E', 'A', 'C', 'N', 'O']
 
@@ -64,4 +65,58 @@ const REASON_PHRASES: Record<Trait, { high: string; low: string }> = {
 export function buildReason(big5: PersonalityScores, signature: Trait[]): string {
   const phrases = signature.map((trait) => (big5[trait] >= 50 ? REASON_PHRASES[trait].high : REASON_PHRASES[trait].low))
   return `${phrases.join(', ')} 성향과 잘 맞아요`
+}
+
+/**
+ * 응답자 모집단 기준. 2026-10-11 Supabase survey_results 내보내기에서 완전 중복 행을 제거한 응답자 2,310명의
+ * 특성별 평균과 표준편차. 설문 원점수는 이 기준으로 정규화한 뒤(평균 50, 표준편차 1 = 25점) 프로필과 비교한다.
+ * 데이터가 더 쌓이면 src/scripts/profile-calibration.js가 출력하는 모집단 통계로 갱신한다. 설계 문서 5.0
+ */
+export const POPULATION_BASELINE: { mean: PersonalityScores; sd: PersonalityScores } = {
+  mean: { E: 39, A: 53, C: 56, N: 49, O: 55 },
+  sd: { E: 21, A: 15, C: 18, N: 20, O: 16 },
+}
+/** 정규화 척도에서 표준편차 1에 해당하는 점수 */
+export const SD_SCALE = 25
+
+/**
+ * 설문 원점수를 응답자 모집단 기준으로 정규화한다. 모집단 평균이 50, 평균 + 1표준편차가 75가 되고 0~100으로 자른다.
+ * 입력 객체는 바꾸지 않는다.
+ */
+export function normalizeScores(raw: PersonalityScores): PersonalityScores {
+  const normalized: PersonalityScores = { ...raw }
+  for (const trait of TRAITS) {
+    const z = (raw[trait] - POPULATION_BASELINE.mean[trait]) / POPULATION_BASELINE.sd[trait]
+    normalized[trait] = Math.min(100, Math.max(0, 50 + SD_SCALE * z))
+  }
+  return normalized
+}
+
+function compareLabel(a: string, b: string): number {
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
+}
+
+/**
+ * 정규화된 점수로 게임의 모든 전문화에 점수를 매겨 내림차순으로 돌려준다. 화면은 상위 3개를 쓴다.
+ * 점수 = round(ROLE_WEIGHT * 역할 적합도 + SPEC_WEIGHT * 전문화 적합도). 동점은 라벨 코드포인트 순.
+ */
+export function rankSpecs(game: string, scores: PersonalityScores): Recommendation[] {
+  return getGameClasses(game)
+    .flatMap((gameClass) =>
+      gameClass.specs.map((spec) => ({
+        label: `${gameClass.name}_${spec.name}`,
+        score: Math.round(
+          ROLE_WEIGHT * roleFit(scores, spec.role) + SPEC_WEIGHT * specFit(scores, spec.big5, spec.signature),
+        ),
+        reason: buildReason(spec.big5, spec.signature),
+      })),
+    )
+    .sort((a, b) => b.score - a.score || compareLabel(a.label, b.label))
+}
+
+/** 설문 원점수를 받아 정규화한 뒤 순위를 매긴다. 결과 화면은 이 함수를 호출한다. */
+export function recommend(game: string, raw: PersonalityScores): Recommendation[] {
+  return rankSpecs(game, normalizeScores(raw))
 }
