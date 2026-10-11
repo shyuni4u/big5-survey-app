@@ -1,18 +1,18 @@
 # **🎮 게임 직업 추천 테스트**
 
-**Big5 성격 모델**을 기반으로 사용자의 성향을 분석하고, **World of Warcraft (WoW)** 게임에 가장 적합한 직업과 전문화를 추천해주는 웹 애플리케이션입니다. Next.js와 Python을 결합하여, 과학적인 성격 분석과 AI 기반 직업 추천 기능을 제공합니다.
+**Big5 성격 모델**을 기반으로 사용자의 성향을 분석하고, **World of Warcraft (WoW)** 게임에 가장 적합한 직업과 전문화를 추천해주는 웹 애플리케이션입니다. Big5 성향과 전문화별 플레이 스타일 프로필을 비교하는 규칙 기반 점수로 직업을 추천합니다.
 
 ## **✨ 주요 기능**
 
 - **Big5 성격 테스트**: 과학적으로 검증된 40개의 문항을 통해 사용자의 5가지 성격 특성(외향성, 친화성, 성실성, 신경증, 개방성)을 분석합니다.
-- **AI 기반 직업 추천**:
-  - PyTorch로 학습된 모델을 **ONNX (Open Neural Network Exchange)** 형식으로 변환하여 웹 환경에서 빠르고 효율적인 추론을 수행합니다.
-  - 분석된 성격 프로필을 바탕으로 사용자에게 가장 적합한 **상위 3개의 WoW 직업 및 전문화**를 추천합니다.
+- **성향 기반 직업 추천**:
+  - 전문화마다 목표 Big5 프로필과 시그니처 특성(가중치 2배)을 `src/lib/data.ts`에 정의합니다.
+  - 역할(탱커/힐러/서포터/버퍼/딜러) 적합도와 전문화 적합도를 35:65로 섞어 0~100 적합도를 내고, **상위 3개 직업·전문화**와 한 줄 추천 이유를 보여 줍니다. 계산은 `src/lib/recommend.ts`에 있으며 브라우저에서 동기적으로 실행됩니다.
 - **상세 결과 분석**:
   - 성격 프로필을 시각적인 **레이더 차트**로 제공합니다.
   - 각 성격 특성에 대한 점수와 해석을 **개별 카드 형태**로 보여주어 이해를 돕습니다.
 - **데이터 저장 및 관리**:
-  - **Supabase**를 데이터베이스로 사용하여 사용자의 설문 결과를 저장하고, 이를 모델 학습 데이터로 활용합니다.
+  - **Supabase**를 데이터베이스로 사용하여 사용자의 설문 결과를 저장하고, 이를 프로필 보정과 향후 모델 학습에 활용합니다.
 - **결과 공유 기능**: 테스트 결과를 다른 사람과 쉽게 공유할 수 있도록 URL 복사 및 네이티브 공유 기능을 제공합니다.
 - **반응형 UI**: 데스크톱, 태블릿, 모바일 등 다양한 기기에서 최적화된 화면을 제공합니다.
 
@@ -23,7 +23,7 @@
 | **프론트엔드**    | Next.js, React, TypeScript, Tailwind CSS                                |
 | **UI 컴포넌트**   | shadcn/ui (Radix UI 기반), class-variance-authority, clsx, lucide-react |
 | **데이터 시각화** | chart.js                                                                |
-| **AI/ML**         | Python, PyTorch, ONNX, scikit-learn, pandas, TensorBoard                |
+| **학습 스크립트(향후)** | Python, PyTorch, scikit-learn, pandas, TensorBoard                      |
 | **데이터베이스**  | Supabase (PostgreSQL)                                                   |
 | **데이터 처리**   | pako (데이터 압축/해제)                                                 |
 | **배포**          | Vercel                                                                  |
@@ -65,9 +65,10 @@ src
 │ └── ui/ \# shadcn/ui 기반 공통 컴포넌트  
 ├── lib/  
 │ ├── data.ts \# 설문 문항, 직업 정보 등 핵심 데이터  
-│ ├── onnx.ts \# ONNX 모델 추론 로직  
+│ ├── recommend.ts \# 규칙 기반 직업 추천 점수 계산 (모집단 정규화 포함)  
 │ └── utils.ts \# 유틸리티 함수 (cn, 데이터 압축/해제)  
 └── scripts/  
+ ├── profile-calibration.js \# 실데이터 보정 리포트 (설문 내보내기와 전문화 프로필 비교)  
  ├── dataset/ \# 학습 데이터셋 빌더 (Supabase 실데이터 + 합성 데이터)  
  ├── profiles/ \# 전문화별 Big5 추정 프로필 (합성 데이터의 중심값)  
  ├── ml/model.py \# PyTorch 모델 정의  
@@ -76,7 +77,16 @@ src
  ├── models/<game>/ \# 게임별 학습 체크포인트(model.pth)  
  └── create-tables.sql \# Supabase 테이블 생성 DDL
 
-## **🧠 모델 및 학습**
+## **🧠 추천 방식**
+
+- **데이터**: `src/lib/data.ts`의 각 전문화에 `big5`(E/A/C/N/O 목표값 0~100)와 `signature`(가중치 2배 특성 1~2개)가 있습니다. 같은 게임 안에서 프로필이 같은 전문화가 없도록 테스트(`src/lib/recommend.test.ts`)가 거리 10 이상을 강제합니다. 새 직업을 추가할 때는 두 필드가 필수라 빠지면 타입 검사가 실패합니다.
+- **점수**: 설문 원점수는 매칭 전에 응답자 모집단 기준(`src/lib/recommend.ts`의 `POPULATION_BASELINE`, 2026-10-11 내보내기 2,310명의 평균·표준편차)으로 정규화해 "게이머 평균 50, 표준편차 25" 척도로 바꿉니다. `data.ts`의 `big5` 값은 이 정규화된 척도 위의 값입니다. 그 다음 역할 적합도(A·E·N으로 역할 원형과의 거리)와 전문화 적합도(시그니처 가중 거리)를 35:65로 섞습니다. 상수는 `src/lib/recommend.ts` 상단에 있습니다.
+- **검증**: 게임별 성향 유형(힐러형, 탱커형, 도박 외향 딜러 등)에 대한 골든 테스트가 상위 3개의 역할과 전문화를 고정합니다.
+- **실데이터 보정**: Supabase SQL Editor에서 `select app, class, specialization, answers from survey_results;` 결과를 CSV 또는 JSON으로 내보낸 뒤 `node src/scripts/profile-calibration.js survey_results.csv` 를 실행하면, 응답자 모집단의 평균·표준편차(`POPULATION_BASELINE` 갱신용), 실데이터 평균(정규화 척도)이 프로필과 크게 다른 전문화, 서로 가까운 전문화 쌍(실데이터에서 갈리는 특성 포함)을 출력합니다. 이 리포트를 보고 값을 조정하고 테스트로 확인합니다.
+
+### 학습 스크립트 (향후 실데이터 모델 학습용, 현재 앱은 사용하지 않음)
+
+실제 설문 데이터로는 전문화별 Big5 평균이 거의 구분되지 않아(전문화 내 표준편차 15~20, 전문화 평균 간 편차 3) 지금은 규칙 기반 추천을 씁니다. 아래 도구는 데이터가 충분히 쌓였을 때 모델을 다시 학습하기 위해 남겨 둔 것입니다.
 
 - **모델**: 5가지 성격 특성(A, C, E, N, O)을 입력받아 게임별 직업-전문화 조합(WoW 40, 로스트아크 30, 던전앤파이터 71) 중 하나로 분류하는 다중 분류(Multi-class Classification) 모델입니다. 게임마다 모델을 따로 학습합니다.
 - **학습 데이터**: `npm run dataset -- --env .env.local` 이 Supabase `survey_results`의 실데이터를 받아 `src/scripts/data/<game>.csv`를 만듭니다.
@@ -87,9 +97,8 @@ src
   - `venv/Scripts/python.exe ml/train.py --csv data/wow.csv --model models/wow/model.pth --log-dir runs/wow`
   - 체크포인트의 라벨 집합이 CSV와 다르면(직업 추가/삭제) 자동으로 처음부터 학습합니다. 검증 정확도가 가장 높았던 가중치만 저장됩니다.
   - 학습 과정은 TensorBoard로 볼 수 있습니다. (`venv/Scripts/tensorboard.exe --logdir=runs`)
-- **추론**:
-  - `venv/Scripts/python.exe ml/export_onnx.py --model models/wow/model.pth --onnx ../../public/models/wow/model.onnx` 가 `model.onnx`와 출력 인덱스 → 라벨 매핑 `labels.json`을 함께 씁니다. 두 파일은 항상 같이 갱신해야 하며, `src/lib/onnx.test.ts`가 `data.ts`의 라벨 집합과 `labels.json`이 일치하는지 검사합니다.
-  - 클라이언트 측에서는 onnxruntime-web 라이브러리를 사용해 변환된 모델을 로드하고, 사용자의 성격 분석 결과를 입력하여 실시간으로 직업을 추천받습니다.
+- **내보내기**:
+  - `venv/Scripts/python.exe ml/export_onnx.py --model models/wow/model.pth --onnx <출력 경로>/model.onnx` 가 `model.onnx`와 출력 인덱스 → 라벨 매핑 `labels.json`을 함께 씁니다. 두 파일은 항상 같이 갱신해야 합니다. 브라우저 추론 경로(`src/lib/onnx.ts`, `public/models/`, `onnxruntime-web`)는 규칙 기반 추천으로 바뀌면서 제거됐으므로, 모델을 다시 쓰려면 추론 경로를 새로 붙여야 합니다.
 
 ## **📝 개발 로드맵**
 

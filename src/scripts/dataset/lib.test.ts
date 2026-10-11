@@ -1,4 +1,4 @@
-import type { GameClass } from '@/lib/types'
+import type { GameClass, GameSpec } from '@/lib/types'
 import {
   blendMean,
   contrastFactors,
@@ -14,6 +14,12 @@ import {
   type Profiles,
 } from './lib'
 
+// 데이터셋 빌더는 추천용 프로필(big5/signature)을 쓰지 않지만 GameSpec의 필수 필드라 중립값을 채운다.
+const neutralProfile: Pick<GameSpec, 'big5' | 'signature'> = {
+  big5: { E: 50, A: 50, C: 50, N: 50, O: 50 },
+  signature: ['E'],
+}
+
 const classes: Record<'wow' | 'lostark' | 'dnf', GameClass[]> = {
   wow: [
     {
@@ -22,8 +28,8 @@ const classes: Record<'wow' | 'lostark' | 'dnf', GameClass[]> = {
       image: '',
       color: '',
       specs: [
-        { name: 'Arms', nameKr: '무기', role: 'dealer', description: '' },
-        { name: 'Protection', nameKr: '방어', role: 'tanker', description: '' },
+        { name: 'Arms', nameKr: '무기', role: 'dealer', description: '', ...neutralProfile },
+        { name: 'Protection', nameKr: '방어', role: 'tanker', description: '', ...neutralProfile },
       ],
     },
   ],
@@ -33,7 +39,7 @@ const classes: Record<'wow' | 'lostark' | 'dnf', GameClass[]> = {
       nameKr: '마법사 (여)',
       image: '',
       color: '',
-      specs: [{ name: 'Bard', nameKr: '바드', role: 'supporter', description: '' }],
+      specs: [{ name: 'Bard', nameKr: '바드', role: 'supporter', description: '', ...neutralProfile }],
     },
   ],
   dnf: [],
@@ -163,6 +169,7 @@ describe('planSynthetic', () => {
           nameKr: n,
           role: 'dealer' as const,
           description: '',
+          ...neutralProfile,
         })),
       },
     ]

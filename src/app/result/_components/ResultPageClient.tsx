@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
 import { games, traitInfo } from '@/lib/data'
-import { predict } from '@/lib/onnx'
-import type { TestData, PersonalityScores } from '@/lib/types'
+import { recommend } from '@/lib/recommend'
+import type { TestData, PersonalityScores, Recommendation } from '@/lib/types'
 import { SEPERATE_TOKEN, zipData, unzipData, hashString } from '@/lib/utils'
 import { AdpickBanner } from '@/components/atoms/AdpickBanner'
 import { Footer } from '@/components/atoms/Footer'
@@ -32,18 +32,20 @@ function ResultContent() {
   const game = searchParams.get('game') || ''
 
   const savedResults = useRef(new Set<string>())
-  const [retry, setRetry] = useState(0)
   const [invalid, setInvalid] = useState(false)
   const [testData, setTestData] = useState<TestData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [recommendations, setRecommendations] = useState<
-    {
-      label: string
-      score: number
-    }[]
-  >([])
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false)
-  const [recommendationError, setRecommendationError] = useState<string>('')
+  // 추천은 동기 순수 함수라 상태가 아니라 파생값으로 둔다. game과 testData가 같은 렌더에서 짝을 이루고,
+  // 설문 원점수는 recommend 안에서 모집단 기준으로 정규화된다. 계산이 실패해도 페이지 나머지는 그대로 보여 준다.
+  const recommendations = useMemo<Recommendation[]>(() => {
+    if (!testData) return []
+    try {
+      return recommend(game, testData.personalityScores)
+    } catch (error) {
+      console.error('Failed to compute recommendations:', error)
+      return []
+    }
+  }, [game, testData])
 
   useEffect(() => {
     const dataParam = searchParams.get('data')
@@ -56,24 +58,6 @@ function ResultContent() {
       return
     }
     setInvalid(false)
-    let cancelled = false
-
-    const fetchRecommendations = async (personalityScores: PersonalityScores) => {
-      setRecommendations([])
-      setIsLoadingRecommendations(true)
-      setRecommendationError('')
-      try {
-        const data = await predict(game, personalityScores)
-        if (!cancelled) setRecommendations(data.top_5_recommendations || [])
-      } catch (error) {
-        console.error('Failed to get recommendations locally:', error)
-        const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
-        if (!cancelled) setRecommendationError(errorMessage)
-        if (!cancelled) toast.error('추천을 불러오지 못했어요. 다시 시도해주세요.')
-      } finally {
-        if (!cancelled) setIsLoadingRecommendations(false)
-      }
-    }
 
     try {
       const parsedData: TestData = unzipData(dataParam)
@@ -95,7 +79,7 @@ function ResultContent() {
 
       // 같은 결과(data 파라미터)는 브라우저 세션당 한 번만 저장한다.
       // savedResults 는 한 마운트 안에서의 effect 재실행을, sessionStorage 는 새로고침·재방문을 막는다.
-      // 저장에 실패하면 둘 다 지워 다음 시도(재시도 버튼, 새로고침)에서 다시 보낼 수 있게 한다.
+      // 저장에 실패하면 둘 다 지워 다음 시도(새로고침)에서 다시 보낼 수 있게 한다.
       const saveKey = `saved:${game}:${hashString(dataParam)}`
       const readSavedFlag = () => {
         try {
@@ -151,18 +135,12 @@ function ResultContent() {
       }
 
       setIsLoading(false)
-
-      // Fetch AI recommendations
-      fetchRecommendations(parsedData.personalityScores)
     } catch (error) {
       console.error('Failed to parse test data:', error)
       toast.error('테스트 데이터를 불러오는 데 실패했습니다.')
       setInvalid(true)
     }
-    return () => {
-      cancelled = true
-    }
-  }, [searchParams, router, game, retry])
+  }, [searchParams, router, game])
 
   useEffect(() => {
     const scores = testData?.personalityScores
@@ -334,14 +312,8 @@ function ResultContent() {
             </Button>
           </section>
         )}
-        {/* AI 추천 결과 섹션 */}
-        <RecommendationSection
-          game={game}
-          recommendations={recommendations}
-          isLoading={isLoadingRecommendations}
-          error={recommendationError}
-          onRetry={() => setRetry((n) => n + 1)}
-        />
+        {/* 성향 기반 추천 결과 섹션 */}
+        <RecommendationSection game={game} recommendations={recommendations} />
 
         <ShareResult game={game} scores={testData.personalityScores} recommendation={recommendations[0]?.label} />
         <section className="rounded-2xl border bg-card p-6">

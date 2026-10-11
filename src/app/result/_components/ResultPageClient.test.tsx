@@ -1,3 +1,4 @@
+import type { ImgHTMLAttributes } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import { zipData, SEPERATE_TOKEN } from '@/lib/utils'
 import type { TestData } from '@/lib/types'
@@ -12,8 +13,15 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => searchParams,
 }))
 
-jest.mock('@/lib/onnx', () => ({
-  predict: jest.fn().mockResolvedValue({ top_5_recommendations: [] }),
+// 추천은 동기 순수 함수(src/lib/recommend)라 모킹하지 않는다. next/image 는 jsdom 에서 일반 img 로 바꾼다.
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => {
+    const { unoptimized, ...rest } = props
+    void unoptimized
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img {...(rest as ImgHTMLAttributes<HTMLImageElement>)} />
+  },
 }))
 
 jest.mock('chart.js', () => ({
@@ -113,4 +121,17 @@ describe('ResultPageClient result saving', () => {
     await screen.findAllByText('성격 분석 결과')
     expect(mockFetch).not.toHaveBeenCalled()
   })
+})
+
+describe('ResultPageClient recommendations', () => {
+  it.each(['WoW', 'LostArk', 'DNF'])(
+    'renders three rule-based recommendations with a fit score for %s',
+    async (game) => {
+      renderResult({ ...existingUser, userType: 'new' }, game)
+
+      await screen.findByRole('heading', { name: '이번 모험의 주인공은?' })
+      expect(screen.getAllByText(/^[0-9]+%$/)).toHaveLength(3)
+      expect(screen.getByText('01 / 가장 먼저 만나볼 직업')).toBeInTheDocument()
+    },
+  )
 })
