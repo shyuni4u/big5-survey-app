@@ -147,7 +147,7 @@ export default function Home() {
                     </CardHeader>
                     <CardContent className="space-y-4 text-center">
                       <p className="text-sm text-muted-foreground">
-                        처음 시작하시거나 새로운 직업을 찾고 계신가요? AI가 당신의 성격을 분석해서 가장 적합한 직업을
+                        처음 시작하시거나 새로운 직업을 찾고 계신가요? 성격 성향을 분석해서 가장 적합한 직업을
                         추천해드립니다.
                       </p>
                       <Button className="pointer-events-none bg-green-600 text-white hover:bg-green-700">

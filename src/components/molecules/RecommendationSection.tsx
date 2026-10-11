@@ -6,18 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getGameClasses } from '@/lib/data'
 import { cn } from '@/lib/utils'
-import { Trophy, Medal, Award, AlertTriangle } from 'lucide-react'
-
-interface Recommendation {
-  label: string
-  score: number
-}
+import { Trophy, Medal, Award } from 'lucide-react'
+import type { Recommendation } from '@/lib/types'
 
 interface RecommendationSectionProps {
   game: string
   recommendations: Recommendation[]
-  isLoading: boolean
-  error?: string
 }
 
 export const SpriteIcon = ({
@@ -49,11 +43,11 @@ export const SpriteIcon = ({
   </div>
 )
 
-export default function RecommendationSection({ game, recommendations, isLoading, error }: RecommendationSectionProps) {
+export default function RecommendationSection({ game, recommendations }: RecommendationSectionProps) {
   const [visibleCards, setVisibleCards] = useState<number>(0)
 
   useEffect(() => {
-    if (recommendations.length > 0 && !isLoading) {
+    if (recommendations.length > 0) {
       const timer = setInterval(() => {
         setVisibleCards((prev) => {
           if (prev < 3) {
@@ -67,7 +61,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
 
       return () => clearInterval(timer)
     }
-  }, [recommendations, isLoading])
+  }, [recommendations])
 
   const getClassAndSpec = (label: string) => {
     const [className, specName] = label.split('_')
@@ -165,39 +159,6 @@ export default function RecommendationSection({ game, recommendations, isLoading
     }
   }
 
-  if (error) {
-    return (
-      <Card className="border-border bg-card">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20">
-            <AlertTriangle className="h-8 w-8 text-destructive" />
-          </div>
-          <CardTitle className="text-2xl text-foreground">AI 추천 오류</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-center">
-          <p className="text-muted-foreground">AI 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.</p>
-          <p className="text-sm text-muted-foreground">오류: {error}</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <Card className="border-border bg-card">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl text-foreground">AI 직업 추천 분석 중...</CardTitle>
-        </CardHeader>
-        <CardContent className="flex justify-center py-12">
-          <div className="flex items-center gap-4">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            <p className="text-muted-foreground">당신에게 완벽한 직업을 찾고 있습니다...</p>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   if (recommendations.length === 0) {
     return null
   }
@@ -250,9 +211,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
 
                 {/* 점수 표시 - 카드 외부에 배치 */}
                 <div className="mb-4 text-center">
-                  <div className={cn('font-bold text-foreground', scale.scoreSize)}>
-                    {Math.round(item.data.score * 100)}%
-                  </div>
+                  <div className={cn('font-bold text-foreground', scale.scoreSize)}>{item.data.score}%</div>
                   <div className="text-sm text-muted-foreground">적합도</div>
                 </div>
 
@@ -293,6 +252,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
                       {spec.role === 'supporter' && '✨ 서포터'}
                       {spec.role === 'buffer' && '✨ 버퍼'}
                     </p>
+                    <p className="mb-2 text-xs font-medium text-primary">{item.data.reason}</p>
                     <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
                   </CardContent>
                 </Card>
@@ -362,7 +322,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
                         <div className="flex items-start justify-between">
                           <h3 className="truncate text-lg font-bold text-foreground">{gameClass.nameKr}</h3>
                           <div className="text-right">
-                            <div className="text-xl font-bold text-foreground">{Math.round(item.score * 100)}%</div>
+                            <div className="text-xl font-bold text-foreground">{item.score}%</div>
                             <div className="text-xs text-muted-foreground">적합도</div>
                           </div>
                         </div>
@@ -374,6 +334,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
                           {spec.role === 'supporter' && '✨ 서포터'}
                           {spec.role === 'buffer' && '✨ 버퍼'}
                         </p>
+                        <p className="mb-2 text-xs font-medium text-primary">{item.reason}</p>
                         <p className="text-xs leading-relaxed text-muted-foreground">{spec.description}</p>
                       </div>
                     </div>
@@ -390,7 +351,7 @@ export default function RecommendationSection({ game, recommendations, isLoading
             <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 px-4 py-3 md:px-6">
               <span className="text-xl md:text-2xl">🎉</span>
               <p className="text-sm font-semibold text-foreground md:text-base">
-                축하합니다! AI가 분석한 당신만의 완벽한 직업을 찾았습니다
+                축하합니다! 당신의 성향에 꼭 맞는 직업을 찾았습니다
               </p>
               <span className="text-xl md:text-2xl">🎉</span>
             </div>

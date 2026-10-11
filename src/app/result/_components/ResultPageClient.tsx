@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Chart, registerables } from 'chart.js'
 import Link from 'next/link'
 import { games, traitInfo } from '@/lib/data'
-import { predict } from '@/lib/onnx'
-import type { TestData, PersonalityScores } from '@/lib/types'
+import { recommend } from '@/lib/recommend'
+import type { TestData, Recommendation } from '@/lib/types'
 import { SEPERATE_TOKEN, zipData, unzipData } from '@/lib/utils'
 import { KakaoAdFit } from '@/components/atoms/KakaoAdFit'
 import { Footer } from '@/components/atoms/Footer'
@@ -32,14 +32,7 @@ function ResultContent() {
 
   const [testData, setTestData] = useState<TestData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [recommendations, setRecommendations] = useState<
-    {
-      label: string
-      score: number
-    }[]
-  >([])
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false)
-  const [recommendationError, setRecommendationError] = useState<string>('')
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
 
   useEffect(() => {
     const dataParam = searchParams.get('data')
@@ -50,20 +43,6 @@ function ResultContent() {
     if (!dataParam) {
       router.push('/')
       return
-    }
-
-    const fetchRecommendations = async (personalityScores: PersonalityScores) => {
-      setIsLoadingRecommendations(true)
-      setRecommendationError('')
-      try {
-        const data = await predict(game, personalityScores)
-        setRecommendations(data.top_5_recommendations || [])
-      } catch (error) {
-        console.error('Failed to get recommendations locally:', error)
-        setRecommendationError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.')
-      } finally {
-        setIsLoadingRecommendations(false)
-      }
     }
 
     try {
@@ -100,10 +79,8 @@ function ResultContent() {
 
       if (parsedData.userType === 'existing') saveResult()
 
+      setRecommendations(recommend(game, parsedData.personalityScores))
       setIsLoading(false)
-
-      // Fetch AI recommendations
-      fetchRecommendations(parsedData.personalityScores)
     } catch (error) {
       console.error('Failed to parse test data:', error)
       router.push('/')
@@ -247,13 +224,8 @@ function ResultContent() {
       </header>
 
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-8">
-        {/* AI 추천 결과 섹션 */}
-        <RecommendationSection
-          game={game}
-          recommendations={recommendations}
-          isLoading={isLoadingRecommendations}
-          error={recommendationError}
-        />
+        {/* 성향 기반 추천 결과 섹션 */}
+        <RecommendationSection game={game} recommendations={recommendations} />
 
         <KakaoAdFit width={300} height={250} />
 
