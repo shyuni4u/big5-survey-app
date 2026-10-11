@@ -1,51 +1,25 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
 import { traitInfo, resultInterpretations } from '@/lib/data'
-import { cn } from '@/lib/utils'
-
-interface ResultCardProps {
-  trait: keyof typeof traitInfo
-  score: number
-}
-
-export default function ResultCard({ trait, score }: ResultCardProps) {
-  const interpretation = score >= 50 ? resultInterpretations[trait].high : resultInterpretations[trait].low
-
-  const getScoreColorClass = (score: number) => {
-    if (score >= 80) return 'text-red-400'
-    if (score >= 60) return 'text-cyan-400'
-    if (score >= 40) return 'text-blue-400'
-    if (score >= 20) return 'text-green-400'
-    return 'text-gray-400'
-  }
-
-  const getProgressColorClass = (score: number) => {
-    if (score >= 80) return '[&>div]:bg-red-400'
-    if (score >= 60) return '[&>div]:bg-cyan-400'
-    if (score >= 40) return '[&>div]:bg-blue-400'
-    if (score >= 20) return '[&>div]:bg-green-400'
-    return '[&>div]:bg-gray-400'
-  }
-
+export default function ResultCard({ trait, score }: { trait: string; score: number }) {
+  const color: Record<string, string> = { E: '#7dd3fc', A: '#6ee7b7', C: '#c4b5fd', N: '#fcd34d', O: '#f9a8d4' }
   return (
-    <Card className="border-border bg-card transition-all duration-300 hover:scale-105 hover:border-primary/50">
-      <CardHeader className="items-center pb-4 text-center">
-        <div className="mb-2 text-3xl">{traitInfo[trait].icon}</div>
-        <CardTitle className="text-lg text-foreground">{traitInfo[trait].name}</CardTitle>
-        <CardDescription className="text-center text-sm text-muted-foreground">
-          {traitInfo[trait].description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="mb-4">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">점수</span>
-            <span className={cn('text-xl font-bold', getScoreColorClass(score))}>{score}%</span>
-          </div>
-          <Progress value={score} className={cn('h-2 bg-muted', getProgressColorClass(score))} />
-        </div>
-        <p className="text-sm leading-relaxed text-muted-foreground">{interpretation}</p>
-      </CardContent>
-    </Card>
+    <article className="rounded-2xl border bg-card p-5">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold">{traitInfo[trait].name}</h3>
+        <span style={{ color: color[trait] }} className="text-lg font-bold">
+          {score}
+          <span className="ml-1 text-xs font-normal text-muted-foreground">/ 100</span>
+        </span>
+      </div>
+      <div className="my-4 h-1.5 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
+        <div className="h-full rounded-full" style={{ width: `${score}%`, backgroundColor: color[trait] }} />
+      </div>
+      <p className="text-sm leading-6 text-muted-foreground">
+        {score >= 40 && score <= 60
+          ? '두 성향 사이에서 상황에 따라 유연하게 반응하는 편입니다.'
+          : score > 60
+            ? resultInterpretations[trait].high
+            : resultInterpretations[trait].low}
+      </p>
+    </article>
   )
 }
