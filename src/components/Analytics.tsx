@@ -5,11 +5,11 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { captureShareSource, track } from '@/lib/analytics'
 import { safeAnalyticsUrl } from '@/lib/sharing'
 
-export default function Analytics({ gaId }: { gaId?: string }) {
+export default function Analytics({ gaId, tagId = gaId }: { gaId?: string; tagId?: string }) {
   const path = usePathname()
   const search = useSearchParams().toString()
   const previous = useRef('')
-  const valid = !!gaId && /^G-[A-Z0-9]+$/.test(gaId)
+  const valid = !!gaId && /^G-[A-Z0-9]+$/.test(gaId) && !!tagId && /^(G|GT)-[A-Z0-9]+$/.test(tagId)
   useEffect(() => {
     if (!valid || !gaId) return
     if (!window.personaGaId) {
@@ -21,7 +21,9 @@ export default function Analytics({ gaId }: { gaId?: string }) {
       }
       window.personaGaId = gaId
       window.gtag('js', new Date())
-      window.gtag('config', gaId, {
+      // A stream's destination ID can differ from its connected Google tag ID.
+      // Initialize the installation tag; route events to the intended stream below.
+      window.gtag('config', tagId, {
         send_page_view: false,
         page_location: safeAnalyticsUrl(window.location.href),
         page_referrer: document.referrer ? safeAnalyticsUrl(document.referrer) : '',
@@ -33,8 +35,8 @@ export default function Analytics({ gaId }: { gaId?: string }) {
     const source = captureShareSource(search)
     track('page_view', { page_title: document.title })
     if (source) track('share_landing', { method: source, landing_page: path })
-  }, [gaId, valid, path, search])
+  }, [gaId, tagId, valid, path, search])
   return valid ? (
-    <Script id="persona-ga" src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
+    <Script id="persona-ga" src={`https://www.googletagmanager.com/gtag/js?id=${tagId}`} strategy="afterInteractive" />
   ) : null
 }
