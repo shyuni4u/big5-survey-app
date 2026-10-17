@@ -7,7 +7,7 @@ jest.mock('next/navigation', () => ({
 }))
 jest.mock('next/script', () => ({
   __esModule: true,
-  default: ({ src }: { src: string }) => <script async src={src} />,
+  default: ({ src }: { src: string }) => <span data-testid="ga-script" data-src={src} />,
 }))
 
 afterEach(() => {
@@ -19,7 +19,7 @@ afterEach(() => {
 
 it('loads the connected tag but routes events to the GA4 stream', () => {
   const { container, rerender } = render(<Analytics gaId="G-DESTINATION" tagId="GT-INSTALLATION" />)
-  expect(container.querySelector('script')?.src).toBe('https://www.googletagmanager.com/gtag/js?id=GT-INSTALLATION')
+  expect(container.querySelector('[data-testid=ga-script]')?.getAttribute('data-src')).toBe('https://www.googletagmanager.com/gtag/js?id=GT-INSTALLATION')
   const commands = () => window.dataLayer!.map(command => Array.from(command as ArrayLike<unknown>))
   expect(commands()).toContainEqual(['config', 'GT-INSTALLATION', expect.objectContaining({ send_page_view: false })])
   expect(commands()).toContainEqual(['event', 'page_view', expect.objectContaining({ send_to: 'G-DESTINATION' })])
@@ -29,11 +29,12 @@ it('loads the connected tag but routes events to the GA4 stream', () => {
 
 it('keeps the measurement ID fallback for ordinary streams', () => {
   const { container } = render(<Analytics gaId="G-EXAMPLE" />)
-  expect(container.querySelector('script')?.src).toContain('id=G-EXAMPLE')
+  expect(container.querySelector('[data-testid=ga-script]')?.getAttribute('data-src')).toContain('id=G-EXAMPLE')
 })
 
 it('does not initialize an invalid installation tag', () => {
   const { container } = render(<Analytics gaId="G-EXAMPLE" tagId="invalid" />)
-  expect(container.querySelector('script')).toBeNull()
+  expect(container.querySelector('[data-testid=ga-script]')).toBeNull()
   expect(window.dataLayer).toBeUndefined()
 })
+
