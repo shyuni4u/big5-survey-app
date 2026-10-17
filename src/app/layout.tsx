@@ -14,7 +14,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="ko" suppressHydrationWarning className={cn(pretendard.variable, 'scroll-smooth font-sans')}>
       <body>
         <Suspense fallback={null}>
-          <Analytics gaId={gaId} />
+          <Analytics gaId={gaId} tagId={process.env.NEXT_PUBLIC_GOOGLE_TAG_ID || gaId} />
         </Suspense>
         <ThemeProvider attribute="class" forcedTheme="dark">
           <ErrorBoundary>{children}</ErrorBoundary>

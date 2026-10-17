@@ -33,6 +33,7 @@ export function track(name: string, params: Record<string, string | number> = {}
   if (typeof window === 'undefined' || !window.personaGaId) return
   window.gtag?.('event', name, {
     ...params,
+    send_to: window.personaGaId,
     acquisition_source: shareSource(),
     page_location: safeAnalyticsUrl(window.location.href),
     page_referrer: document.referrer ? safeAnalyticsUrl(document.referrer) : '',
